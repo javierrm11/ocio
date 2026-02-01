@@ -1,36 +1,34 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/server'
+import { getUserId } from "@/lib/auth/get-user";
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
-// POST /api/profiles
-export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { user } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
+export async function GET(request: Request) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
+  const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+  let query = supabase.from("profiles").select("*");
 
-  const { username, full_name } = await request.json()
+  const filterableFields = [
+    "username",
+    "name",
+    "avatar_path",
+    "description",
+  ];
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .upsert({
-      id: user.id,
-      username,
-      full_name,
-    })
-    .select()
-    .single()
+  filterableFields.forEach((field) => {
+    const value = searchParams.get(field);
+    if (value) {
+      query = query.ilike(field, `%${value}%`);
+    }
+  });
 
+  const { data, error } = await query;
   if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    )
+    console.error("Error fetching profiles:", error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
-
-  return NextResponse.json(data)
+  return NextResponse.json(data);
 }

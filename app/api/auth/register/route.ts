@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { username, email, password, role, name, avatar_path, description } = await request.json();
+  const { username, email, password, role, name, avatar_path, description, type } = await request.json();
   // añadir a tabla profiles
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { username, name, role, avatar_path, description },
+      data: { username, name, role, avatar_path, description, type},
     }
   })
     if (error) {

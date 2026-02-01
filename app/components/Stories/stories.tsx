@@ -73,14 +73,14 @@ function Stories() {
                 <div className="w-full h-full rounded-full bg-gray-900 p-0.5">
                   <img
                     src={story.media_path}
-                    alt={`Story ${story.venue_id}`}
+                    alt={`Story ${story.venues.name}`}
                     className="w-full h-full rounded-full object-cover"
                   />
                 </div>
               </div>
             </div>
             <span className="text-xs text-white truncate max-w-[64px]">
-              {story.venue_id}
+              {story.venues.name}
             </span>
           </div>
         ))}
@@ -120,7 +120,7 @@ function Stories() {
                 />
               </div>
               <span className="text-white font-semibold text-sm">
-                {selectedStory.venue_id}
+                {selectedStory.venues.name}
               </span>
               <span className="text-gray-400 text-xs">
                 {new Date(selectedStory.created_at).toLocaleTimeString()}
@@ -168,20 +168,7 @@ function Stories() {
           </div>
 
           {/* Story Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-            <div className="flex items-center gap-2 bg-gray-800 bg-opacity-50 rounded-full px-4 py-2">
-              <input
-                type="text"
-                placeholder="Enviar mensaje"
-                className="flex-1 bg-transparent text-white outline-none placeholder-gray-400"
-              />
-              <button className="text-white">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          
         </div>
       )}
 

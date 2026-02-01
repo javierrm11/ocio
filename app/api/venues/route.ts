@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
 
-  let query = supabase.from("venues").select("*");
+  let query = supabase.from("venues").select("*, events(*)");
 
   // Lista de campos por los que se puede filtrar
   const filterableFields = [

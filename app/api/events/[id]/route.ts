@@ -22,7 +22,7 @@ export async function PUT(
         description,
         starts_at,
         ends_at,
-        featured
+        featured,
     } = body;
     const { id } = await params;
 

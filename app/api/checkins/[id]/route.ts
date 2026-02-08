@@ -85,7 +85,8 @@ export async function DELETE(
     const { data: existing, error: checkError } = await supabase
         .from('check_ins')
         .select('*')
-        .eq('id', id)
+        .eq('venue_id', id)
+        .eq('profile_id', userId)
         .single();
     if (checkError || !existing) {
         return NextResponse.json(
@@ -97,7 +98,8 @@ export async function DELETE(
     const { data, error, status, statusText } = await supabase
         .from('check_ins')
         .delete()
-        .eq('id', id)
+        .eq('venue_id', id)
+        .eq('profile_id', userId)
         .select()
         .single();
     if (error) {

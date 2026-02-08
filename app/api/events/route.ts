@@ -52,19 +52,51 @@ export async function POST(request: Request) {
       { status: 401 }
     );
   }
+
   const supabase = await createClient();
-  const body = await request.json();
+  const formData = await request.formData();
 
-  const {
-    venue_id,
-    title,
-    description,
-    starts_at,
-    ends_at,
-    featured
-  } = body;
+  const venue_id = formData.get("venue_id") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const starts_at = formData.get("starts_at") as string;
+  const ends_at = formData.get("ends_at") as string;
+  const featured = formData.get("featured") === "true";
+  const imageFile = formData.get("image") as File | null;
 
+  let image_path = null;
 
+  // Si hay un archivo de imagen, subirlo a Supabase Storage
+  if (imageFile && imageFile.size > 0) {
+    const fileExt = imageFile.name.split('.').pop();
+    const fileName = `${title.replace(/\s+/g, '-')}-${Date.now()}.${fileExt}`;
+    const filePath = `events/${fileName}`;
+
+    // Subir archivo al bucket 'events'
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('events')
+      .upload(filePath, imageFile, {
+        contentType: imageFile.type,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error al subir imagen:', uploadError);
+      return NextResponse.json(
+        { error: 'Error al subir la imagen: ' + uploadError.message },
+        { status: 400 }
+      );
+    }
+
+    // Obtener URL pública de la imagen
+    const { data: { publicUrl } } = supabase.storage
+      .from('events')
+      .getPublicUrl(filePath);
+
+    image_path = publicUrl;
+  }
+
+  // Insertar evento en la base de datos
   const { data, error } = await supabase
     .from("events")
     .insert({
@@ -73,7 +105,8 @@ export async function POST(request: Request) {
       description,
       starts_at,
       ends_at,
-      featured
+      featured,
+      image_path
     })
     .select();
 

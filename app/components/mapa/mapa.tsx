@@ -1,6 +1,8 @@
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import { useEffect, useState } from 'react';
+import { getPublicImageUrl } from '@/lib/getImageUrl';
 import 'leaflet/dist/leaflet.css';
+import { on } from 'events';
 
 interface Venue {
   id: number;
@@ -9,10 +11,11 @@ interface Venue {
   name: string;
   ambience_level: 'low' | 'medium' | 'high';
   description?: string;
+  avatar_path?: string; // Path guardado en la BD
   distance?: string;
   genres?: string[];
   rating?: number;
-  image?: string;
+  check_ins?: number;
 }
 
 function MyMap() {
@@ -34,6 +37,38 @@ function MyMap() {
     setSelectedVenue(null);
   };
 
+  const onCheckIn = (venueId:any) => {    
+    // llamar a la API para hacer check-in
+    fetch(`http://localhost:3000/api/checkins`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ venue_id: venueId })
+    })
+    .then(res => res.json())
+    .then(data => { 
+      closeModal();
+    })
+    .catch(err => {
+      console.error('Error during check-in:', err);
+    });
+  };
+
+  const onCheckOut = (id:any) => {
+    // llamar a la API para quitar check-in
+    fetch(`http://localhost:3000/api/checkins/${id}`, {
+      method: 'DELETE',
+    })
+    .then(res => res.json())
+    .then(data => {
+      closeModal();
+    })
+    .catch(err => {
+      console.error('Error during check-out:', err);
+    });
+  };
+
   return (
     <>
       <MapContainer
@@ -53,16 +88,16 @@ function MyMap() {
             center={[venue.latitude, venue.longitude] as [number, number]}
             radius={8}
             color={
-              venue.ambience_level === 'low'
+              venue.check_ins.length === 0
                 ? '#10b981'
-                : venue.ambience_level === 'medium'
+                : venue.check_ins.length < 5
                 ? '#f59e0b'
                 : '#ef4444'
             }
             fillColor={
-              venue.ambience_level === 'low'
+              venue.check_ins.length === 0
                 ? '#6ee7b7'
-                : venue.ambience_level === 'medium'
+                : venue.check_ins.length < 5
                 ? '#fcd34d'
                 : '#fca5a5'
             }
@@ -91,24 +126,23 @@ function MyMap() {
       {/* Modal */}
       {selectedVenue && (
         <>
-          {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/30 bg-opacity-50 z-[989]"
+            className="fixed inset-0 bg-black/40 z-[989]"
             onClick={closeModal}
           />
           
-          {/* Modal Content */}
-          <div className="fixed bottom-0 left-0 right-0 z-[1002] animate-slide-up">
+          <div 
+          className="fixed bottom-0 left-0 right-0 z-[1002] animate-slide-up"
+          onClick={(e) => e.stopPropagation()}
+        >
             <div className="bg-gray-900 rounded-t-3xl max-w-2xl mx-auto">
-              {/* Venue Image */}
               <div className="relative h-64 rounded-t-3xl overflow-hidden">
                 <img
-                  src={selectedVenue.image || 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800'}
+                  src={selectedVenue.avatar_path}
                   alt={selectedVenue.name}
                   className="w-full h-full object-cover"
                 />
                 
-                {/* Close Button */}
                 <button
                   onClick={closeModal}
                   className="absolute top-4 right-4 bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition"
@@ -118,60 +152,51 @@ function MyMap() {
                   </svg>
                 </button>
 
-                <div className={`absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full ${
-                  selectedVenue.ambience_level === 'low' ? 'bg-green-500' :
-                  selectedVenue.ambience_level === 'medium' ? 'bg-yellow-500' :
-                  'bg-red-500'
-                }`}>
-                  {selectedVenue.ambience_level === 'low' ? 'Low Ambience'
-                   : selectedVenue.ambience_level === 'medium' ? 'Medium Ambience'
-                   : 'High Ambience'}
+                <div className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full" style={{
+                  backgroundColor:
+                    selectedVenue.check_ins.length === 0 ? '#10b981' :
+                    selectedVenue.check_ins.length < 5 ? '#f59e0b' :
+                    '#ef4444'
+                }}>
+                  {
+                    selectedVenue.check_ins.length === 0 ? 'Low Ambience' :
+                    selectedVenue.check_ins.length < 5 ? 'Medium Ambience' :
+                    'High Ambience'
+                  }
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-6">
-                {/* Venue Name */}
                 <h2 className="text-white text-2xl font-bold mb-2">
                   {selectedVenue.name}
                 </h2>
 
-                {/* Distance */}
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                   <span>{selectedVenue.distance || '940m away'}</span>
                 </div>
 
-                {/* Description */}
-                {selectedVenue.description && (
-                  <p className="text-gray-400 text-sm mt-4">
-                    {selectedVenue?.description}
-                  </p>
-                )}
-
-                {/* events */}
-                {selectedVenue.events && selectedVenue.events.length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-white text-lg font-semibold mb-2">Events</h3>
-                    <section className="space-y-3">
-                      {selectedVenue.events.map((event: any) => (
-                        <div key={event.id} className="bg-gray-800 p-4 rounded-lg">
-                          <h4 className="text-white font-bold text-md">{event.title}</h4>
-                          <p className="text-gray-400 text-sm">{event.description}</p>
-                          <p className="text-gray-400 text-sm mt-2">
-                            {new Date(event.starts_at).toLocaleString()} - {new Date(event.ends_at).toLocaleString()}
-                          </p>
-                        </div>
-                      ))}
-                    </section>
-                  </div>
-                )}
-
-
-                {/* address*/}
-                {selectedVenue.address && (
-                  <p className="text-gray-400 text-sm mt-4">
-                    Address: {selectedVenue.address}
-                  </p>
+                {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
+                  <button 
+                  type="button"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  onClick={() => onCheckOut(selectedVenue.id)}
+                  >
+                  Quitar check-in
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  </button>
+                ) : (
+                  <button 
+                  type="button"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  onClick={() => onCheckIn(selectedVenue.id)}
+                  >
+                  Hacer check-in
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  </button>
                 )}
               </div>
             </div>
@@ -200,11 +225,6 @@ function MyMap() {
 
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
-        }
-
-        /* Prevent body scroll when modal is open */
-        body:has(.fixed.bottom-0) {
-          overflow: hidden;
         }
       `}</style>
     </>

@@ -3,7 +3,7 @@ import Stories from '@/components/Stories/stories';
 
 function Header() {
   return (
-    <header className="w-full bg-gradient-to-b from-gray-900 to-transparent text-white absolute top-0 left-0 z-991">
+    <header className="w-full bg-gradient-to-b from-gray-900 to-transparent text-white z-991">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         
         {/* Left: Logo + Title */}
@@ -30,7 +30,6 @@ function Header() {
         </div>
 
       </div>
-      <Stories />
     </header>
   );
 }

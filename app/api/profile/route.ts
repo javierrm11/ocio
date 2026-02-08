@@ -1,17 +1,29 @@
-import { getUserId } from "@/lib/auth/get-user";
+import { getUser, getUserId } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const userId = await getUserId();
-  if (!userId) {
+  const user = await getUser();
+  
+  if (!user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
   const supabase = await createClient();
+  if(user.user_metadata.type == "venue"){
+    const { data, error } = await supabase
+    .from("venues")
+    .select("*, events(*), check_ins(*)")
+    .eq("id", user.id);
+    if (error) {
+      console.error("Error fetching venue profile:", error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    return NextResponse.json(data);
+  }
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", userId);
+    .eq("id", user.id);
 
   if (error) {
     console.error("Error fetching profile:", error);

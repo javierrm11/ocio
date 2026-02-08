@@ -20,31 +20,39 @@ function Stories() {
     fetch('http://localhost:3000/api/stories')
       .then(res => res.json())
       .then(data => {
-        console.log('Stories fetched:', data);
         if (Array.isArray(data)) {
           setStories(data);
         }
       })
       .catch(err => console.error(err));
   }, []);
+  const closeStory = () => {
+    setSelectedStory(null);
+  };
+  const nextStory = () => {
+      if (currentIndex < stories.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setSelectedStory(stories[currentIndex + 1]);
+      } else {
+        closeStory();
+      }
+    };
+  // Timer para imágenes
+  useEffect(() => {
+    if (selectedStory) {
+      const timer = setTimeout(() => {
+        nextStory();
+      }, 15000); // 15 segundos
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedStory, currentIndex]);
 
   const openStory = (story: Story, index: number) => {
     setSelectedStory(story);
     setCurrentIndex(index);
   };
 
-  const closeStory = () => {
-    setSelectedStory(null);
-  };
-
-  const nextStory = () => {
-    if (currentIndex < stories.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setSelectedStory(stories[currentIndex + 1]);
-    } else {
-      closeStory();
-    }
-  };
 
   const prevStory = () => {
     if (currentIndex > 0) {
@@ -60,7 +68,7 @@ function Stories() {
   return (
     <>
       {/* Stories Bar */}
-      <div className="flex gap-4 p-4 overflow-x-auto">
+      <div className="flex gap-4 p-4 overflow-x-auto  z-990">
         {/* Stories List */}
         {stories.filter(story => !isExpired(story.expired_at)).map((story, index) => (
           <div
@@ -183,7 +191,7 @@ function Stories() {
         }
         
         .animate-progress {
-          animation: progress 5s linear forwards;
+          animation: progress 15s linear forwards;
         }
       `}</style>
     </>

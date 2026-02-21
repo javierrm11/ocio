@@ -1,6 +1,5 @@
 import { getUserId } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
-import { error } from "console";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -14,7 +13,6 @@ export async function GET() {
   const supabase = await createClient();
 
   const query = supabase.from("favorites").select("*").eq("user_id", userId);
-  
 
   const { data, error } = await query;
 

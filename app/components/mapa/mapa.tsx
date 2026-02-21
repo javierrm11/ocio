@@ -2,7 +2,6 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import { useEffect, useState } from 'react';
 import { getPublicImageUrl } from '@/lib/getImageUrl';
 import 'leaflet/dist/leaflet.css';
-import { on } from 'events';
 
 interface Venue {
   id: number;
@@ -11,23 +10,54 @@ interface Venue {
   name: string;
   ambience_level: 'low' | 'medium' | 'high';
   description?: string;
-  avatar_path?: string; // Path guardado en la BD
+  avatar_path?: string;
   distance?: string;
   genres?: string[];
   rating?: number;
-  check_ins?: number;
+  check_ins?: any[];
+  is_favorite?: boolean;
 }
 
 function MyMap() {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [userFavorites, setUserFavorites] = useState<number[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/venues')
-      .then(res => res.json())
-      .then(data => setVenues(data))
-      .catch(err => console.error(err));
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    try {
+      // Cargar venues
+      const venuesRes = await fetch('http://localhost:3000/api/venues');
+      const venuesData = await venuesRes.json();
+      
+      // Cargar favoritos del usuario
+      const favoritesRes = await fetch('http://localhost:3000/api/favorites', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const favoritesData = await favoritesRes.json();
+      
+      // Extraer IDs de venues favoritos
+      const favoriteIds = favoritesData.map((fav: any) => fav.venue_id);
+      setUserFavorites(favoriteIds);
+      
+      // Marcar venues como favoritos
+      const venuesWithFavorites = venuesData.map((venue: Venue) => ({
+        ...venue,
+        is_favorite: favoriteIds.includes(venue.id)
+      }));
+      
+      setVenues(venuesWithFavorites);
+    } catch (err) {
+      console.error('Error loading data:', err);
+    }
+  };
 
   const handleVenueClick = (venue: Venue) => {
     setSelectedVenue(venue);
@@ -37,17 +67,22 @@ function MyMap() {
     setSelectedVenue(null);
   };
 
-  const onCheckIn = (venueId:any) => {    
-    // llamar a la API para hacer check-in
+  const onCheckIn = (venueId: any) => {    
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
     fetch(`http://localhost:3000/api/checkins`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ venue_id: venueId })
     })
     .then(res => res.json())
     .then(data => { 
+      setVenues(venues.map(v => 
+        v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data] } : v
+      ));
       closeModal();
     })
     .catch(err => {
@@ -55,13 +90,20 @@ function MyMap() {
     });
   };
 
-  const onCheckOut = (id:any) => {
-    // llamar a la API para quitar check-in
-    fetch(`http://localhost:3000/api/checkins/${id}`, {
+  const onCheckOut = (venueId: any) => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    fetch(`http://localhost:3000/api/checkins/${venueId}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
     .then(res => res.json())
     .then(data => {
+      setVenues(venues.map(v => 
+        v.id === venueId ? { ...v, check_ins: [] } : v
+      ));
       closeModal();
     })
     .catch(err => {
@@ -69,23 +111,56 @@ function MyMap() {
     });
   };
 
-  const toggleFavorite = (venueId: number) => {
-    fetch(`http://localhost:3000/api/favorites`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ venue_id: venueId })
-    })
-    .then(res => res.json())
-    .then(data => {
-      setVenues(venues.map(venue =>
-        venue.id === venueId ? { ...venue, is_favorite: !venue.is_favorite } : venue
-      ));
-    })
-    .catch(err => {
-      console.error('Error toggling favorite:', err);
-    });
+  const toggleFavorite = (venueId: number, isFavorite: boolean) => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    if (isFavorite) {
+      // Quitar de favoritos - DELETE
+      fetch(`http://localhost:3000/api/favorites/${venueId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Actualizar estado local
+        setVenues(venues.map(venue =>
+          venue.id === venueId ? { ...venue, is_favorite: false } : venue
+        ));
+        if (selectedVenue?.id === venueId) {
+          setSelectedVenue({ ...selectedVenue, is_favorite: false });
+        }
+        setUserFavorites(userFavorites.filter(id => id !== venueId));
+      })
+      .catch(err => {
+        console.error('Error removing favorite:', err);
+      });
+    } else {
+      // Agregar a favoritos - POST
+      fetch(`http://localhost:3000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ venue_id: venueId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Actualizar estado local
+        setVenues(venues.map(venue =>
+          venue.id === venueId ? { ...venue, is_favorite: true } : venue
+        ));
+        if (selectedVenue?.id === venueId) {
+          setSelectedVenue({ ...selectedVenue, is_favorite: true });
+        }
+        setUserFavorites([...userFavorites, venueId]);
+      })
+      .catch(err => {
+        console.error('Error adding favorite:', err);
+      });
+    }
   };
 
   return (
@@ -107,16 +182,16 @@ function MyMap() {
             center={[venue.latitude, venue.longitude] as [number, number]}
             radius={8}
             color={
-              venue.check_ins.length === 0
+              venue.check_ins?.length === 0
                 ? '#10b981'
-                : venue.check_ins.length < 5
+                : (venue.check_ins?.length || 0) < 5
                 ? '#f59e0b'
                 : '#ef4444'
             }
             fillColor={
-              venue.check_ins.length === 0
+              venue.check_ins?.length === 0
                 ? '#6ee7b7'
-                : venue.check_ins.length < 5
+                : (venue.check_ins?.length || 0) < 5
                 ? '#fcd34d'
                 : '#fca5a5'
             }
@@ -151,9 +226,9 @@ function MyMap() {
           />
           
           <div 
-          className="fixed bottom-0 left-0 right-0 z-[1002] animate-slide-up"
-          onClick={(e) => e.stopPropagation()}
-        >
+            className="fixed bottom-0 left-0 right-0 z-[1002] animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="bg-gray-900 rounded-t-3xl max-w-2xl mx-auto">
               <div className="relative h-64 rounded-t-3xl overflow-hidden">
                 <img
@@ -173,13 +248,13 @@ function MyMap() {
 
                 <div className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full" style={{
                   backgroundColor:
-                    selectedVenue.check_ins.length === 0 ? '#10b981' :
-                    selectedVenue.check_ins.length < 5 ? '#f59e0b' :
+                    (selectedVenue.check_ins?.length || 0) === 0 ? '#10b981' :
+                    (selectedVenue.check_ins?.length || 0) < 5 ? '#f59e0b' :
                     '#ef4444'
                 }}>
                   {
-                    selectedVenue.check_ins.length === 0 ? 'Low Ambience' :
-                    selectedVenue.check_ins.length < 5 ? 'Medium Ambience' :
+                    (selectedVenue.check_ins?.length || 0) === 0 ? 'Low Ambience' :
+                    (selectedVenue.check_ins?.length || 0) < 5 ? 'Medium Ambience' :
                     'High Ambience'
                   }
                 </div>
@@ -193,37 +268,54 @@ function MyMap() {
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                   <span>{selectedVenue.distance || '940m away'}</span>
                 </div>
+                
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                   {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
                     <button 
-                    type="button"
-                    className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                    onClick={() => onCheckOut(selectedVenue.id)}
+                      type="button"
+                      className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                      onClick={() => onCheckOut(selectedVenue.id)}
                     >
-                    Quitar check-in
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                      Quitar check-in
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   ) : (
                     <button 
-                    type="button"
-                    className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                    onClick={() => onCheckIn(selectedVenue.id)}
+                      type="button"
+                      className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                      onClick={() => onCheckIn(selectedVenue.id)}
                     >
-                    Hacer check-in
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                      Hacer check-in
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </button>
                   )}
+                  
+                  {/* Botón de favorito con corazón relleno/vacío */}
                   <button
                     type="button"
-                    className="flex-1 w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                    onClick={() => toggleFavorite(selectedVenue.id)}
+                    className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${
+                      selectedVenue.is_favorite 
+                        ? 'bg-red-600 hover:bg-red-700 text-white' 
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    }`}
+                    onClick={() => toggleFavorite(selectedVenue.id, selectedVenue.is_favorite || false)}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg 
+                      className="w-5 h-5" 
+                      fill={selectedVenue.is_favorite ? "currentColor" : "none"} 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                      />
                     </svg>
                   </button>
 
@@ -233,7 +325,8 @@ function MyMap() {
                     onClick={() => {
                       const url = `http://localhost:3000/venues/${selectedVenue.id}`;
                       window.open(url, '_blank');
-                    }}>
+                    }}
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
                     </svg>

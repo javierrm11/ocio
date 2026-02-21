@@ -16,9 +16,9 @@ function BottomNav() {
 
         <NavItem
           icon={<Compass size={20} />}
-          label="Explore"
-          active={active === 'Explore'}
-          onClick={() => handleNav('Explore', '/mapa')}
+          label="Mapa"
+          active={active === 'Mapa'}
+          onClick={() => handleNav('Mapa', '/mapa')}
         />
 
         <NavItem
@@ -37,9 +37,9 @@ function BottomNav() {
 
         <NavItem
           icon={<User size={20} />}
-          label="Profile"
-          active={active === 'Profile'}
-          onClick={() => handleNav('Profile', '/profile')}
+          label="Perfil"
+          active={active === 'Perfil'}
+          onClick={() => handleNav('Perfil', '/profile')}
         />
 
       </div>

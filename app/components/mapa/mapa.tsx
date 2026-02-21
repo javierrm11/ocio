@@ -174,30 +174,43 @@ function MyMap() {
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                   <span>{selectedVenue.distance || '940m away'}</span>
                 </div>
-
-                {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
-                  <button 
-                  type="button"
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                  onClick={() => onCheckOut(selectedVenue.id)}
-                  >
-                  Quitar check-in
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
+                  {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
+                    <button 
+                    type="button"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => onCheckOut(selectedVenue.id)}
+                    >
+                    Quitar check-in
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    </button>
+                  ) : (
+                    <button 
+                    type="button"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => onCheckIn(selectedVenue.id)}
+                    >
+                    Hacer check-in
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => {
+                      const url = `http://localhost:3000/venues/${selectedVenue.id}`;
+                      window.open(url, '_blank');
+                    }}>
+                    Visitar
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
+                    </svg>
                   </button>
-                ) : (
-                  <button 
-                  type="button"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                  onClick={() => onCheckIn(selectedVenue.id)}
-                  >
-                  Hacer check-in
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  </button>
-                )}
+                </div>
               </div>
             </div>
           </div>

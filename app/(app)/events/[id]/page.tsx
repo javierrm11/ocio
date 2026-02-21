@@ -257,7 +257,7 @@ export default function EventDetail() {
             >
               <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
                 <img
-                  src={event.venues?.avatar_path || 'https://via.placeholder.com/80'}
+                  src={event.venue?.avatar_path || 'https://via.placeholder.com/80'}
                   alt={event.venues?.name || 'Venue'}
                   className="w-full h-full object-cover"
                 />

@@ -89,7 +89,7 @@ export default function EventDetail() {
       try {
         await navigator.share({
           title: event.title,
-          text: event.description,
+          text: event.description ?? '',
           url: window.location.href,
         });
       } catch (error) {

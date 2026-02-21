@@ -69,6 +69,25 @@ function MyMap() {
     });
   };
 
+  const toggleFavorite = (venueId: number) => {
+    fetch(`http://localhost:3000/api/favorites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ venue_id: venueId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      setVenues(venues.map(venue =>
+        venue.id === venueId ? { ...venue, is_favorite: !venue.is_favorite } : venue
+      ));
+    })
+    .catch(err => {
+      console.error('Error toggling favorite:', err);
+    });
+  };
+
   return (
     <>
       <MapContainer
@@ -178,7 +197,7 @@ function MyMap() {
                   {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
                     <button 
                     type="button"
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                     onClick={() => onCheckOut(selectedVenue.id)}
                     >
                     Quitar check-in
@@ -189,7 +208,7 @@ function MyMap() {
                   ) : (
                     <button 
                     type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                     onClick={() => onCheckIn(selectedVenue.id)}
                     >
                     Hacer check-in
@@ -200,12 +219,21 @@ function MyMap() {
                   )}
                   <button
                     type="button"
-                    className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    className="flex-1 w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => toggleFavorite(selectedVenue.id)}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="flex-1 w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                     onClick={() => {
                       const url = `http://localhost:3000/venues/${selectedVenue.id}`;
                       window.open(url, '_blank');
                     }}>
-                    Visitar
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
                     </svg>

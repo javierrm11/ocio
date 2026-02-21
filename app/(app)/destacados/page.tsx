@@ -1,5 +1,5 @@
 'use client';
-import Destacados from '@/components/Destacados/destacados';
+import Destacados from '@/components/destacados/destacados';
 import Header from '@/components/layout/header';
 import BottomNav from '@/components/Boton/BottomNav';
 

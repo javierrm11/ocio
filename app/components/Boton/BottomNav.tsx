@@ -23,16 +23,16 @@ function BottomNav() {
 
         <NavItem
           icon={<Sparkles size={20} />}
-          label="VibeCheck"
-          active={active === 'VibeCheck'}
-          onClick={() => handleNav('VibeCheck')}
+          label="Destacados"
+          active={active === 'Destacados'}
+          onClick={() => handleNav('Destacados', '/destacados')}
         />
 
         <NavItem
           icon={<Heart size={20} />}
-          label="Saved"
-          active={active === 'Saved'}
-          onClick={() => handleNav('Saved')}
+          label="Notificaciones"
+          active={active === 'Notificaciones'}
+          onClick={() => handleNav('Notificaciones', '/notificaciones')}
         />
 
         <NavItem

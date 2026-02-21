@@ -21,9 +21,15 @@ export async function GET(request: Request) {
     return NextResponse.json(data);
   }
   const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id);
+  .from("profiles")
+  .select(`
+    *,
+    favorites(
+      *,
+      venues(*)
+    )
+  `)
+  .eq("id", user.id);
 
   if (error) {
     console.error("Error fetching profile:", error);

@@ -3,6 +3,40 @@ import { getUserId } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> },
+) {
+    const supabase = await createClient();
+    const { id } = await params;
+    if (!id) {
+        return NextResponse.json(
+            { error: 'id es requerido' },
+            { status: 400 }
+        );
+    }
+    const { data, error } = await supabase
+        .from('venues')
+        .select('*')
+        .eq('id', id)
+        .single();
+    if (error) {
+        return NextResponse.json(
+            { error: error.message },
+            { status: 400 }
+        );
+    }
+    if (!data) {
+        return NextResponse.json(
+            { error: 'Venue no encontrado' },
+            { status: 404 }
+        );
+    }
+    return NextResponse.json(data);
+}
+
+
+
 export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }

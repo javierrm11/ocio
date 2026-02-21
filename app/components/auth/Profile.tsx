@@ -14,7 +14,7 @@ interface UserProfile {
   updated_at: string;
   // Stats
   checkIns?: number;
-  favorites?: number;
+  favorites?: any[];
   following?: number;
   events?: any[];
 }
@@ -166,7 +166,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                 <div className="text-gray-400 text-xs mt-1">Check-ins</div>
               </div>
               <div className="text-center border-x border-gray-700">
-                <div className="text-ozio-blue text-2xl font-bold">{user.favorites || 0}</div>
+                <div className="text-ozio-blue text-2xl font-bold">{user.favorites?.length || 0}</div>
                 <div className="text-gray-400 text-xs mt-1">Favoritos</div>
               </div>
               <div className="text-center">
@@ -275,8 +275,13 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           {/* CONTENIDO PARA USUARIOS */}
           {!isVenue && activeTab === 'favorites' && (
             <div className="space-y-3">
-              <FavoriteSpotCard key="favorite-1" />
-              <FavoriteSpotCard key="favorite-2" />
+              {user.favorites && user.favorites.length > 0 ? (
+                <div className="space-y-3">
+                  {user.favorites.map((fav) => (
+                    <FavoriteSpotCard key={`${fav.user_id}${fav.venue_id}`} favorite={fav.venues} />
+                  ))}
+                </div>
+              ) : null}
               <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
                 <p className="text-gray-400">No hay más favoritos</p>
               </div>
@@ -571,22 +576,23 @@ function EventCard({ event }: { event: any }) {
 }
 
 // Componente auxiliar para lugares favoritos
-function FavoriteSpotCard() {
+function FavoriteSpotCard({favorite}: {favorite: any}) {
   return (
     <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition">
       <img
-        src="https://via.placeholder.com/80"
+        src={favorite?.avatar_path || "https://via.placeholder.com/80"}
         alt="Venue"
         className="w-20 h-20 rounded-xl object-cover"
       />
       <div className="flex-1">
-        <h3 className="text-white font-semibold">Club Velocity</h3>
-        <p className="text-gray-400 text-sm">Techno • 1.2km away</p>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="bg-ambience-high/20 text-ambience-high text-xs px-2 py-1 rounded-full border border-ambience-high/30">
-            High Ambience
-          </span>
-        </div>
+        <h3 className="text-white font-semibold">{favorite?.name}</h3>
+        <p className="text-gray-400 text-sm">{favorite?.address}</p>
+        <button 
+        className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-white text-xs font-medium rounded-full transition"
+        onClick={() => alert('Función de mapa no implementada')}
+        >
+          Ver en mapa
+        </button>
       </div>
       <button className="text-red-400 hover:text-red-500 transition">
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">

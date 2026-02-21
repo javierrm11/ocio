@@ -257,21 +257,21 @@ export default function EventDetail() {
             >
               <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
                 <img
-                  src={event.venues.avatar_path || 'https://via.placeholder.com/80'}
-                  alt={event.venues.name}
+                  src={event.venues?.avatar_path || 'https://via.placeholder.com/80'}
+                  alt={event.venues?.name || 'Venue'}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1">
                 <p className="text-gray-400 text-sm mb-1">Lugar</p>
-                <p className="text-white font-semibold">{event.venues.name}</p>
-                {event.venues.address && (
+                <p className="text-white font-semibold">{event.venues?.name}</p>
+                {event.venues?.address && (
                   <p className="text-gray-400 text-sm mt-1 flex items-center gap-1">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {event.venues.address}
+                    {event.venues?.address}
                   </p>
                 )}
               </div>

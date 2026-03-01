@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+interface LoginProps {
+  onLoginSuccess: () => void;
+}
 
-export default function Login() {
+export default function Login({ onLoginSuccess }: LoginProps) {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -45,7 +48,7 @@ export default function Login() {
       }
 
       // Redirigir
-      window.location.href = '/';
+      onLoginSuccess();
     } catch (err: any) {
       setError(err.message);
     } finally {

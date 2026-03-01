@@ -10,13 +10,10 @@ import Header from "@/components/layout/header";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // Verificar si el usuario está autenticado
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    setIsAuthenticated(!!token);
-  }, []);
+    return !!token;
+  });
 
   // Mostrar loading mientras verifica autenticación
   if (isAuthenticated === null) {

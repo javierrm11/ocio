@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import Login from "@/components/auth/Login";
-import Register from "@/components/auth/Register";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
 
@@ -88,7 +87,7 @@ export default function ProfilePage() {
           {activeTab === "login" ? (
             <Login onLoginSuccess={() => setIsAuthenticated(true)} />
           ) : (
-            <Register onRegisterSuccess={() => setIsAuthenticated(true)} />
+            <Login onLoginSuccess={() => setIsAuthenticated(true)} />
           )}
         </div>
       </main>

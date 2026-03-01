@@ -146,7 +146,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
         <p className="text-center text-gray-400 text-sm mt-6">
           ¿No tienes cuenta?{' '}
-          <Link href="/register" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
+          <Link href="/profile" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
             Regístrate
           </Link>
         </p>

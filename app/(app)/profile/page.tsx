@@ -15,7 +15,9 @@ export default function ProfilePage() {
   useEffect(() => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
-    setIsAuthenticated(!!token);
+    setTimeout(() => {
+      setIsAuthenticated(!!token);
+    }, 0);
   }, []);
 
   // Mostrar loading mientras verifica autenticación

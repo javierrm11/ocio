@@ -1,6 +1,6 @@
 /* /app/(app)/profile/page.tsx */
 "use client";
-
+export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import Login from "@/components/auth/Login";
 import Register from "@/components/auth/Register";

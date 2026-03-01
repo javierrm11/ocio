@@ -34,7 +34,7 @@ function Stories() {
   }, []);
 
   const fetchStories = () => {
-    fetch('http://localhost:3000/api/stories')
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -48,7 +48,7 @@ function Stories() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch('http://localhost:3000/api/profile', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -127,7 +127,7 @@ function Stories() {
       formData.append('media', selectedFile);
       formData.append('media_type', selectedFile.type.startsWith('video/') ? 'video' : 'image');
 
-      const response = await fetch('http://localhost:3000/api/stories', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -152,7 +152,7 @@ function Stories() {
   return (
     <>
       {/* Stories Bar */}
-      <div className="flex gap-4 p-4 overflow-x-auto z-990">
+      <div className="flex gap-4 p-4 overflow-x-auto z-990 max-w-7xl mx-auto">
         {/* Botón para crear historia (solo venues) */}
         {isVenue && (
           <div

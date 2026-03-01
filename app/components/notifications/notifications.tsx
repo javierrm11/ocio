@@ -36,8 +36,8 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const url = filter === 'unread' 
-        ? 'http://localhost:3000/api/notifications?unread_only=true'
-        : 'http://localhost:3000/api/notifications';
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/api/notifications?unread_only=true`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/api/notifications`;
 
       const response = await fetch(url, {
         headers: {
@@ -63,7 +63,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/notifications/${notificationId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -87,7 +87,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch('http://localhost:3000/api/notifications/actions', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/actions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/notifications/${notificationId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

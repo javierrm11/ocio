@@ -41,7 +41,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch('http://localhost:3000/api/profile', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -387,7 +387,7 @@ function CreateEventModal({
         data.append('image', formData.image);
       }
 
-      const response = await fetch('http://localhost:3000/api/events', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

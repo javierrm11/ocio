@@ -147,7 +147,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
       }
 
       if (formData.profileType === 'user') {
-        const response = await fetch('http://localhost:3000/api/auth/register', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/register`, {
           method: 'POST',
           body: submitData,
         });
@@ -173,7 +173,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         }
       } else {
         // Para venues, solo crear el usuario sin iniciar sesión
-        const response = await fetch('http://localhost:3000/api/venues', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`, {
           method: 'POST',
           body: submitData,
         });

@@ -55,7 +55,7 @@ export default function VenueDetail() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/venues/${venueId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -81,7 +81,7 @@ export default function VenueDetail() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/venues/${venueId}/checkin`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}/checkin`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

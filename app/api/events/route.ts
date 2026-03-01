@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
 
-  let query = supabase.from("events").select("*");
+  let query = supabase.from("events").select("*, event_attendees(*)");
 
   // Lista de campos por los que se puede filtrar
   const filterableFields = [

@@ -43,11 +43,11 @@ function MyMap() {
     try {
       // Ejecutar todos los fetch en paralelo
       const [venuesRes, favoritesRes, profileRes] = await Promise.all([
-        fetch('http://localhost:3000/api/venues'),
-        fetch('http://localhost:3000/api/favorites', {
+        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`),
+        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:3000/api/profile', {
+        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -89,7 +89,7 @@ function MyMap() {
   const onCheckIn = (venueId: any) => {    
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
-    fetch(`http://localhost:3000/api/checkins`, {
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ function MyMap() {
   const onCheckOut = (venueId: any) => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
-    fetch(`http://localhost:3000/api/checkins/${venueId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -141,7 +141,7 @@ function MyMap() {
     
     if (isFavorite) {
       // Quitar de favoritos - DELETE
-      fetch(`http://localhost:3000/api/favorites/${venueId}`, {
+      fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -162,7 +162,7 @@ function MyMap() {
       });
     } else {
       // Agregar a favoritos - POST
-      fetch(`http://localhost:3000/api/favorites`, {
+      fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -367,7 +367,7 @@ function MyMap() {
                     type="button"
                     className="flex-1 w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                     onClick={() => {
-                      const url = `http://localhost:3000/venues/${selectedVenue.id}`;
+                      const url = `${process.env.NEXT_PUBLIC_APP_URL}/venues/${selectedVenue.id}`;
                       window.open(url, '_blank');
                     }}
                   >

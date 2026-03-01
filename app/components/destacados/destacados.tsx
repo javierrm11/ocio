@@ -22,7 +22,8 @@ interface Event {
   starts_at: string;
   ends_at: string;
   featured: boolean;
-  image_path: string | null;
+  image_path: string | null,
+  event_attendees?: any[];
 }
 
 interface DestacadosData {
@@ -44,7 +45,7 @@ export default function Destacados() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch('http://localhost:3000/api/destacados', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/destacados`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -223,6 +224,15 @@ function EventCard({ event }: { event: Event }) {
             {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - 
             {endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
           </span>
+        </div>
+        {/* Asistentes */}
+        <div className="flex items-center gap-2 mt-3">
+          <div className="bg-ozio-blue/20 text-ozio-blue text-xs px-3 py-1 rounded-full font-medium border border-ozio-blue/30 flex items-center gap-1">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zM8 13c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.98 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+            {event.event_attendees?.length || 0} asistentes
+          </div>
         </div>
       </div>
     </div>

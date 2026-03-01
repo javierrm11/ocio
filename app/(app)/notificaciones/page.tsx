@@ -32,7 +32,7 @@ export default function NotificationsPage() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-      const response = await fetch('http://localhost:3000/api/notifications', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ export default function NotificationsPage() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/notifications/${notificationId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,5 +1,5 @@
 "use client";
-import MyMap from '@/components/mapa/mapa';
+import MapWrapper from '@/components/mapa/MapaWrapper';
 import Header from '@/components/layout/header';
 import BottomNav from '@/components/Boton/BottomNav';
 import StoriesWrapper from '@/components/Stories/StoriesWrapper';
@@ -12,7 +12,7 @@ export default function MapaPage() {
         <Header />
         <StoriesWrapper />
       </div>
-      <MyMap />
+      <MapWrapper />
       <BottomNav />
     </div>
   );

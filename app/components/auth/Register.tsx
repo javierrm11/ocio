@@ -9,12 +9,19 @@ import 'leaflet/dist/leaflet.css';
 // Fix para los iconos de Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: () => void }) {
+export default function Register({
+  onRegisterSuccess,
+}: {
+  onRegisterSuccess?: () => void;
+}) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -37,35 +44,31 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
 
   const totalSteps = 4;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Validar tamaño (máx 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('La imagen no puede superar los 5MB');
-        return;
-      }
+    if (!file) return;
 
-      // Validar tipo
-      if (!file.type.startsWith('image/')) {
-        setError('Solo se permiten archivos de imagen');
-        return;
-      }
-
-      setFormData({
-        ...formData,
-        profileImage: file,
-        profileImagePreview: URL.createObjectURL(file),
-      });
-      setError('');
+    if (file.size > 5 * 1024 * 1024) {
+      setError('La imagen no puede superar los 5MB');
+      return;
     }
+    if (!file.type.startsWith('image/')) {
+      setError('Solo se permiten archivos de imagen');
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      profileImage: file,
+      profileImagePreview: URL.createObjectURL(file),
+    });
+    setError('');
   };
 
   const handleNextStep = (e: React.FormEvent) => {
@@ -73,43 +76,25 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
     setError('');
 
     if (step === 1) {
-      if (!formData.name.trim()) {
-        setError('El nombre es requerido');
-        return;
-      }
-      if (!formData.email.trim()) {
-        setError('El email es requerido');
-        return;
-      }
+      if (!formData.name.trim()) return setError('El nombre es requerido');
+      if (!formData.email.trim()) return setError('El email es requerido');
     }
 
     if (step === 2) {
       if (formData.profileType === 'user') {
-        if (!formData.username.trim()) {
-          setError('El nombre de usuario es requerido');
-          return;
-        }
-        if (formData.username.length < 3) {
-          setError('El nombre de usuario debe tener al menos 3 caracteres');
-          return;
-        }
+        if (!formData.username.trim()) return setError('El nombre de usuario es requerido');
+        if (formData.username.length < 3)
+          return setError('El nombre de usuario debe tener al menos 3 caracteres');
       } else {
-        if (!formData.address.trim()) {
-          setError('La dirección es requerida');
-          return;
-        }
+        if (!formData.address.trim()) return setError('La dirección es requerida');
       }
     }
 
     if (step === 3) {
-      if (formData.password !== formData.confirmPassword) {
-        setError('Las contraseñas no coinciden');
-        return;
-      }
-      if (formData.password.length < 6) {
-        setError('La contraseña debe tener al menos 6 caracteres');
-        return;
-      }
+      if (formData.password !== formData.confirmPassword)
+        return setError('Las contraseñas no coinciden');
+      if (formData.password.length < 6)
+        return setError('La contraseña debe tener al menos 6 caracteres');
     }
 
     setStep(step + 1);
@@ -122,7 +107,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
     setUploadProgress(0);
 
     try {
-      // Crear FormData para enviar archivo
       const submitData = new FormData();
       submitData.append('name', formData.name);
       submitData.append('email', formData.email);
@@ -140,53 +124,47 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         submitData.append('longitude', formData.longitude.toString());
       }
 
-      // Agregar imagen si existe
       if (formData.profileImage) {
         submitData.append('avatar', formData.profileImage);
         setUploadProgress(50);
       }
 
+      let response: Response;
+      let data: any;
+
       if (formData.profileType === 'user') {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/register`, {
+        response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/register`, {
           method: 'POST',
           body: submitData,
         });
-
         setUploadProgress(100);
+        data = await response.json();
 
-        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Error al registrarse');
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Error al registrarse');
-        }
-
-        // Guardar token si viene en la respuesta
-        if (data.session?.access_token) {
+        // Guardar token solo si estamos en el cliente
+        if (typeof window !== 'undefined' && data.session?.access_token) {
           localStorage.setItem('token', data.session.access_token);
         }
 
-        // Llamar callback o redirigir
-        if (onRegisterSuccess) {
-          onRegisterSuccess();
-        } else {
-          window.location.href = '/';
-        }
+        if (onRegisterSuccess) onRegisterSuccess();
+        else if (typeof window !== 'undefined') window.location.href = '/';
       } else {
-        // Para venues, solo crear el usuario sin iniciar sesión
-        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`, {
+        // Para venues
+        response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`, {
           method: 'POST',
           body: submitData,
         });
         setUploadProgress(100);
+        data = await response.json();
 
-        const data = await response.json();
-        if (!response.ok) {
+        if (!response.ok)
           throw new Error(data.error || 'Error al registrar el establecimiento');
-        }
-        window.location.href = '/';
+
+        if (typeof window !== 'undefined') window.location.href = '/';
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Error inesperado');
       setUploadProgress(0);
     } finally {
       setLoading(false);

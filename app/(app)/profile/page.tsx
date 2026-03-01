@@ -1,10 +1,14 @@
 /* /app/(app)/profile/page.tsx */
 "use client";
-export const dynamic = "force-dynamic";
+import dynamic from "next/dynamic";
+
+const ProfileContent = dynamic(
+  () => import("@/components/auth/Profile"),
+  { ssr: false }
+);
 import { useState, useEffect } from "react";
 import Login from "@/components/auth/Login";
 import Register from "@/components/auth/Register";
-import ProfileContent from "@/components/auth/Profile";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
 

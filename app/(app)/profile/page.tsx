@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
+import Login from "@/components/auth/Login";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
 
@@ -17,7 +18,9 @@ export default function ProfilePage() {
   // Check token on client-side only
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    setIsAuthenticated(!!token);
+    Promise.resolve().then(() => {
+      setIsAuthenticated(!!token);
+    });
   }, []);
 
   // Mostrar loading mientras verifica autenticación
@@ -80,7 +83,13 @@ export default function ProfilePage() {
           </button>
         </div>
 
-
+        <div>
+          {activeTab === "login" ? (
+            <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+          ) : (
+            <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+          )}
+        </div>
       </main>
       <BottomNav />
     </div>

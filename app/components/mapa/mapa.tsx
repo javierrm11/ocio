@@ -101,7 +101,7 @@ function MyMap() {
       setVenues(venues.map(v => 
         v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data] } : v
       ));
-      if (selectedVenue?.id === venueId) {
+      if (selectedVenue && selectedVenue.id === venueId) {
         setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data] });
       }
       closeModal();
@@ -125,7 +125,7 @@ function MyMap() {
       setVenues(venues.map(v => 
         v.id === venueId ? { ...v, check_ins: [] } : v
       ));
-      if (selectedVenue?.id === venueId) {
+      if (selectedVenue && selectedVenue.id === venueId) {
         setSelectedVenue({ ...selectedVenue, check_ins: [] });
       }
       closeModal();
@@ -151,7 +151,7 @@ function MyMap() {
         setVenues(venues.map(venue =>
           venue.id === venueId ? { ...venue, is_favorite: false } : venue
         ));
-        if (selectedVenue?.id === venueId) {
+        if (selectedVenue && selectedVenue.id === venueId) {
           setSelectedVenue({ ...selectedVenue, is_favorite: false });
         }
         setUserFavorites(userFavorites.filter(id => id !== venueId));
@@ -174,7 +174,7 @@ function MyMap() {
         setVenues(venues.map(venue =>
           venue.id === venueId ? { ...venue, is_favorite: true } : venue
         ));
-        if (selectedVenue?.id === venueId) {
+        if (selectedVenue && selectedVenue.id === venueId) {
           setSelectedVenue({ ...selectedVenue, is_favorite: true });
         }
         setUserFavorites([...userFavorites, venueId]);

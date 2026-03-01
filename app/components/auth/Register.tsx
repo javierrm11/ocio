@@ -102,7 +102,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         }
       }
     }
-
+    // a
     if (step === 3) {
       if (formData.password !== formData.confirmPassword) {
         setError('Las contraseñas no coinciden');

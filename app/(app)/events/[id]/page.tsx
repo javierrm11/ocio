@@ -340,7 +340,7 @@ export default function EventDetail() {
           </div>
           <div className="h-64 relative overflow-hidden">
             <iframe
-              src={`https://www.google.com/maps?q=${event.venue.latitude},${event.venue.longitude}&z=15&output=embed`}
+              src={`https://www.google.com/maps?q=${event.venues.latitude},${event.venues.longitude}&z=15&output=embed`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -352,7 +352,7 @@ export default function EventDetail() {
           </div>
           <div className="p-4">
             <button 
-              onClick={() => window.open(`https://maps.google.com/?q=${event.venue.latitude},${event.venue.longitude}`, '_blank')}
+              onClick={() => window.open(`https://maps.google.com/?q=${event.venues.latitude},${event.venues.longitude}`, '_blank')}
               className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

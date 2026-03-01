@@ -172,7 +172,7 @@ function Stories() {
         )}
 
         {/* Stories List */}
-        {stories.filter(story => !isExpired(story.expired_at)).map((story, index) => (
+        {stories.filter(story => !isExpired(story.expires_at)).map((story, index) => (
           <div
             key={index}
             className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"

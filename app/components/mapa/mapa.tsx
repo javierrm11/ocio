@@ -18,35 +18,51 @@ interface Venue {
   is_favorite?: boolean;
 }
 
+interface UserProfile {
+  id: string;
+  username: string;
+  role: 'user' | 'venue';
+}
+
 function MyMap() {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [userFavorites, setUserFavorites] = useState<number[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
+    loadAllData();
   }, []);
 
-  const loadData = async () => {
+  const loadAllData = async () => {
+    setLoading(true);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
     try {
-      // Cargar venues
-      const venuesRes = await fetch('http://localhost:3000/api/venues');
-      const venuesData = await venuesRes.json();
-      
-      // Cargar favoritos del usuario
-      const favoritesRes = await fetch('http://localhost:3000/api/favorites', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const favoritesData = await favoritesRes.json();
-      
-      // Extraer IDs de venues favoritos
+      // Ejecutar todos los fetch en paralelo
+      const [venuesRes, favoritesRes, profileRes] = await Promise.all([
+        fetch('http://localhost:3000/api/venues'),
+        fetch('http://localhost:3000/api/favorites', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch('http://localhost:3000/api/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      // Parsear todas las respuestas en paralelo
+      const [venuesData, favoritesData, profileData] = await Promise.all([
+        venuesRes.json(),
+        favoritesRes.json(),
+        profileRes.json()
+      ]);
+
+      // Procesar datos
       const favoriteIds = favoritesData.map((fav: any) => fav.venue_id);
       setUserFavorites(favoriteIds);
-      
+      setCurrentUser(profileData[0]);
+
       // Marcar venues como favoritos
       const venuesWithFavorites = venuesData.map((venue: Venue) => ({
         ...venue,
@@ -56,6 +72,8 @@ function MyMap() {
       setVenues(venuesWithFavorites);
     } catch (err) {
       console.error('Error loading data:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,6 +101,9 @@ function MyMap() {
       setVenues(venues.map(v => 
         v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data] } : v
       ));
+      if (selectedVenue?.id === venueId) {
+        setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data] });
+      }
       closeModal();
     })
     .catch(err => {
@@ -104,6 +125,9 @@ function MyMap() {
       setVenues(venues.map(v => 
         v.id === venueId ? { ...v, check_ins: [] } : v
       ));
+      if (selectedVenue?.id === venueId) {
+        setSelectedVenue({ ...selectedVenue, check_ins: [] });
+      }
       closeModal();
     })
     .catch(err => {
@@ -124,7 +148,6 @@ function MyMap() {
       })
       .then(res => res.json())
       .then(data => {
-        // Actualizar estado local
         setVenues(venues.map(venue =>
           venue.id === venueId ? { ...venue, is_favorite: false } : venue
         ));
@@ -148,7 +171,6 @@ function MyMap() {
       })
       .then(res => res.json())
       .then(data => {
-        // Actualizar estado local
         setVenues(venues.map(venue =>
           venue.id === venueId ? { ...venue, is_favorite: true } : venue
         ));
@@ -162,6 +184,26 @@ function MyMap() {
       });
     }
   };
+
+  const isUserProfile = currentUser?.username !== undefined && currentUser?.username !== null;
+
+  // Pantalla de carga
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-ozio-dark flex flex-col items-center justify-center z-50">
+        <div className="relative">
+          {/* Spinner animado */}
+          <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-ozio-blue"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-ozio-blue to-ozio-purple rounded-full opacity-50"></div>
+          </div>
+        </div>
+        <p className="text-white text-lg font-semibold mt-6 animate-pulse">
+          Cargando mapa...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -270,31 +312,32 @@ function MyMap() {
                 </div>
                 
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
-                  {selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
-                    <button 
-                      type="button"
-                      className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                      onClick={() => onCheckOut(selectedVenue.id)}
-                    >
-                      Quitar check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button 
-                      type="button"
-                      className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                      onClick={() => onCheckIn(selectedVenue.id)}
-                    >
-                      Hacer check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
+                  {isUserProfile && (
+                    selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
+                      <button 
+                        type="button"
+                        className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                        onClick={() => onCheckOut(selectedVenue.id)}
+                      >
+                        Quitar check-in
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    ) : (
+                      <button 
+                        type="button"
+                        className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                        onClick={() => onCheckIn(selectedVenue.id)}
+                      >
+                        Hacer check-in
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )
                   )}
                   
-                  {/* Botón de favorito con corazón relleno/vacío */}
                   <button
                     type="button"
                     className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${

@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Login from "@/components/auth/Login";
 import Register from "@/components/auth/Register";
-import ProfileContent from "@/components/auth/Profile";
+import ProfileContent from "@/components/auth/ProfileWrapper";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
 

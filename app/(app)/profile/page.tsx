@@ -34,7 +34,7 @@ export default function ProfilePage() {
         </div>
         
         {/* Contenido del perfil */}
-        <ProfileContent onLogout={() => setIsAuthenticated(false)} />
+        <ProfileContent />
         
         <BottomNav />
       </div>

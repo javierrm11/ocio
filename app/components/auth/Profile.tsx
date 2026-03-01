@@ -25,8 +25,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('');
   const [showEventModal, setShowEventModal] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    setToken(token);
     fetchUserProfile();
   }, []);
 
@@ -39,7 +42,6 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
   const fetchUserProfile = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: {

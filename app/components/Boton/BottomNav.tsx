@@ -1,3 +1,4 @@
+"use client";
 import { useState } from 'react';
 import { Compass, Sparkles, Heart, User } from 'lucide-react';
 import { redirect } from 'next/navigation';

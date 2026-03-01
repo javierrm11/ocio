@@ -1,4 +1,3 @@
-"use client";
 import MyMap from '@/components/mapa/mapa';
 import Header from '@/components/layout/header';
 import BottomNav from '@/components/Boton/BottomNav';

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -15,6 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: () => void }) {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -169,7 +171,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         if (onRegisterSuccess) {
           onRegisterSuccess();
         } else {
-          window.location.href = '/';
+          router.push('/');
         }
       } else {
         // Para venues, solo crear el usuario sin iniciar sesión
@@ -183,7 +185,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         if (!response.ok) {
           throw new Error(data.error || 'Error al registrar el establecimiento');
         }
-        window.location.href = '/';
+        router.push('/');
       }
     } catch (err: any) {
       setError(err.message);

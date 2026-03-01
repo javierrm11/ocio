@@ -1,3 +1,4 @@
+"use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import { useEffect, useState } from 'react';
 import { getPublicImageUrl } from '@/lib/getImageUrl';

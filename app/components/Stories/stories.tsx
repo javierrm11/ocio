@@ -5,7 +5,7 @@ interface Story {
   media_type: string;
   media_path: string;
   created_at: string;
-  expired_at: string;
+  expires_at: string;
   venues: {
     name: string;
   };

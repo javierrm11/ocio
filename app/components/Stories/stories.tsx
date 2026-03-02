@@ -23,6 +23,7 @@ function Stories() {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -47,6 +48,10 @@ function Stories() {
   const fetchCurrentUser = async () => {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        setUserLoading(false);
+        return;
+      }
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: {
@@ -60,8 +65,12 @@ function Stories() {
       }
     } catch (error) {
       console.error('Error fetching user:', error);
+    } finally {
+      setUserLoading(false);
     }
   };
+
+  const canUploadStories = !userLoading && currentUser && !currentUser.username;
 
   const closeStory = () => {
     setSelectedStory(null);
@@ -76,12 +85,11 @@ function Stories() {
     }
   };
 
-  // Timer para imágenes
   useEffect(() => {
     if (selectedStory) {
       const timer = setTimeout(() => {
         nextStory();
-      }, 15000); // 15 segundos
+      }, 15000);
 
       return () => clearTimeout(timer);
     }
@@ -102,8 +110,6 @@ function Stories() {
   const isExpired = (expiredAt: string) => {
     return new Date(expiredAt) < new Date();
   };
-
-  const isVenue = !currentUser?.username; // Los venues no tienen username
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,7 +145,7 @@ function Stories() {
         setShowUploadModal(false);
         setSelectedFile(null);
         setPreviewUrl(null);
-        fetchStories(); // Recargar historias
+        fetchStories();
       }
     } catch (error) {
       console.error('Error uploading story:', error);
@@ -154,9 +160,9 @@ function Stories() {
       {/* Stories Bar */}
       <div className="flex gap-4 p-4 overflow-x-auto z-990 max-w-7xl mx-auto">
         {/* Botón para crear historia (solo venues) */}
-        {isVenue && (
+        {canUploadStories && (
           <div
-            className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"
+            className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
             onClick={() => setShowUploadModal(true)}
           >
             <div className="relative">
@@ -397,6 +403,21 @@ function Stories() {
         
         .animate-progress {
           animation: progress 15s linear forwards;
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
       `}</style>
     </>

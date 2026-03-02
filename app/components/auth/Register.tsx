@@ -3,17 +3,20 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import dynamic from 'next/dynamic';
 
-// Fix para los iconos de Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Importar Leaflet dinámicamente solo en el cliente
+const MapWithNoSSR = dynamic(
+  () => import('@/components/auth/MapComponent'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="h-64 bg-gray-800 rounded-xl flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-ozio-blue"></div>
+      </div>
+    )
+  }
+);
 
 export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: () => void }) {
   const router = useRouter();
@@ -49,13 +52,10 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validar tamaño (máx 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('La imagen no puede superar los 5MB');
         return;
       }
-
-      // Validar tipo
       if (!file.type.startsWith('image/')) {
         setError('Solo se permiten archivos de imagen');
         return;
@@ -102,7 +102,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         }
       }
     }
-    // a
+
     if (step === 3) {
       if (formData.password !== formData.confirmPassword) {
         setError('Las contraseñas no coinciden');
@@ -124,7 +124,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
     setUploadProgress(0);
 
     try {
-      // Crear FormData para enviar archivo
       const submitData = new FormData();
       submitData.append('name', formData.name);
       submitData.append('email', formData.email);
@@ -142,7 +141,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         submitData.append('longitude', formData.longitude.toString());
       }
 
-      // Agregar imagen si existe
       if (formData.profileImage) {
         submitData.append('avatar', formData.profileImage);
         setUploadProgress(50);
@@ -155,26 +153,22 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         });
 
         setUploadProgress(100);
-
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(data.error || 'Error al registrarse');
         }
 
-        // Guardar token si viene en la respuesta
         if (data.session?.access_token) {
           localStorage.setItem('token', data.session.access_token);
         }
 
-        // Llamar callback o redirigir
         if (onRegisterSuccess) {
           onRegisterSuccess();
         } else {
           router.push('/');
         }
       } else {
-        // Para venues, solo crear el usuario sin iniciar sesión
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`, {
           method: 'POST',
           body: submitData,
@@ -198,7 +192,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
   return (
     <div className="bg-ozio-dark flex items-center justify-center min-h-[600px]">
       <div className="w-full max-w-md">
-        {/* Formulario */}
         <div className="bg-ozio-card rounded-3xl p-8 shadow-xl">
           {/* Progress indicator */}
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -384,22 +377,13 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </label>
                 <p className="text-xs text-gray-400 mb-2">Haz clic en el mapa para seleccionar tu ubicación</p>
                 <div className="rounded-xl overflow-hidden border border-gray-700 h-64">
-                  <MapContainer
-                    center={[formData.latitude, formData.longitude]}
-                    zoom={15}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='© OpenStreetMap contributors'
-                    />
-                    <LocationMarker
-                      position={[formData.latitude, formData.longitude]}
-                      setPosition={(lat, lng) => {
-                        setFormData({ ...formData, latitude: lat, longitude: lng });
-                      }}
-                    />
-                  </MapContainer>
+                  <MapWithNoSSR 
+                    latitude={formData.latitude}
+                    longitude={formData.longitude}
+                    onPositionChange={(lat, lng) => {
+                      setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }));
+                    }}
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   <div className="text-xs text-gray-400">
@@ -554,7 +538,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   {formData.profileImagePreview ? 'Cambiar imagen' : 'Seleccionar imagen'}
                 </button>
 
-                {/* Barra de progreso */}
                 {loading && uploadProgress > 0 && (
                   <div className="w-full mt-4">
                     <div className="w-full bg-gray-700 rounded-full h-2">
@@ -598,7 +581,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             </form>
           )}
 
-          {/* Link a login */}
           <p className="text-center text-gray-400 text-sm mt-6">
             ¿Ya tienes cuenta?{' '}
             <Link href="/login" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
@@ -609,18 +591,4 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
       </div>
     </div>
   );
-}
-
-// Componente para manejar clics en el mapa
-function LocationMarker({ position, setPosition }: {
-  position: [number, number];
-  setPosition: (lat: number, lng: number) => void;
-}) {
-  useMapEvents({
-    click(e) {
-      setPosition(e.latlng.lat, e.latlng.lng);
-    },
-  });
-
-  return <Marker position={position} />;
 }

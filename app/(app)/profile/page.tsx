@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Login from "@/components/auth/Login";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
+import Register from "@/components/auth/Register";
 
 const ProfileContent = dynamic(
   () => import("@/components/auth/Profile"),
@@ -87,7 +88,7 @@ export default function ProfilePage() {
           {activeTab === "login" ? (
             <Login onLoginSuccess={() => setIsAuthenticated(true)} />
           ) : (
-            <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+            <Register onRegisterSuccess={() => setIsAuthenticated(true)} />
           )}
         </div>
       </main>

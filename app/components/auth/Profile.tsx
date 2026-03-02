@@ -26,6 +26,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [activeTab, setActiveTab] = useState<string>('');
   const [showEventModal, setShowEventModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
 
   useEffect(() => {
@@ -261,7 +262,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               {user.events && user.events.length > 0 ? (
                 <div className="space-y-3">
                   {user.events.map((event) => (
-                    <EventCard key={event.id} event={event} />
+                    <EventCard 
+                      key={event.id} 
+                      event={event} 
+                      onEdit={() => setEditingEvent(event)}  // ← falta esto
+                    />
                   ))}
                 </div>
               ) : null}
@@ -346,6 +351,16 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         }}
       />
     )}
+    {editingEvent && (
+  <EditEventModal
+    event={editingEvent}
+    onClose={() => setEditingEvent(null)}
+    onEventUpdated={() => {
+      setEditingEvent(null);
+      fetchUserProfile();
+    }}
+  />
+)}
     </div>
   );
 }
@@ -562,7 +577,7 @@ function CreateEventModal({
 }
 
 // Componente para eventos (venues)
-function EventCard({ event }: { event: any }) {
+function EventCard({ event, onEdit }: { event: any; onEdit: (event: any) => void }) {
   return (
     <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition">
       <img
@@ -581,7 +596,7 @@ function EventCard({ event }: { event: any }) {
           }
         </div>
       </div>
-      <button className="text-ozio-blue hover:text-ozio-purple transition">
+      <button className="text-ozio-blue hover:text-ozio-purple transition" onClick={() => onEdit(event)}>
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
         </svg>
@@ -821,6 +836,156 @@ function EditProfileModal({
               disabled={loading}
               className="flex-1 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              {loading ? 'Guardando...' : 'Guardar cambios'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+function EditEventModal({
+  event,
+  onClose,
+  onEventUpdated,
+}: {
+  event: any;
+  onClose: () => void;
+  onEventUpdated: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(event.image_path || null);
+  const [formData, setFormData] = useState({
+    title: event.title || '',
+    description: event.description || '',
+    starts_at: event.starts_at ? event.starts_at.slice(0, 16) : '',
+    ends_at: event.ends_at ? event.ends_at.slice(0, 16) : '',
+    featured: event.featured || false,
+    image: null as File | null,
+  });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const data = new FormData();
+
+      data.append('venue_id', event.venue_id);
+      data.append('title', formData.title);
+      data.append('description', formData.description);
+      data.append('starts_at', formData.starts_at);
+      data.append('ends_at', formData.ends_at);
+      data.append('featured', formData.featured.toString());
+
+      if (formData.image) {
+        data.append('image', formData.image);
+      } else if (event.image_path) {
+        data.append('image_path', event.image_path);
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${event.id}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data,
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar evento');
+      onEventUpdated();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al actualizar el evento');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
+          <h2 className="text-white text-xl font-bold">✏️ Editar Evento</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Imagen */}
+          <div>
+            <label className="block text-white font-medium mb-2">Imagen del evento</label>
+            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="edit-event-image" />
+            <label htmlFor="edit-event-image" className="block w-full h-48 border-2 border-dashed border-gray-700 rounded-2xl cursor-pointer hover:border-ozio-blue transition overflow-hidden">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Click para cambiar imagen</span>
+                </div>
+              )}
+            </label>
+          </div>
+
+          {/* Título */}
+          <div>
+            <label className="block text-white font-medium mb-2">Título *</label>
+            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none"
+              placeholder="Nombre del evento" />
+          </div>
+
+          {/* Descripción */}
+          <div>
+            <label className="block text-white font-medium mb-2">Descripción</label>
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3} className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none resize-none"
+              placeholder="Describe tu evento..." />
+          </div>
+
+          {/* Fechas */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-white font-medium mb-2">Inicio *</label>
+              <input type="datetime-local" required value={formData.starts_at} onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-white font-medium mb-2">Fin *</label>
+              <input type="datetime-local" required value={formData.ends_at} onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
+            </div>
+          </div>
+
+          {/* Destacado */}
+          <div className="flex items-center justify-between bg-ozio-dark rounded-xl px-4 py-3 border border-gray-700">
+            <span className="text-white font-medium">⭐ Evento destacado</span>
+            <button type="button" onClick={() => setFormData({ ...formData, featured: !formData.featured })}
+              className={`w-12 h-6 rounded-full transition relative ${formData.featured ? 'bg-ozio-blue' : 'bg-gray-700'}`}>
+              <div className={`w-5 h-5 bg-white rounded-full transition-transform absolute top-0.5 ${formData.featured ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
+
+          {/* Botones */}
+          <div className="flex gap-3 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading} className="flex-1 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? 'Guardando...' : 'Guardar cambios'}
             </button>
           </div>

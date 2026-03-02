@@ -44,12 +44,12 @@ function MyMap() {
       // Ejecutar todos los fetch en paralelo
       const [venuesRes, favoritesRes, profileRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`),
-        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
+        token ? fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
           headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
+        }) : Promise.resolve(new Response('[]')),
+        token ? fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
-        })
+        }) : Promise.resolve(new Response('[]'))
       ]);
 
       // Parsear todas las respuestas en paralelo
@@ -60,9 +60,9 @@ function MyMap() {
       ]);
 
       // Procesar datos
-      const favoriteIds = favoritesData.map((fav: any) => fav.venue_id);
+      const favoriteIds = Array.isArray(favoritesData) ? favoritesData.map((fav: any) => fav.venue_id) : [];
       setUserFavorites(favoriteIds);
-      setCurrentUser(profileData[0]);
+      setCurrentUser(Array.isArray(profileData) ? profileData[0] : null);
 
       // Marcar venues como favoritos
       const venuesWithFavorites = venuesData.map((venue: Venue) => ({

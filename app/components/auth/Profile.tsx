@@ -577,7 +577,7 @@ function CreateEventModal({
               <label className="block text-white font-medium mb-2">Inicio *</label>
               <DatePicker
                 selected={formData.starts_at}
-                onChange={(date) => setFormData({ ...formData, starts_at: date })}
+                onChange={(date: Date | null) => setFormData({ ...formData, starts_at: date })}
                 showTimeSelect
                 dateFormat="Pp"
                 placeholderText="Seleccionar fecha"
@@ -588,7 +588,7 @@ function CreateEventModal({
               <label className="block text-white font-medium mb-2">Fin *</label>
               <DatePicker
                 selected={formData.ends_at}
-                onChange={(date) => setFormData({ ...formData, ends_at: date })}
+                onChange={(date: Date | null) => setFormData({ ...formData, ends_at: date })}
                 showTimeSelect
                 dateFormat="Pp"
                 placeholderText="Seleccionar fecha"
@@ -1014,7 +1014,7 @@ function EditEventModal({
               <label className="block text-white font-medium mb-2">Inicio *</label>
               <DatePicker
                 selected={formData.starts_at}
-                onChange={(date) => setFormData({ ...formData, starts_at: date })}
+                onChange={(date: Date | null) => setFormData({ ...formData, starts_at: date })}
                 showTimeSelect
                 dateFormat="Pp"
                 minDate={new Date()}
@@ -1025,7 +1025,7 @@ function EditEventModal({
               <label className="block text-white font-medium mb-2">Fin *</label>
               <DatePicker
                 selected={formData.ends_at}
-                onChange={(date) => setFormData({ ...formData, ends_at: date })}
+                onChange={(date: Date | null) => setFormData({ ...formData, ends_at: date })}
                 showTimeSelect
                 dateFormat="Pp"
                 minDate={new Date()}

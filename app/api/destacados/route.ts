@@ -6,8 +6,11 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const supabase = await createClient();
   
-  const query = supabase.from("events").select("*, event_attendees(*)").order("created_at", { ascending: false }).limit(5);
-
+  const query = supabase
+  .from("events")
+  .select("*, event_attendees(count)")
+  .order("count", { foreignTable: "event_attendees", ascending: false })
+  .limit(5);
   const query_venues = supabase.from("venues").select("*, check_ins(*)").order("created_at", { ascending: false }).limit(5);
 
     const { data: events, error: eventsError } = await query;

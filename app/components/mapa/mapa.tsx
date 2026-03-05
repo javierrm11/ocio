@@ -1,6 +1,7 @@
 "use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getPublicImageUrl } from '@/lib/getImageUrl';
 import 'leaflet/dist/leaflet.css';
 
@@ -98,6 +99,7 @@ function formatEventTime(event: Event): string {
 }
 
 function MyMap() {
+  const router = useRouter();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [userFavorites, setUserFavorites] = useState<number[]>([]);
@@ -307,6 +309,9 @@ function MyMap() {
                   {(selectedVenue.check_ins?.length || 0) === 0 ? 'Low Ambience' :
                    (selectedVenue.check_ins?.length || 0) < 5 ? 'Medium Ambience' : 'High Ambience'}
                 </div>
+                <div id='count-checkins' className="absolute top-4 right-16 text-white text-xs font-bold px-3 py-1 rounded-full bg-gray-700">
+
+                </div>
 
                 {/* Banner evento activo/próximo */}
                 {(() => {
@@ -333,34 +338,36 @@ function MyMap() {
 
               <div className="p-6">
                 <h2 className="text-white text-2xl font-bold mb-2">{selectedVenue.name}</h2>
+                <p id='count-checkins' className="text-white text-sm">
+                  {selectedVenue.check_ins?.length || 0} check-ins
+                </p>
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                   <span>{selectedVenue.distance || '940m away'}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
+                <div className="flex flex-wrap items-center gap-2 text-gray-400 text-sm mb-4">
                   {isUserProfile && (
                     selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
-                      <button type="button" className="flex-10 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" onClick={() => onCheckOut(selectedVenue.id)}>
+                      <button type="button" className="flex-[100%] w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" onClick={() => onCheckOut(selectedVenue.id)}>
                         Quitar check-in
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     ) : (
-                      <button type="button" className="flex-10 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" onClick={() => onCheckIn(selectedVenue.id)}>
+                      <button type="button" className="flex-[100%] w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" onClick={() => onCheckIn(selectedVenue.id)}>
                         Hacer check-in
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                       </button>
                     )
                   )}
-                  
+                  <button 
+                  type="button" 
+                  className="flex-10 w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" 
+                  onClick={() => router.push(`/venues/${selectedVenue.id}`)}>
+                    Ver detalles
+                  </button>
                   <button type="button" className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${selectedVenue.is_favorite ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'}`} onClick={() => toggleFavorite(selectedVenue.id, selectedVenue.is_favorite || false)}>
                     <svg className="w-5 h-5" fill={selectedVenue.is_favorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
-
-                  <button type="button" className="flex-1 w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition" onClick={() => window.open(`${process.env.NEXT_PUBLIC_APP_URL}/venues/${selectedVenue.id}`, '_blank')}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
                     </svg>
                   </button>
                 </div>

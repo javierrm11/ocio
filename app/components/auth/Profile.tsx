@@ -1,7 +1,8 @@
 "use client";
-
+import "react-datepicker/dist/react-datepicker.css";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import DatePicker from "react-datepicker";
 
 interface UserProfile {
   id: string;
@@ -28,13 +29,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
-
   useEffect(() => {
     fetchUserProfile();
   }, []);
 
   useEffect(() => {
-    // Establecer tab inicial según el rol
     if (user) {
       setActiveTab((!user.username) ? 'events' : 'favorites');
     }
@@ -44,7 +43,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
+      const response = await fetch('http://localhost:3000/api/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -60,6 +59,33 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
+      const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar evento');
+      }
+
+      // Recargar perfil para actualizar la lista
+      fetchUserProfile();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar el evento');
     }
   };
 
@@ -198,16 +224,6 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                 🎉 Eventos
               </button>
               <button
-                onClick={() => setActiveTab('history')}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === 'history'
-                    ? 'bg-ozio-blue text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                📊 Historial
-              </button>
-              <button
                 onClick={() => setActiveTab('settings')}
                 className={`flex-1 py-3 rounded-xl font-medium transition ${
                   activeTab === 'settings'
@@ -231,16 +247,6 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                 ❤️ Favoritos
               </button>
               <button
-                onClick={() => setActiveTab('history')}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === 'history'
-                    ? 'bg-ozio-blue text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                📍 Historial
-              </button>
-              <button
                 onClick={() => setActiveTab('settings')}
                 className={`flex-1 py-3 rounded-xl font-medium transition ${
                   activeTab === 'settings'
@@ -256,33 +262,95 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
         {/* Tab Content */}
         <div className="mt-6">
-          {/* CONTENIDO PARA VENUES */}
+          {/* EVENTOS PARA VENUES (Próximos y Pasados) */}
           {isVenue && activeTab === 'events' && (
             <div className="space-y-3">
               {user.events && user.events.length > 0 ? (
                 <div className="space-y-3">
-                  {user.events.map((event) => (
-                    <EventCard 
-                      key={event.id} 
-                      event={event} 
-                      onEdit={() => setEditingEvent(event)}  // ← falta esto
-                    />
-                  ))}
+                  {user.events
+                    .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
+                    .map((event) => {
+                      const isPast = new Date(event.ends_at) <= new Date();
+                      return (
+                        <div 
+                          key={event.id} 
+                          className={`bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition ${
+                            isPast ? 'opacity-60' : ''
+                          }`}
+                        >
+                          <img
+                            src={event.image_path || 'https://via.placeholder.com/80'}
+                            alt="Event"
+                            className={`w-20 h-20 rounded-xl object-cover ${isPast ? 'grayscale' : ''}`}
+                          />
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold">{event.name || event.title}</h3>
+                            <p className="text-gray-400 text-sm">
+                              {new Date(event.starts_at).toLocaleDateString('es-ES')} {new Date(event.starts_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - {new Date(event.ends_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                            <p className="text-gray-400 text-sm mt-1">
+                              👥 {event.event_attendees[0]?.count || 0} asistentes
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              {isPast && (
+                                <span className="bg-gray-700/50 text-gray-400 text-xs px-2 py-1 rounded-full">
+                                  Finalizado
+                                </span>
+                              )}
+                              {event.featured && (
+                                <span className={`text-xs px-2 py-1 rounded-full border ${
+                                  isPast 
+                                    ? 'bg-gray-700/20 text-gray-500 border-gray-600/30'
+                                    : 'bg-ozio-blue/20 text-ozio-blue border-ozio-blue/30'
+                                }`}>
+                                  Destacado
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button 
+                              className={`transition ${
+                                isPast 
+                                  ? 'text-gray-500 hover:text-gray-400'
+                                  : 'text-ozio-blue hover:text-ozio-purple'
+                              }`}
+                              onClick={() => setEditingEvent(event)}
+                              title="Editar evento"
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                            <button 
+                              className="text-red-500 hover:text-red-600 transition"
+                              onClick={() => handleDeleteEvent(event.id)}
+                              title="Eliminar evento"
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
-              ) : null}
-              <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
-                <p className="text-gray-400">No hay eventos próximos</p>
-                <button 
-                  onClick={() => setShowEventModal(true)}
-                  className="mt-4 px-6 py-2 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-full transition"
-                >
-                  + Crear Evento
-                </button>
-              </div>
+              ) : (
+                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
+                  <p className="text-gray-400">No hay eventos</p>
+                </div>
+              )}
+              <button 
+                onClick={() => setShowEventModal(true)}
+                className="w-full mt-4 px-6 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-2xl transition"
+              >
+                + Crear Evento
+              </button>
             </div>
           )}
 
-          {/* CONTENIDO PARA USUARIOS */}
+          {/* FAVORITOS PARA USUARIOS */}
           {!isVenue && activeTab === 'favorites' && (
             <div className="space-y-3">
               {user.favorites && user.favorites.length > 0 ? (
@@ -291,19 +359,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                     <FavoriteSpotCard key={`${fav.user_id}${fav.venue_id}`} favorite={fav.venues} />
                   ))}
                 </div>
-              ) : null}
-              <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
-                <p className="text-gray-400">No hay más favoritos</p>
-              </div>
-            </div>
-          )}
-
-          {/* HISTORIAL (COMÚN PARA AMBOS) */}
-          {activeTab === 'history' && (
-            <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
-              <p className="text-gray-400">
-                {isVenue ? 'No hay estadísticas recientes' : 'No hay historial reciente'}
-              </p>
+              ) : (
+                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
+                  <p className="text-gray-400">No hay favoritos</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -333,7 +393,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         </div>
       </div>
 
-      {/* Modal para crear evento */}
+      {/* Modales */}
       {showEventModal && (
         <CreateEventModal 
           venueId={user.id}
@@ -341,26 +401,32 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           onEventCreated={fetchUserProfile}
         />
       )}
+      
       {showEditModal && (
-      <EditProfileModal
-        user={user}
-        onClose={() => setShowEditModal(false)}
-        onProfileUpdated={(updatedUser) => {
-          setUser({ ...user, ...updatedUser });
-          setShowEditModal(false);
-        }}
-      />
-    )}
-    {editingEvent && (
-  <EditEventModal
-    event={editingEvent}
-    onClose={() => setEditingEvent(null)}
-    onEventUpdated={() => {
-      setEditingEvent(null);
-      fetchUserProfile();
-    }}
-  />
-)}
+        <EditProfileModal
+          user={user}
+          onClose={() => setShowEditModal(false)}
+          onProfileUpdated={(updatedUser) => {
+            setUser({ ...user, ...updatedUser });
+            setShowEditModal(false);
+          }}
+        />
+      )}
+      
+      {editingEvent && (
+        <EditEventModal
+          event={editingEvent}
+          onClose={() => setEditingEvent(null)}
+          onEventUpdated={() => {
+            setEditingEvent(null);
+            fetchUserProfile();
+          }}
+          onEventDeleted={() => {
+            setEditingEvent(null);
+            fetchUserProfile();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -380,8 +446,8 @@ function CreateEventModal({
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    starts_at: '',
-    ends_at: '',
+    starts_at: null as Date | null,
+    ends_at: null as Date | null,
     featured: false,
     image: null as File | null
   });
@@ -409,15 +475,15 @@ function CreateEventModal({
       data.append('venue_id', venueId);
       data.append('title', formData.title);
       data.append('description', formData.description);
-      data.append('starts_at', formData.starts_at);
-      data.append('ends_at', formData.ends_at);
+      data.append('starts_at', formData.starts_at?.toISOString() || '');
+      data.append('ends_at', formData.ends_at?.toISOString() || '');
       data.append('featured', formData.featured.toString());
       
       if (formData.image) {
         data.append('image', formData.image);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events`, {
+      const response = await fetch('http://localhost:3000/api/events', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -442,7 +508,6 @@ function CreateEventModal({
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-white text-xl font-bold">🎉 Crear Evento</h2>
           <button 
@@ -455,9 +520,7 @@ function CreateEventModal({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Imagen */}
           <div>
             <label className="block text-white font-medium mb-2">Imagen del evento</label>
             <div className="relative">
@@ -486,7 +549,6 @@ function CreateEventModal({
             </div>
           </div>
 
-          {/* Título */}
           <div>
             <label className="block text-white font-medium mb-2">Título *</label>
             <input
@@ -499,7 +561,6 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Descripción */}
           <div>
             <label className="block text-white font-medium mb-2">Descripción</label>
             <textarea
@@ -511,31 +572,31 @@ function CreateEventModal({
             />
           </div>
 
-          {/* Fechas */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-white font-medium mb-2">Inicio *</label>
-              <input
-                type="datetime-local"
-                required
-                value={formData.starts_at}
-                onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+              <DatePicker
+                selected={formData.starts_at}
+                onChange={(date) => setFormData({ ...formData, starts_at: date })}
+                showTimeSelect
+                dateFormat="Pp"
+                placeholderText="Seleccionar fecha"
                 className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none"
               />
             </div>
             <div>
               <label className="block text-white font-medium mb-2">Fin *</label>
-              <input
-                type="datetime-local"
-                required
-                value={formData.ends_at}
-                onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+              <DatePicker
+                selected={formData.ends_at}
+                onChange={(date) => setFormData({ ...formData, ends_at: date })}
+                showTimeSelect
+                dateFormat="Pp"
+                placeholderText="Seleccionar fecha"
                 className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none"
               />
             </div>
           </div>
 
-          {/* Destacado */}
           <div className="flex items-center justify-between bg-ozio-dark rounded-xl px-4 py-3 border border-gray-700">
             <span className="text-white font-medium">⭐ Evento destacado</span>
             <button
@@ -553,7 +614,6 @@ function CreateEventModal({
             </button>
           </div>
 
-          {/* Botones */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"
@@ -576,35 +636,6 @@ function CreateEventModal({
   );
 }
 
-// Componente para eventos (venues)
-function EventCard({ event, onEdit }: { event: any; onEdit: (event: any) => void }) {
-  return (
-    <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition">
-      <img
-        src={event.image_path || 'https://via.placeholder.com/80'}
-        alt="Event"
-        className="w-20 h-20 rounded-xl object-cover"
-      />
-      <div className="flex-1">
-        <h3 className="text-white font-semibold">{event.name || event.title}</h3>
-        <p className="text-gray-400 text-sm">{new Date(event.starts_at).toLocaleDateString('es-ES')} {new Date(event.starts_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - {new Date(event.ends_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
-        <div className="flex items-center gap-2 mt-2">
-          { event.featured &&
-          <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full border border-ozio-blue/30">
-            Destacado
-          </span>
-          }
-        </div>
-      </div>
-      <button className="text-ozio-blue hover:text-ozio-purple transition" onClick={() => onEdit(event)}>
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
 // Componente auxiliar para lugares favoritos
 function FavoriteSpotCard({favorite}: {favorite: any}) {
   return (
@@ -618,8 +649,8 @@ function FavoriteSpotCard({favorite}: {favorite: any}) {
         <h3 className="text-white font-semibold">{favorite?.name}</h3>
         <p className="text-gray-400 text-sm">{favorite?.address}</p>
         <button 
-        className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-white text-xs font-medium rounded-full transition"
-        onClick={() => alert('Función de mapa no implementada')}
+          className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-white text-xs font-medium rounded-full transition"
+          onClick={() => alert('Función de mapa no implementada')}
         >
           Ver en mapa
         </button>
@@ -672,6 +703,8 @@ function SettingsItem({ icon, title, toggle, onClick }: { icon: string; title: s
     </div>
   );
 }
+
+// Modal para editar perfil
 function EditProfileModal({
   user,
   onClose,
@@ -702,46 +735,44 @@ function EditProfileModal({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-    const data = new FormData();
-    data.append('name', formData.name);
-    data.append('description', formData.description);
-    if (!isVenue) data.append('username', formData.username);
-    if (formData.avatar) {
-      data.append('avatar', formData.avatar);
-    } else if (user.avatar_path) {
-      data.append('avatar_path', user.avatar_path);
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('description', formData.description);
+      if (!isVenue) data.append('username', formData.username);
+      if (formData.avatar) {
+        data.append('avatar', formData.avatar);
+      } else if (user.avatar_path) {
+        data.append('avatar_path', user.avatar_path);
+      }
+
+      const response = await fetch('http://localhost:3000/api/profile', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: data,
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar perfil');
+
+      const updated = await response.json();
+      onProfileUpdated(updated);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al actualizar el perfil');
+    } finally {
+      setLoading(false);
     }
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        // ← Sin Content-Type, el browser lo pone solo con el boundary correcto
-      },
-      body: data,
-    });
-
-    if (!response.ok) throw new Error('Error al actualizar perfil');
-
-    const updated = await response.json();
-    onProfileUpdated(updated);
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error al actualizar el perfil');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-white text-xl font-bold">✏️ Editar Perfil</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">
@@ -752,7 +783,6 @@ function EditProfileModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Avatar */}
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
               {avatarPreview ? (
@@ -776,7 +806,6 @@ function EditProfileModal({
             <p className="text-gray-400 text-xs">Toca la cámara para cambiar tu foto</p>
           </div>
 
-          {/* Nombre */}
           <div>
             <label className="block text-white font-medium mb-2">
               {isVenue ? 'Nombre del local *' : 'Nombre *'}
@@ -791,7 +820,6 @@ function EditProfileModal({
             />
           </div>
 
-          {/* Username (solo usuarios) */}
           {!isVenue && (
             <div>
               <label className="block text-white font-medium mb-2">Usuario</label>
@@ -808,7 +836,6 @@ function EditProfileModal({
             </div>
           )}
 
-          {/* Descripción */}
           <div>
             <label className="block text-white font-medium mb-2">Descripción</label>
             <textarea
@@ -822,7 +849,6 @@ function EditProfileModal({
             <p className="text-gray-500 text-xs text-right mt-1">{formData.description.length}/200</p>
           </div>
 
-          {/* Botones */}
           <div className="flex gap-3 pt-2">
             <button
               type="button"
@@ -844,22 +870,26 @@ function EditProfileModal({
     </div>
   );
 }
+
+// Modal para editar eventos
 function EditEventModal({
   event,
   onClose,
   onEventUpdated,
+  onEventDeleted,
 }: {
   event: any;
   onClose: () => void;
   onEventUpdated: () => void;
+  onEventDeleted: () => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(event.image_path || null);
   const [formData, setFormData] = useState({
     title: event.title || '',
     description: event.description || '',
-    starts_at: event.starts_at ? event.starts_at.slice(0, 16) : '',
-    ends_at: event.ends_at ? event.ends_at.slice(0, 16) : '',
+    starts_at: event.starts_at ? new Date(event.starts_at) : null,
+    ends_at: event.ends_at ? new Date(event.ends_at) : null,
     featured: event.featured || false,
     image: null as File | null,
   });
@@ -874,6 +904,31 @@ function EditEventModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:3000/api/events/${event.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Error al eliminar evento');
+      
+      onEventDeleted();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar el evento');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -884,8 +939,8 @@ function EditEventModal({
       data.append('venue_id', event.venue_id);
       data.append('title', formData.title);
       data.append('description', formData.description);
-      data.append('starts_at', formData.starts_at);
-      data.append('ends_at', formData.ends_at);
+      data.append('starts_at', formData.starts_at?.toISOString() || '');
+      data.append('ends_at', formData.ends_at?.toISOString() || '');
       data.append('featured', formData.featured.toString());
 
       if (formData.image) {
@@ -894,7 +949,7 @@ function EditEventModal({
         data.append('image_path', event.image_path);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${event.id}`, {
+      const response = await fetch(`http://localhost:3000/api/events/${event.id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: data,
@@ -923,7 +978,6 @@ function EditEventModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Imagen */}
           <div>
             <label className="block text-white font-medium mb-2">Imagen del evento</label>
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="edit-event-image" />
@@ -941,7 +995,6 @@ function EditEventModal({
             </label>
           </div>
 
-          {/* Título */}
           <div>
             <label className="block text-white font-medium mb-2">Título *</label>
             <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -949,7 +1002,6 @@ function EditEventModal({
               placeholder="Nombre del evento" />
           </div>
 
-          {/* Descripción */}
           <div>
             <label className="block text-white font-medium mb-2">Descripción</label>
             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -957,21 +1009,31 @@ function EditEventModal({
               placeholder="Describe tu evento..." />
           </div>
 
-          {/* Fechas */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-white font-medium mb-2">Inicio *</label>
-              <input type="datetime-local" required value={formData.starts_at} onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
-                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
+              <DatePicker
+                selected={formData.starts_at}
+                onChange={(date) => setFormData({ ...formData, starts_at: date })}
+                showTimeSelect
+                dateFormat="Pp"
+                minDate={new Date()}
+                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none"
+              />
             </div>
             <div>
               <label className="block text-white font-medium mb-2">Fin *</label>
-              <input type="datetime-local" required value={formData.ends_at} onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
-                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
+              <DatePicker
+                selected={formData.ends_at}
+                onChange={(date) => setFormData({ ...formData, ends_at: date })}
+                showTimeSelect
+                dateFormat="Pp"
+                minDate={new Date()}
+                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none"
+              />
             </div>
           </div>
 
-          {/* Destacado */}
           <div className="flex items-center justify-between bg-ozio-dark rounded-xl px-4 py-3 border border-gray-700">
             <span className="text-white font-medium">⭐ Evento destacado</span>
             <button type="button" onClick={() => setFormData({ ...formData, featured: !formData.featured })}
@@ -980,8 +1042,11 @@ function EditEventModal({
             </button>
           </div>
 
-          {/* Botones */}
           <div className="flex gap-3 pt-4">
+            <button type="button" onClick={handleDelete} disabled={loading}
+              className="py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? '...' : '🗑️'}
+            </button>
             <button type="button" onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition">
               Cancelar
             </button>

@@ -42,11 +42,17 @@ export default function EventDetailPage({
   const [loading, setLoading] = useState(true);
   const [eventId, setEventId] = useState<string>("");
   const [isAttending, setIsAttending] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
   useEffect(() => {
     params.then((resolvedParams) => {
       setEventId(resolvedParams.id);
     });
+    if (typeof window !== "undefined") {
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      setIsUserLoggedIn(!!token);
+    }
   }, [params]);
 
   useEffect(() => {
@@ -411,6 +417,7 @@ export default function EventDetailPage({
         )}
 
         {/* Botones de acción */}
+        {isUserLoggedIn && (
         <div className="flex gap-3">
           {isAttending ? (
             <button
@@ -453,23 +460,8 @@ export default function EventDetailPage({
               Asistir
             </button>
           )}
-
-          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316"
-              />
-            </svg>
-          </button>
         </div>
+          )}
       </div>
     </div>
   );

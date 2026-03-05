@@ -1,7 +1,10 @@
 import { Bell, User } from 'lucide-react';
 import Stories from '@/components/Stories/stories';
+import { ro } from 'date-fns/locale';
+import { useRouter } from 'next/navigation';
 
 function Header() {
+  const router = useRouter();
   return (
     <header className="w-full bg-gradient-to-b from-gray-900 to-transparent text-white z-991">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -24,7 +27,10 @@ function Header() {
           <button className="hover:text-blue-400 transition">
             <Bell size={18} />
           </button>
-          <button className="hover:text-blue-400 transition">
+          <button 
+          className="hover:text-blue-400 transition"
+          onClick={() => { router.push('/profile') }}
+          >
             <User size={18} />
           </button>
         </div>

@@ -158,8 +158,8 @@ function MyMap() {
     })
     .then(res => res.json())
     .then(data => { 
-      setVenues(venues.map(v => v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data] } : v));
-      if (selectedVenue && selectedVenue.id === venueId) setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data] });
+      setVenues(venues.map(v => v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data.data] } : v));
+      if (selectedVenue && selectedVenue.id === venueId) setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data.data] });
       closeModal();
     });
   };

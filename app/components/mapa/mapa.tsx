@@ -160,7 +160,7 @@ function MyMap() {
       });
   };
 
-  const toggleFavorite = (venueId: number, isFavorite: boolean) => {
+  const toggleFavorite = (venueId: any, isFavorite: boolean) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
 

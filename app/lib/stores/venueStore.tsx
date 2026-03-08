@@ -17,7 +17,7 @@ interface Venue {
   longitude: number;
   name: string;
   ambience_level: 'low' | 'medium' | 'high';
-  description: string;
+  description?: string;
   avatar_path?: string;
   distance?: string;
   genres?: string[];

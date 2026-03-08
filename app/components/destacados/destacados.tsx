@@ -7,7 +7,7 @@ import { useState } from 'react';
 interface Venue {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   address?: string | null;
   latitude: number;
   longitude: number;

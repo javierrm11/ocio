@@ -1,8 +1,8 @@
 "use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getPublicImageUrl } from "@/lib/getImageUrl";
+import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
 
 interface Event {
@@ -30,12 +30,6 @@ interface Venue {
   check_ins?: any[];
   is_favorite?: boolean;
   events?: Event[];
-}
-
-interface UserProfile {
-  id: string;
-  username: string;
-  role: "user" | "venue";
 }
 
 // Helpers para eventos
@@ -106,70 +100,11 @@ function formatEventTime(event: Event): string {
 
 function MyMap() {
   const router = useRouter();
-  const [venues, setVenues] = useState<Venue[]>([]);
+
+  // ✅ Datos del store global — no se vuelven a cargar al navegar
+  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded } = useAppStore();
+
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
-  const [userFavorites, setUserFavorites] = useState<number[]>([]);
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = async () => {
-    setLoading(true);
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-
-    try {
-      // ✅ Venues siempre se carga, sin token
-      const venuesRes = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/venues`,
-      );
-      const venuesData = await venuesRes.json();
-
-      // ✅ Solo llamamos a APIs autenticadas si hay token
-      if (token) {
-        try {
-          const [favoritesRes, profileRes] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-          ]);
-
-          const [favoritesData, profileData] = await Promise.all([
-            favoritesRes.json(),
-            profileRes.json(),
-          ]);
-
-          const favoriteIds = favoritesData.map((fav: any) => fav.venue_id);
-          setUserFavorites(favoriteIds);
-          setCurrentUser(profileData[0]);
-
-          setVenues(
-            venuesData.map((venue: Venue) => ({
-              ...venue,
-              is_favorite: favoriteIds.includes(venue.id),
-            })),
-          );
-        } catch (authErr) {
-          // Token inválido/expirado → mostramos venues sin auth
-          console.warn("Auth failed, showing venues without user data");
-          setVenues(venuesData);
-        }
-      } else {
-        // Sin token → venues sin favoritos
-        setVenues(venuesData);
-      }
-    } catch (err) {
-      console.error("Error loading venues:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
@@ -177,6 +112,7 @@ function MyMap() {
   const onCheckIn = (venueId: any) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
+
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
       headers: {
@@ -187,6 +123,7 @@ function MyMap() {
     })
       .then((res) => res.json())
       .then((data) => {
+        // ✅ Actualiza el store global
         setVenues(
           venues.map((v) =>
             v.id === venueId
@@ -206,12 +143,14 @@ function MyMap() {
   const onCheckOut = (venueId: any) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
+
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then(() => {
+        // ✅ Actualiza el store global
         setVenues(
           venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)),
         );
@@ -224,11 +163,13 @@ function MyMap() {
   const toggleFavorite = (venueId: number, isFavorite: boolean) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
+
     if (isFavorite) {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       }).then(() => {
+        // ✅ Actualiza el store global
         setVenues(
           venues.map((v) =>
             v.id === venueId ? { ...v, is_favorite: false } : v,
@@ -247,6 +188,7 @@ function MyMap() {
         },
         body: JSON.stringify({ venue_id: venueId }),
       }).then(() => {
+        // ✅ Actualiza el store global
         setVenues(
           venues.map((v) =>
             v.id === venueId ? { ...v, is_favorite: true } : v,
@@ -262,7 +204,8 @@ function MyMap() {
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
 
-  if (loading) {
+  // ✅ Loading controlado por el store, no por estado local
+  if (!loaded) {
     return (
       <div className="fixed inset-0 bg-ozio-dark flex flex-col items-center justify-center z-50">
         <div className="relative">
@@ -296,7 +239,7 @@ function MyMap() {
 
           return (
             <CircleMarker
-              key={venue.id}
+              key={`${venue.id}-${venue.check_ins?.length || 0}`}
               center={[venue.latitude, venue.longitude] as [number, number]}
               radius={eventStatus !== "none" ? 11 : 8}
               color={
@@ -468,7 +411,7 @@ function MyMap() {
                 <h2 className="text-white text-2xl font-bold mb-2">
                   {selectedVenue.name}
                 </h2>
-                <p id="count-checkins" className="text-white text-sm">
+                <p className="text-white text-sm">
                   {selectedVenue.check_ins?.length || 0} check-ins
                 </p>
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
@@ -529,30 +472,34 @@ function MyMap() {
                     Ver detalles
                   </button>
                   {isUserProfile && (
-                  <button
-                    type="button"
-                    className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${selectedVenue.is_favorite ? "bg-red-600 hover:bg-red-700 text-white" : "bg-gray-600 hover:bg-gray-700 text-white"}`}
-                    onClick={() =>
-                      toggleFavorite(
-                        selectedVenue.id,
-                        selectedVenue.is_favorite || false,
-                      )
-                    }
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill={selectedVenue.is_favorite ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    <button
+                      type="button"
+                      className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${
+                        selectedVenue.is_favorite
+                          ? "bg-red-600 hover:bg-red-700 text-white"
+                          : "bg-gray-600 hover:bg-gray-700 text-white"
+                      }`}
+                      onClick={() =>
+                        toggleFavorite(
+                          selectedVenue.id,
+                          selectedVenue.is_favorite || false,
+                        )
+                      }
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        className="w-5 h-5"
+                        fill={selectedVenue.is_favorite ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      </svg>
+                    </button>
                   )}
                 </div>
               </div>
@@ -583,7 +530,6 @@ function MyMap() {
           animation: slide-up 0.3s ease-out;
         }
 
-        /* Pulso para eventos activos (morado) */
         @keyframes event-pulse {
           0%,
           100% {
@@ -600,7 +546,6 @@ function MyMap() {
           animation: event-pulse 1.5s ease-in-out infinite;
         }
 
-        /* Pulso suave para eventos próximos (naranja) */
         @keyframes soon-pulse {
           0%,
           100% {

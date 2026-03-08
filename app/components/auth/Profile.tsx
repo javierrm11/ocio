@@ -3,6 +3,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DatePicker from "react-datepicker";
+import { useAppStore } from '@/lib/stores/venueStore'; // 👈
 
 interface UserProfile {
   id: string;
@@ -21,8 +22,10 @@ interface UserProfile {
 }
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
+  
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
+  const { setLoaded, setCurrentUser, setUserFavorites, setVenues } = useAppStore(); // 👈
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('');
   const [showEventModal, setShowEventModal] = useState(false);
@@ -90,14 +93,21 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    if (onLogout) {
-      onLogout();
-    } else {
-      router.push('/');
-    }
-  };
+  localStorage.removeItem('token');
+  sessionStorage.removeItem('token');
+
+  // ✅ Limpiar store y forzar recarga sin token
+  setCurrentUser(null);
+  setUserFavorites([]);
+  setVenues([]);
+  setLoaded(false);
+
+  if (onLogout) {
+    onLogout();
+  } else {
+    router.push('/');
+  }
+};
 
   if (loading) {
     return (

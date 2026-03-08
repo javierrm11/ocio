@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAppStore } from '@/lib/stores/venueStore'; // 👈
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -12,6 +13,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const { setLoaded } = useAppStore(); // 👈
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,7 +38,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         throw new Error(data.error || 'Error al iniciar sesión');
       }
 
-      // Guardar token solo en cliente
       if (typeof window !== 'undefined') {
         if (rememberMe) {
           localStorage.setItem('token', data.session.access_token);
@@ -43,6 +45,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           sessionStorage.setItem('token', data.session.access_token);
         }
       }
+
+      // ✅ Forzar recarga del store con el nuevo token
+      setLoaded(false);
 
       onLoginSuccess();
     } catch (err: any) {
@@ -64,7 +69,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
               Email
@@ -81,7 +85,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             />
           </div>
 
-          {/* Contraseña */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
               Contraseña
@@ -98,7 +101,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             />
           </div>
 
-          {/* Remember me */}
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -124,7 +126,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-700"></div>
@@ -134,7 +135,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
         </div>
 
-        {/* Social login */}
         <div className="grid grid-cols-2 gap-4">
           <button className="bg-ozio-dark border border-gray-700 text-white font-medium py-3 px-4 rounded-xl hover:bg-gray-800 transition flex items-center justify-center gap-2">
             Google

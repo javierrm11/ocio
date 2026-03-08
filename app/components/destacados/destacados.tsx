@@ -11,7 +11,7 @@ interface Venue {
   address?: string | null;
   latitude: number;
   longitude: number;
-  avatar_path: string;
+  avatar_path?: string;
   check_ins: any[];
 }
 

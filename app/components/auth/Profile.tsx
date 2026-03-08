@@ -46,7 +46,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch('http://localhost:3000/api/profile', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -73,7 +73,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${eventId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -493,7 +493,7 @@ function CreateEventModal({
         data.append('image', formData.image);
       }
 
-      const response = await fetch('http://localhost:3000/api/events', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -760,7 +760,7 @@ function EditProfileModal({
         data.append('avatar_path', user.avatar_path);
       }
 
-      const response = await fetch('http://localhost:3000/api/profile', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -923,7 +923,7 @@ function EditEventModal({
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:3000/api/events/${event.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${event.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -959,7 +959,7 @@ function EditEventModal({
         data.append('image_path', event.image_path);
       }
 
-      const response = await fetch(`http://localhost:3000/api/events/${event.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${event.id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: data,

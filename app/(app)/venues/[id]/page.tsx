@@ -45,12 +45,12 @@ export default function VenueDetail() {
   const venueFromStore = venues.find((v) => String(v.id) === venueId) ?? null;
 
   // ✅ Enriquecer con sus eventos del store
-  const venueWithEvents: Venue | null = venueFromStore
-    ? {
-        ...venueFromStore,
-        events: events.filter((e) => e.venue_id === venueId),
-      }
-    : null;
+  const venueWithEvents = venueFromStore
+  ? ({
+      ...venueFromStore,
+      events: events.filter((e) => e.venue_id === venueId),
+    } as unknown as Venue)
+  : null;
 
   // ✅ 2. Si no está en el store, fetch como fallback
   const [venue, setVenue] = useState<Venue | null>(venueWithEvents);

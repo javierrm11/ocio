@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useAppStore } from '@/lib/stores/venueStore';
 
 interface Event {
   id: string;
@@ -38,60 +39,68 @@ export default function VenueDetail() {
   const router = useRouter();
   const params = useParams();
   const venueId = params.id as string;
-  
-  const [venue, setVenue] = useState<Venue | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { venues, events } = useAppStore();
+
+  // ✅ 1. Busca en el store
+  const venueFromStore = venues.find((v) => String(v.id) === venueId) ?? null;
+
+  // ✅ Enriquecer con sus eventos del store
+  const venueWithEvents: Venue | null = venueFromStore
+    ? {
+        ...venueFromStore,
+        events: events.filter((e) => e.venue_id === venueId),
+      }
+    : null;
+
+  // ✅ 2. Si no está en el store, fetch como fallback
+  const [venue, setVenue] = useState<Venue | null>(venueWithEvents);
+  const [loading, setLoading] = useState(!venueWithEvents);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
 
   useEffect(() => {
-    if (venueId) {
-      fetchVenueDetail();
-    }
-  }, [venueId]);
+    if (venue) return; // ya tenemos datos
 
-  const fetchVenueDetail = async () => {
-    try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+    const fetchVenueDetail = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      if (!response.ok) {
-        throw new Error('Error al cargar el local');
+        if (!response.ok) throw new Error('Error al cargar el local');
+
+        const result = await response.json();
+        setVenue(result);
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const result = await response.json();
-      setVenue(result);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchVenueDetail();
+  }, [venueId]);
 
   const handleCheckIn = async () => {
     if (checkingIn) return;
-    
     setCheckingIn(true);
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}/checkin`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         setHasCheckedIn(true);
-        // Recargar datos para actualizar contador
-        fetchVenueDetail();
+        // Actualiza el contador localmente sin refetch
+        setVenue((prev) =>
+          prev
+            ? { ...prev, check_ins: [...(prev.check_ins || []), { id: Date.now().toString(), user_id: '', venue_id: venueId, created_at: new Date().toISOString() }] }
+            : prev,
+        );
       }
     } catch (error) {
       console.error('Error:', error);
@@ -147,11 +156,9 @@ export default function VenueDetail() {
     );
   }
 
-  const upcomingEvents = venue.events?.filter(event => 
-    new Date(event.starts_at) > new Date()
-  ).sort((a, b) => 
-    new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
-  ) || [];
+  const upcomingEvents = venue.events
+    ?.filter((event) => new Date(event.starts_at) > new Date())
+    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()) || [];
 
   const totalCheckIns = venue.check_ins?.length || 0;
 
@@ -159,17 +166,13 @@ export default function VenueDetail() {
     <div className="min-h-screen bg-ozio-dark pb-20">
       {/* Header con imagen */}
       <div className="relative h-80">
-        {/* Imagen de fondo */}
         <img
           src={venue.avatar_path || 'https://via.placeholder.com/800x600'}
           alt={venue.name}
           className="w-full h-full object-cover"
         />
-        
-        {/* Overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-ozio-dark"></div>
 
-        {/* Botones superiores */}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 pt-16">
           <button
             onClick={() => router.back()}
@@ -189,10 +192,7 @@ export default function VenueDetail() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
             </button>
-
-            <button
-              className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition border border-white/10"
-            >
+            <button className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition border border-white/10">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
@@ -200,7 +200,6 @@ export default function VenueDetail() {
           </div>
         </div>
 
-        {/* Stats badge */}
         <div className="absolute bottom-4 left-4">
           <div className="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium border border-white/10 flex items-center gap-2">
             <svg className="w-5 h-5 text-ozio-orange" fill="currentColor" viewBox="0 0 24 24">
@@ -213,19 +212,13 @@ export default function VenueDetail() {
 
       {/* Contenido principal */}
       <div className="px-4 -mt-6 relative z-10">
-        {/* Card principal */}
         <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 shadow-2xl mb-6">
-          {/* Título */}
           <h1 className="text-white text-3xl font-bold mb-4">{venue.name}</h1>
 
-          {/* Descripción */}
           {venue.description && (
-            <p className="text-gray-300 leading-relaxed mb-6">
-              {venue.description}
-            </p>
+            <p className="text-gray-300 leading-relaxed mb-6">{venue.description}</p>
           )}
 
-          {/* Dirección */}
           {venue.address && (
             <div className="flex items-start gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex items-center justify-center flex-shrink-0">
@@ -241,7 +234,6 @@ export default function VenueDetail() {
             </div>
           )}
 
-          {/* Botón de Check-in */}
           <button
             onClick={handleCheckIn}
             disabled={hasCheckedIn || checkingIn}
@@ -249,8 +241,8 @@ export default function VenueDetail() {
               hasCheckedIn
                 ? 'bg-green-600 text-white'
                 : checkingIn
-                ? 'bg-gray-600 text-white'
-                : 'bg-gradient-to-r from-ozio-orange to-red-500 text-white hover:shadow-2xl hover:scale-[1.02]'
+                  ? 'bg-gray-600 text-white'
+                  : 'bg-gradient-to-r from-ozio-orange to-red-500 text-white hover:shadow-2xl hover:scale-[1.02]'
             }`}
           >
             {hasCheckedIn ? (
@@ -285,11 +277,10 @@ export default function VenueDetail() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full"
             />
           </div>
           <div className="p-4">
-            <button 
+            <button
               onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, '_blank')}
               className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
             >
@@ -311,7 +302,6 @@ export default function VenueDetail() {
                 {upcomingEvents.length}
               </span>
             </div>
-            
             <div className="space-y-3">
               {upcomingEvents.map((event) => (
                 <EventMiniCard key={event.id} event={event} />
@@ -321,13 +311,13 @@ export default function VenueDetail() {
         )}
       </div>
 
-      {/* Share menu modal */}
+      {/* Share menu */}
       {showShareMenu && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center p-4"
           onClick={() => setShowShareMenu(false)}
         >
-          <div 
+          <div
             className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
@@ -356,57 +346,45 @@ export default function VenueDetail() {
   );
 }
 
-// Mini card para eventos en el venue
 function EventMiniCard({ event }: { event: Event }) {
   const router = useRouter();
   const startDate = new Date(event.starts_at);
 
   return (
-    <div 
+    <div
       className="bg-ozio-dark border border-gray-700/50 rounded-2xl p-4 hover:border-ozio-blue/50 transition cursor-pointer"
-      onClick={() => router.push(`/events/${event.id}`)}
+      onClick={() => {
+        const eventData = encodeURIComponent(JSON.stringify(event));
+        router.push(`/events/${event.id}?data=${eventData}`);
+      }}
     >
       <div className="flex gap-3">
-        {/* Fecha compacta */}
         <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex flex-col items-center justify-center">
           <span className="text-white text-xs font-medium">
             {startDate.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()}
           </span>
-          <span className="text-white text-2xl font-bold">
-            {startDate.getDate()}
-          </span>
+          <span className="text-white text-2xl font-bold">{startDate.getDate()}</span>
         </div>
 
-        {/* Info del evento */}
         <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold truncate mb-1">{event.title}</h3>
-          
           {event.description && (
             <p className="text-gray-400 text-sm line-clamp-1 mb-2">{event.description}</p>
           )}
-
           <div className="flex items-center gap-2 text-gray-400 text-xs">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>
-              {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-            </span>
+            <span>{startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </div>
 
-        {/* Imagen del evento */}
         {event.image_path && (
           <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden">
-            <img
-              src={event.image_path}
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={event.image_path} alt={event.title} className="w-full h-full object-cover" />
           </div>
         )}
 
-        {/* Arrow */}
         <div className="flex items-center">
           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

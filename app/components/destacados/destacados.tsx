@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppStore } from "@/lib/stores/venueStore";
+import { useState } from 'react';
 
 interface Venue {
   id: string;
@@ -22,49 +23,17 @@ interface Event {
   starts_at: string;
   ends_at: string;
   featured: boolean;
-  image_path: string | null,
+  image_path: string | null;
   event_attendees?: any[];
-}
-
-interface DestacadosData {
-  events: Event[];
-  venues: Venue[];
 }
 
 export default function Destacados() {
   const router = useRouter();
-  const [data, setData] = useState<DestacadosData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { venues, events, loaded } = useAppStore();
   const [activeTab, setActiveTab] = useState<'eventos' | 'locales'>('eventos');
 
-  useEffect(() => {
-    fetchDestacados();
-  }, []);
-
-  const fetchDestacados = async () => {
-    try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/destacados`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al cargar destacados');
-      }
-
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  // ✅ Loading controlado por el store
+  if (!loaded) {
     return (
       <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ozio-blue"></div>
@@ -72,15 +41,12 @@ export default function Destacados() {
     );
   }
 
-  if (!data) return null;
+  // ✅ venues es el array directamente, no [venues]
+  const topVenues = [...venues]
+    .sort((a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
+    .slice(0, 5);
 
-  // Ordenar venues por cantidad de check-ins
-  const topVenues = [...data.venues].sort(
-    (a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0)
-  ).slice(0, 5);
-
-  // Filtrar solo eventos destacados y ordenar por fecha
-  const featuredEvents = data.events
+  const featuredEvents = events
     .filter(event => event.featured)
     .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 
@@ -169,18 +135,19 @@ export default function Destacados() {
   );
 }
 
-// Componente para tarjeta de evento
 function EventCard({ event }: { event: Event }) {
   const router = useRouter();
   const startDate = new Date(event.starts_at);
   const endDate = new Date(event.ends_at);
 
   return (
-    <div 
+    <div
       className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer"
-      onClick={() => router.push(`/events/${event.id}`)}
+      onClick={() => {
+        const eventData = encodeURIComponent(JSON.stringify(event));
+        router.push(`/events/${event.id}?data=${eventData}`);
+      }}
     >
-      {/* Imagen */}
       <div className="relative h-48">
         <img
           src={event.image_path || 'https://via.placeholder.com/400x200'}
@@ -194,25 +161,19 @@ function EventCard({ event }: { event: Event }) {
         </div>
       </div>
 
-      {/* Info */}
       <div className="p-4">
         <h3 className="text-white font-bold text-lg mb-2">{event.title}</h3>
-        
+
         {event.description && (
           <p className="text-gray-400 text-sm mb-3 line-clamp-2">{event.description}</p>
         )}
 
-        {/* Fecha y hora */}
         <div className="flex items-center gap-2 text-gray-300 text-sm mb-2">
           <svg className="w-4 h-4 text-ozio-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>
-            {startDate.toLocaleDateString('es-ES', { 
-              weekday: 'short', 
-              day: 'numeric', 
-              month: 'short' 
-            })}
+            {startDate.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
           </span>
         </div>
 
@@ -221,11 +182,11 @@ function EventCard({ event }: { event: Event }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>
-            {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - 
+            {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} -
             {endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
-        {/* Asistentes */}
+
         <div className="flex items-center gap-2 mt-3">
           <div className="bg-ozio-blue/20 text-ozio-blue text-xs px-3 py-1 rounded-full font-medium border border-ozio-blue/30 flex items-center gap-1">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -239,12 +200,11 @@ function EventCard({ event }: { event: Event }) {
   );
 }
 
-// Componente para tarjeta de venue con ranking
 function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
   const router = useRouter();
-  
+
   const getRankColor = (rank: number) => {
-    switch(rank) {
+    switch (rank) {
       case 1: return 'from-yellow-500 to-yellow-600';
       case 2: return 'from-gray-400 to-gray-500';
       case 3: return 'from-orange-600 to-orange-700';
@@ -253,7 +213,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
   };
 
   const getRankEmoji = (rank: number) => {
-    switch(rank) {
+    switch (rank) {
       case 1: return '🥇';
       case 2: return '🥈';
       case 3: return '🥉';
@@ -262,29 +222,26 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
   };
 
   return (
-    <div 
+    <div
       className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-orange/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       <div className="flex gap-4 p-4">
-        {/* Ranking Badge */}
         <div className="flex-shrink-0">
           <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getRankColor(rank)} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
             {getRankEmoji(rank)}
           </div>
         </div>
 
-        {/* Avatar */}
         <img
           src={venue.avatar_path || 'https://via.placeholder.com/80'}
           alt={venue.name}
           className="w-20 h-20 rounded-xl object-cover"
         />
 
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold text-lg truncate">{venue.name}</h3>
-          
+
           {venue.address && (
             <div className="flex items-center gap-1 text-gray-400 text-sm mt-1">
               <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,7 +252,6 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
             </div>
           )}
 
-          {/* Check-ins counter */}
           <div className="flex items-center gap-2 mt-2">
             <div className="bg-ozio-orange/20 text-ozio-orange text-xs px-3 py-1 rounded-full font-medium border border-ozio-orange/30 flex items-center gap-1">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -306,7 +262,6 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
           </div>
         </div>
 
-        {/* Arrow */}
         <div className="flex items-center">
           <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -316,3 +271,4 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
     </div>
   );
 }
+

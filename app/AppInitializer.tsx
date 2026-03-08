@@ -3,16 +3,36 @@ import { useEffect } from "react";
 import { useAppStore } from "@/lib/stores/venueStore";
 
 export function AppInitializer() {
-  const { loaded, setVenues, setUserFavorites, setCurrentUser, setLoaded } = useAppStore();
+  const {
+    loaded,
+    setVenues,
+    setUserFavorites,
+    setCurrentUser,
+    setLoaded,
+    setEvents,
+  } = useAppStore();
 
   useEffect(() => {
     if (loaded) return;
 
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
 
     const loadData = async () => {
-      const venuesRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues`);
+      const venuesRes = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/venues`,
+      );
       const venuesData = await venuesRes.json();
+      const eventsRes = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/events`,
+      );
+      const eventsData = await eventsRes.json();
+
+      // ✅ Enriquecer eventos con los datos del venue
+      const eventsWithVenues = eventsData.map((event: any) => ({
+        ...event,
+        venues: venuesData.find((v: any) => v.id === event.venue_id) || null,
+      }));
 
       if (token) {
         try {
@@ -24,17 +44,28 @@ export function AppInitializer() {
               headers: { Authorization: `Bearer ${token}` },
             }),
           ]);
-          const [favData, profileData] = await Promise.all([favRes.json(), profileRes.json()]);
+          const [favData, profileData] = await Promise.all([
+            favRes.json(),
+            profileRes.json(),
+          ]);
           const favoriteIds = favData.map((f: any) => f.venue_id);
 
           setUserFavorites(favoriteIds);
           setCurrentUser(profileData[0]);
-          setVenues(venuesData.map((v: any) => ({ ...v, is_favorite: favoriteIds.includes(v.id) })));
+          setVenues(
+            venuesData.map((v: any) => ({
+              ...v,
+              is_favorite: favoriteIds.includes(v.id),
+            })),
+          );
+          setEvents(eventsWithVenues); // 👈
         } catch {
           setVenues(venuesData);
+          setEvents(eventsWithVenues); // 👈
         }
       } else {
         setVenues(venuesData);
+        setEvents(eventsWithVenues); // 👈
       }
 
       setLoaded(true);

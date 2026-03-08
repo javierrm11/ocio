@@ -34,9 +34,11 @@ interface AppStore {
   userFavorites: number[];
   currentUser: any | null;
   loaded: boolean;
+  events: Event[];
   setVenues: (v: Venue[]) => void;
   setUserFavorites: (ids: number[]) => void;
   setCurrentUser: (u: any | null) => void;
+  setEvents: (events: Event[]) => void;
   setLoaded: (v: boolean) => void;
 }
 
@@ -45,8 +47,10 @@ export const useAppStore = create<AppStore>((set) => ({
   userFavorites: [],
   currentUser: null,
   loaded: false,
+  events: [],
   setVenues: (venues) => set({ venues }),
   setUserFavorites: (userFavorites) => set({ userFavorites }),
   setCurrentUser: (currentUser) => set({ currentUser }),
+  setEvents: (events) => set({ events }),
   setLoaded: (loaded) => set({ loaded }),
 }));

@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   
   const query = supabase
   .from("events")
-  .select("*, event_attendees(count)")
+  .select("*, event_attendees(count), venues(*)")
   .order("count", { foreignTable: "event_attendees", ascending: false })
   .limit(5);
   const query_venues = supabase.from("venues").select("*, check_ins(*)").order("created_at", { ascending: false }).limit(5);

@@ -8,7 +8,7 @@ interface Venue {
   id: string;
   name: string;
   description: string;
-  address: string | null;
+  address?: string | null;
   latitude: number;
   longitude: number;
   avatar_path: string;

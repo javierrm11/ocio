@@ -528,6 +528,7 @@ function MyMap() {
                   >
                     Ver detalles
                   </button>
+                  {isUserProfile && (
                   <button
                     type="button"
                     className={`flex-1 w-full font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition ${selectedVenue.is_favorite ? "bg-red-600 hover:bg-red-700 text-white" : "bg-gray-600 hover:bg-gray-700 text-white"}`}
@@ -552,6 +553,7 @@ function MyMap() {
                       />
                     </svg>
                   </button>
+                  )}
                 </div>
               </div>
             </div>

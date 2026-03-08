@@ -12,7 +12,7 @@ interface Event {
 }
 
 interface Venue {
-  id: number;
+  id: string;
   latitude: number;
   longitude: number;
   name: string;

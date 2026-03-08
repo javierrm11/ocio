@@ -49,7 +49,7 @@ export default function EventDetailPage() {
   const eventFromStore = events.find((e) => e.id === eventId) ?? null;
 
   // ✅ 3. Si tampoco, fetch como último recurso
-  const [event, setEvent] = useState<Event | null>(eventFromUrl ?? eventFromStore ?? null);
+  const [event, setEvent] = useState<Event | null>((eventFromUrl ?? eventFromStore ?? null) as Event | null);
   const [loading, setLoading] = useState(!eventFromUrl && !eventFromStore);
 
   const isUserLoggedIn = !!currentUser;

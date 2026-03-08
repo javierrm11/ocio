@@ -12,7 +12,7 @@ interface Venue {
   latitude: number;
   longitude: number;
   avatar_path?: string;
-  check_ins: any[];
+  check_ins?: any[];
 }
 
 interface Event {

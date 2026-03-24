@@ -10,7 +10,9 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("stories")
-    .select("*, venues(name)");
+    .select("*, venues(name, avatar_path)") // ✅ Incluir datos del local
+    .gt("expires_at", new Date().toISOString()) // ✅ Solo stories activas
+    .order("created_at", { ascending: false });
 
   const filterableFields = [
     "venue_id",

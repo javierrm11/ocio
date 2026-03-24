@@ -4,13 +4,13 @@ import { NextResponse } from "next/server";
 
 // obtener todas las companies, con filtro opcional por cualquier campo
 export async function GET(request: Request) {
-
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
 
-  let query = supabase.from("events").select("*, event_attendees(*)");
+  let query = supabase
+    .from("events")
+    .select("*, event_attendees(*)");
 
-  // Lista de campos por los que se puede filtrar
   const filterableFields = [
     "venue_id",
     "title",
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
   filterableFields.forEach((field) => {
     const value = searchParams.get(field);
     if (value) {
-      query = query.ilike(field, `%${value}%`);
+      query = query.or(`${field}.ilike.%${value}%`);
     }
   });
 
@@ -34,7 +34,37 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json(data);
+  const now = new Date();
+
+  // ✅ Asigna prioridad: 0 = activo ahora, 1 = futuro, 2 = pasado
+  const getEventPriority = (event: any): number => {
+    const starts = new Date(event.starts_at);
+    const ends = new Date(event.ends_at);
+    if (starts <= now && ends >= now) return 0; // en curso
+    if (starts > now) return 1;                 // próximo
+    return 2;                                   // finalizado
+  };
+
+  const sorted = data.sort((a: any, b: any) => {
+    const priorityDiff = getEventPriority(a) - getEventPriority(b);
+    if (priorityDiff !== 0) return priorityDiff;
+
+    const aStarts = new Date(a.starts_at).getTime();
+    const bStarts = new Date(b.starts_at).getTime();
+    const aAttendees = a.event_attendees?.length ?? 0;
+    const bAttendees = b.event_attendees?.length ?? 0;
+
+    // Dentro del mismo grupo, ordenar por asistentes desc y luego por fecha
+    if (bAttendees !== aAttendees) return bAttendees - aAttendees;
+
+    // Futuros: los más próximos primero (asc)
+    // Pasados: los más recientes primero (desc)
+    return getEventPriority(a) === 1
+      ? aStarts - bStarts
+      : bStarts - aStarts;
+  });
+
+  return NextResponse.json(sorted);
 }
 
 // crear un nuevo event

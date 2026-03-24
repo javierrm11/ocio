@@ -46,9 +46,7 @@ export default function Destacados() {
     .sort((a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
     .slice(0, 5);
 
-  const featuredEvents = events
-    .filter(event => event.featured)
-    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+  const featuredEvents = events.filter((e: Event) => e.featured).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-20">
@@ -140,9 +138,44 @@ function EventCard({ event }: { event: Event }) {
   const startDate = new Date(event.starts_at);
   const endDate = new Date(event.ends_at);
 
+  // ✅ Detectar si el evento ya finalizó
+  const isPastEvent = endDate < new Date();
+  const isActiveEvent = startDate <= new Date() && endDate >= new Date();
+
+  // ✅ Badge de estado
+  const getStatusBadge = () => {
+    if (isPastEvent) {
+      return (
+        <span className="bg-gray-700/90 backdrop-blur-sm text-gray-400 text-xs px-3 py-1.5 rounded-full font-medium border border-gray-600/30 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Finalizado
+        </span>
+      );
+    }
+    if (isActiveEvent) {
+      return (
+        <span className="bg-green-600/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-green-500/30 flex items-center gap-1 animate-pulse">
+          <div className="w-2 h-2 bg-white rounded-full"></div>
+          En curso
+        </span>
+      );
+    }
+    return (
+      <span className="bg-ozio-blue/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-blue/30">
+        ⭐ Destacado
+      </span>
+    );
+  };
+
   return (
     <div
-      className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer"
+      className={`bg-ozio-card border rounded-2xl overflow-hidden transition cursor-pointer ${
+        isPastEvent
+          ? 'border-gray-800/50 opacity-70 hover:opacity-90'
+          : 'border-gray-700/50 hover:border-ozio-blue/50'
+      }`}
       onClick={() => {
         const eventData = encodeURIComponent(JSON.stringify(event));
         router.push(`/events/${event.id}?data=${eventData}`);
@@ -152,24 +185,33 @@ function EventCard({ event }: { event: Event }) {
         <img
           src={event.image_path || 'https://via.placeholder.com/400x200'}
           alt={event.title}
-          className="w-full h-full object-cover"
+          // ✅ Escala de grises si finalizó
+          className={`w-full h-full object-cover ${isPastEvent ? 'grayscale opacity-60' : ''}`}
         />
+        {/* ✅ Overlay "Evento Finalizado" */}
+        {isPastEvent && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <div className="bg-gray-800/90 backdrop-blur-sm text-white text-sm font-bold px-4 py-2 rounded-xl border border-gray-600">
+              Evento Finalizado
+            </div>
+          </div>
+        )}
         <div className="absolute top-3 right-3">
-          <span className="bg-ozio-blue/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-blue/30">
-            ⭐ Destacado
-          </span>
+          {getStatusBadge()}
         </div>
       </div>
 
       <div className="p-4">
-        <h3 className="text-white font-bold text-lg mb-2">{event.title}</h3>
+        <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-gray-400' : 'text-white'}`}>
+          {event.title}
+        </h3>
 
         {event.description && (
-          <p className="text-gray-400 text-sm mb-3 line-clamp-2">{event.description}</p>
+          <p className="text-gray-500 text-sm mb-3 line-clamp-2">{event.description}</p>
         )}
 
-        <div className="flex items-center gap-2 text-gray-300 text-sm mb-2">
-          <svg className="w-4 h-4 text-ozio-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+          <svg className={`w-4 h-4 ${isPastEvent ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>
@@ -177,8 +219,8 @@ function EventCard({ event }: { event: Event }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-gray-300 text-sm">
-          <svg className="w-4 h-4 text-ozio-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 text-gray-400 text-sm">
+          <svg className={`w-4 h-4 ${isPastEvent ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>
@@ -188,7 +230,12 @@ function EventCard({ event }: { event: Event }) {
         </div>
 
         <div className="flex items-center gap-2 mt-3">
-          <div className="bg-ozio-blue/20 text-ozio-blue text-xs px-3 py-1 rounded-full font-medium border border-ozio-blue/30 flex items-center gap-1">
+          {/* ✅ Badge asistentes en gris si finalizó */}
+          <div className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${
+            isPastEvent
+              ? 'bg-gray-700/50 text-gray-500 border border-gray-700/30'
+              : 'bg-ozio-blue/20 text-ozio-blue border border-ozio-blue/30'
+          }`}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
               <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zM8 13c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.98 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
             </svg>

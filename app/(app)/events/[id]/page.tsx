@@ -41,14 +41,10 @@ export default function EventDetailPage() {
 
   const eventId = params.id as string;
 
-  // ✅ 1. Intenta leer de la URL
   const rawData = searchParams.get("data");
   const eventFromUrl: Event | null = rawData ? JSON.parse(decodeURIComponent(rawData)) : null;
-
-  // ✅ 2. Si no hay URL, busca en el store
   const eventFromStore = events.find((e) => e.id === eventId) ?? null;
 
-  // ✅ 3. Si tampoco, fetch como último recurso
   const [event, setEvent] = useState<Event | null>((eventFromUrl ?? eventFromStore ?? null) as Event | null);
   const [loading, setLoading] = useState(!eventFromUrl && !eventFromStore);
 
@@ -60,12 +56,17 @@ export default function EventDetailPage() {
   const [isAttending, setIsAttending] = useState(isAttendingInitial);
   const [attendees, setAttendees] = useState(event?.event_attendees ?? []);
 
+  // Verificar si el evento ya pasó
+  const isPastEvent = event ? new Date(event.ends_at) < new Date() : false;
+  const isActiveEvent = event ? new Date(event.starts_at) <= new Date() && new Date(event.ends_at) >= new Date() : false;
+  const isFutureEvent = event ? new Date(event.starts_at) > new Date() : false;
+
   useEffect(() => {
-    if (event) return; // ya tenemos datos, no fetchamos
+    if (event) return;
 
     const fetchEvent = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events/${eventId}`);
+        const res = await fetch(`http://localhost:3000/api/events/${eventId}`);
         if (!res.ok) throw new Error("Error al cargar el evento");
         const data = await res.json();
         setEvent(data);
@@ -99,10 +100,42 @@ export default function EventDetailPage() {
       minute: "2-digit",
     });
 
+  const getEventStatusBadge = () => {
+    if (isPastEvent) {
+      return (
+        <div className="bg-gray-700/50 text-gray-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Evento finalizado
+        </div>
+      );
+    }
+    if (isActiveEvent) {
+      return (
+        <div className="bg-green-600/20 text-green-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2 animate-pulse">
+          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+          En curso ahora
+        </div>
+      );
+    }
+    if (isFutureEvent) {
+      return (
+        <div className="bg-ozio-blue/20 text-ozio-blue text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Próximamente
+        </div>
+      );
+    }
+    return null;
+  };
+
   const handleAttend = async () => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/eventAttendees`, {
+      const res = await fetch(`http://localhost:3000/api/eventAttendees`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +161,7 @@ export default function EventDetailPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/eventAttendees/${myAttendance.id}`,
+        `http://localhost:3000/api/eventAttendees/${myAttendance.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -185,28 +218,49 @@ export default function EventDetailPage() {
       {/* Imagen */}
       {event.image_path && (
         <div className="relative h-80 overflow-hidden">
-          <img src={event.image_path} alt={event.title} className="w-full h-full object-cover" />
+          <img 
+            src={event.image_path} 
+            alt={event.title} 
+            className={`w-full h-full object-cover ${isPastEvent ? 'grayscale opacity-60' : ''}`} 
+          />
           {event.featured && (
             <div className="absolute top-4 right-4 bg-ozio-blue text-white text-xs font-bold px-3 py-1 rounded-full">
               ⭐ Destacado
+            </div>
+          )}
+          {isPastEvent && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="bg-gray-800/90 backdrop-blur-sm text-white text-lg font-bold px-6 py-3 rounded-2xl border border-gray-600">
+                Evento Finalizado
+              </div>
             </div>
           )}
         </div>
       )}
 
       <div className="px-4 py-6 space-y-6">
-        {/* Título */}
+        {/* Título y estado */}
         <div>
-          <h2 className="text-white text-3xl font-bold mb-2">{event.title}</h2>
-          <p className="text-ozio-blue font-semibold text-sm mb-2">{attendees.length} asistentes</p>
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <h2 className="text-white text-3xl font-bold flex-1">{event.title}</h2>
+            {getEventStatusBadge()}
+          </div>
+          
+          <p className={`font-semibold text-sm mb-2 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>
+            {attendees.length} {attendees.length === 1 ? 'asistente' : 'asistentes'}
+            {isPastEvent && ' (evento finalizado)'}
+          </p>
+          
           {event.description && (
-            <p className="text-gray-400 text-base leading-relaxed">{event.description}</p>
+            <p className={`text-base leading-relaxed ${isPastEvent ? 'text-gray-500' : 'text-gray-400'}`}>
+              {event.description}
+            </p>
           )}
         </div>
 
         {/* Venue */}
         {event.venues && (
-          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+          <div className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
             <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -216,7 +270,11 @@ export default function EventDetailPage() {
             </h3>
             <div className="flex items-center gap-3">
               {event.venues.avatar_path && (
-                <img src={event.venues.avatar_path} alt={event.venues.name} className="w-12 h-12 rounded-xl object-cover" />
+                <img 
+                  src={event.venues.avatar_path} 
+                  alt={event.venues.name} 
+                  className={`w-12 h-12 rounded-xl object-cover ${isPastEvent ? 'grayscale' : ''}`} 
+                />
               )}
               <div className="flex-1">
                 <p className="text-white font-semibold">{event.venues.name}</p>
@@ -234,7 +292,7 @@ export default function EventDetailPage() {
         )}
 
         {/* Fechas */}
-        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+        <div className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
           <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -243,27 +301,27 @@ export default function EventDetailPage() {
           </h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="bg-ozio-blue/20 p-2 rounded-lg">
-                <svg className="w-5 h-5 text-ozio-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-gray-700/20' : 'bg-ozio-blue/20'}`}>
+                <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
                 <p className="text-gray-400 text-xs">Inicio</p>
                 <p className="text-white font-semibold">{formatDate(event.starts_at)}</p>
-                <p className="text-ozio-blue text-sm">{formatTime(event.starts_at)}</p>
+                <p className={`text-sm ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="bg-ozio-purple/20 p-2 rounded-lg">
-                <svg className="w-5 h-5 text-ozio-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-gray-700/20' : 'bg-ozio-purple/20'}`}>
+                <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
                 <p className="text-gray-400 text-xs">Fin</p>
                 <p className="text-white font-semibold">{formatDate(event.ends_at)}</p>
-                <p className="text-ozio-purple text-sm">{formatTime(event.ends_at)}</p>
+                <p className={`text-sm ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</p>
               </div>
             </div>
           </div>
@@ -271,7 +329,7 @@ export default function EventDetailPage() {
 
         {/* Mapa */}
         {event.venues?.latitude && event.venues?.longitude && (
-          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden">
+          <div className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
             <h3 className="text-white font-semibold p-4">🗺️ Mapa</h3>
             <div className="h-64 relative overflow-hidden">
               <iframe
@@ -286,8 +344,8 @@ export default function EventDetailPage() {
           </div>
         )}
 
-        {/* Botones */}
-        {isUserLoggedIn && (
+        {/* Botones - Solo mostrar si no ha pasado y está logueado */}
+        {isUserLoggedIn && !isPastEvent && (
           <div className="flex gap-3">
             {isAttending ? (
               <button
@@ -310,6 +368,22 @@ export default function EventDetailPage() {
                 Asistir
               </button>
             )}
+          </div>
+        )}
+
+        {/* Mensaje para eventos pasados */}
+        {isPastEvent && (
+          <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 text-center">
+            <svg className="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h4 className="text-white font-bold text-lg mb-2">Este evento ya finalizó</h4>
+            <p className="text-gray-400 text-sm">
+              {isAttending 
+                ? `Asististe a este evento junto a ${attendees.length - 1} ${attendees.length - 1 === 1 ? 'persona más' : 'personas más'}.`
+                : `Este evento tuvo ${attendees.length} ${attendees.length === 1 ? 'asistente' : 'asistentes'}.`
+              }
+            </p>
           </div>
         )}
       </div>

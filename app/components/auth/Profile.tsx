@@ -516,7 +516,7 @@ function CreateEventModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-white text-xl font-bold">🎉 Crear Evento</h2>
           <button 
@@ -781,7 +781,7 @@ function EditProfileModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-white text-xl font-bold">✏️ Editar Perfil</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">
@@ -976,7 +976,7 @@ function EditEventModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-white text-xl font-bold">✏️ Editar Evento</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">

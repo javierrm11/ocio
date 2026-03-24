@@ -230,7 +230,7 @@ function MyMap() {
               : [37.8787857, -4.766206]
         }
         zoom={14}
-        style={{ height: "100vh", width: "100%" }}
+        style={{ height: "100dvh", width: "100%" }}
         zoomControl={false}
       >
         <TileLayer
@@ -580,6 +580,9 @@ function MyMap() {
         .event-soon-pulse path,
         .event-soon-pulse circle {
           animation: soon-pulse 2.5s ease-in-out infinite;
+        }
+        .leaflet-bottom.leaflet-right{
+          display: none;
         }
       `}</style>
     </>

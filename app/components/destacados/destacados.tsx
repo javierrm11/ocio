@@ -32,7 +32,6 @@ export default function Destacados() {
   const { venues, events, loaded } = useAppStore();
   const [activeTab, setActiveTab] = useState<'eventos' | 'locales'>('eventos');
 
-  // ✅ Loading controlado por el store
   if (!loaded) {
     return (
       <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
@@ -41,7 +40,6 @@ export default function Destacados() {
     );
   }
 
-  // ✅ venues es el array directamente, no [venues]
   const topVenues = [...venues]
     .sort((a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
     .slice(0, 5);
@@ -51,83 +49,91 @@ export default function Destacados() {
   return (
     <div className="min-h-screen bg-ozio-dark pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-b from-ozio-purple to-ozio-card px-4 py-6 pt-16">
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => router.back()}
-            className="text-white hover:text-ozio-blue transition"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-white text-2xl font-bold">⭐ Destacados</h1>
-          <div className="w-6"></div>
-        </div>
+      <div className="bg-gradient-to-b from-ozio-purple to-ozio-card px-4 md:px-8 lg:px-12 py-6 pt-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.back()}
+              className="text-white hover:text-ozio-blue transition"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 className="text-white text-2xl font-bold">⭐ Destacados</h1>
+            <div className="w-6"></div>
+          </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
-          <button
-            onClick={() => setActiveTab('eventos')}
-            className={`flex-1 py-3 rounded-xl font-medium transition ${
-              activeTab === 'eventos'
-                ? 'bg-ozio-blue text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-            }`}
-          >
-            🎉 Eventos
-          </button>
-          <button
-            onClick={() => setActiveTab('locales')}
-            className={`flex-1 py-3 rounded-xl font-medium transition ${
-              activeTab === 'locales'
-                ? 'bg-ozio-blue text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-            }`}
-          >
-            🏆 Top Locales
-          </button>
+          {/* Tabs */}
+          <div className="flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
+            <button
+              onClick={() => setActiveTab('eventos')}
+              className={`flex-1 py-3 rounded-xl font-medium transition ${
+                activeTab === 'eventos'
+                  ? 'bg-ozio-blue text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              🎉 Eventos
+            </button>
+            <button
+              onClick={() => setActiveTab('locales')}
+              className={`flex-1 py-3 rounded-xl font-medium transition ${
+                activeTab === 'locales'
+                  ? 'bg-ozio-blue text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              🏆 Top Locales
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="px-4 mt-6">
-        {activeTab === 'eventos' && (
-          <div className="space-y-4">
-            {featuredEvents.length > 0 ? (
-              <>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-white font-semibold">Eventos destacados</span>
-                  <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full">
-                    {featuredEvents.length}
-                  </span>
+      <div className="px-4 md:px-8 lg:px-12 mt-6">
+        <div className="max-w-4xl mx-auto">
+          {activeTab === 'eventos' && (
+            <div className="space-y-4">
+              {featuredEvents.length > 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-white font-semibold">Eventos destacados</span>
+                    <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full">
+                      {featuredEvents.length}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {featuredEvents.map((event) => (
+                      <EventCard key={event.id} event={event} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-8 text-center">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <p className="text-gray-400">No hay eventos destacados en este momento</p>
                 </div>
-                {featuredEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </>
-            ) : (
-              <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-8 text-center">
-                <div className="text-6xl mb-4">🎉</div>
-                <p className="text-gray-400">No hay eventos destacados en este momento</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'locales' && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-white font-semibold">Locales más populares</span>
-              <span className="bg-ozio-orange/20 text-ozio-orange text-xs px-2 py-1 rounded-full">
-                Top {topVenues.length}
-              </span>
+              )}
             </div>
-            {topVenues.map((venue, index) => (
-              <VenueCard key={venue.id} venue={venue} rank={index + 1} />
-            ))}
-          </div>
-        )}
+          )}
+
+          {activeTab === 'locales' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-white font-semibold">Locales más populares</span>
+                <span className="bg-ozio-orange/20 text-ozio-orange text-xs px-2 py-1 rounded-full">
+                  Top {topVenues.length}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {topVenues.map((venue, index) => (
+                  <VenueCard key={venue.id} venue={venue} rank={index + 1} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -138,11 +144,9 @@ function EventCard({ event }: { event: Event }) {
   const startDate = new Date(event.starts_at);
   const endDate = new Date(event.ends_at);
 
-  // ✅ Detectar si el evento ya finalizó
   const isPastEvent = endDate < new Date();
   const isActiveEvent = startDate <= new Date() && endDate >= new Date();
 
-  // ✅ Badge de estado
   const getStatusBadge = () => {
     if (isPastEvent) {
       return (
@@ -185,10 +189,8 @@ function EventCard({ event }: { event: Event }) {
         <img
           src={event.image_path || 'https://via.placeholder.com/400x200'}
           alt={event.title}
-          // ✅ Escala de grises si finalizó
           className={`w-full h-full object-cover ${isPastEvent ? 'grayscale opacity-60' : ''}`}
         />
-        {/* ✅ Overlay "Evento Finalizado" */}
         {isPastEvent && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <div className="bg-gray-800/90 backdrop-blur-sm text-white text-sm font-bold px-4 py-2 rounded-xl border border-gray-600">
@@ -230,7 +232,6 @@ function EventCard({ event }: { event: Event }) {
         </div>
 
         <div className="flex items-center gap-2 mt-3">
-          {/* ✅ Badge asistentes en gris si finalizó */}
           <div className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${
             isPastEvent
               ? 'bg-gray-700/50 text-gray-500 border border-gray-700/30'
@@ -318,4 +319,3 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
     </div>
   );
 }
-

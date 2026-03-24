@@ -225,9 +225,7 @@ function MyMap() {
     <>
       <MapContainer
         center={
-          Array.isArray(userLocation)
-            ? userLocation
-            : userLocation
+          userLocation
               ? [userLocation.latitude, userLocation.longitude]
               : [37.8787857, -4.766206]
         }

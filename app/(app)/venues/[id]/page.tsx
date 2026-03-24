@@ -41,18 +41,11 @@ export default function VenueDetail() {
   const venueId = params.id as string;
   const { venues, events } = useAppStore();
 
-  // ✅ 1. Busca en el store
   const venueFromStore = venues.find((v) => String(v.id) === venueId) ?? null;
-
-  // ✅ Enriquecer con sus eventos del store
   const venueWithEvents = venueFromStore
-  ? ({
-      ...venueFromStore,
-      events: events.filter((e) => e.venue_id === venueId),
-    } as unknown as Venue)
-  : null;
+    ? ({ ...venueFromStore, events: events.filter((e) => e.venue_id === venueId) } as unknown as Venue)
+    : null;
 
-  // ✅ 2. Si no está en el store, fetch como fallback
   const [venue, setVenue] = useState<Venue | null>(venueWithEvents);
   const [loading, setLoading] = useState(!venueWithEvents);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
@@ -60,7 +53,7 @@ export default function VenueDetail() {
   const [checkingIn, setCheckingIn] = useState(false);
 
   useEffect(() => {
-    if (venue) return; // ya tenemos datos
+    if (venue) return;
 
     const fetchVenueDetail = async () => {
       try {
@@ -68,9 +61,7 @@ export default function VenueDetail() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         if (!response.ok) throw new Error('Error al cargar el local');
-
         const result = await response.json();
         setVenue(result);
       } catch (error) {
@@ -92,10 +83,8 @@ export default function VenueDetail() {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.ok) {
         setHasCheckedIn(true);
-        // Actualiza el contador localmente sin refetch
         setVenue((prev) =>
           prev
             ? { ...prev, check_ins: [...(prev.check_ins || []), { id: Date.now().toString(), user_id: '', venue_id: venueId, created_at: new Date().toISOString() }] }
@@ -112,11 +101,7 @@ export default function VenueDetail() {
   const handleShare = async () => {
     if (navigator.share && venue) {
       try {
-        await navigator.share({
-          title: venue.name,
-          text: venue.description || `Visita ${venue.name}`,
-          url: window.location.href,
-        });
+        await navigator.share({ title: venue.name, text: venue.description || `Visita ${venue.name}`, url: window.location.href });
       } catch (error) {
         console.log('Error sharing:', error);
       }
@@ -164,16 +149,18 @@ export default function VenueDetail() {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-20">
-      {/* Header con imagen */}
-      <div className="relative h-80">
+
+      {/* ── Imagen hero ─────────────────────────────────────────────────────── */}
+      <div className="relative h-72 md:h-96 lg:h-[460px]">
         <img
           src={venue.avatar_path || 'https://via.placeholder.com/800x600'}
           alt={venue.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-ozio-dark"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-ozio-dark" />
 
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 pt-16">
+        {/* Botones top */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 pt-16 max-w-6xl mx-auto">
           <button
             onClick={() => router.back()}
             className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition border border-white/10"
@@ -182,7 +169,6 @@ export default function VenueDetail() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-
           <div className="flex gap-2">
             <button
               onClick={handleShare}
@@ -200,7 +186,8 @@ export default function VenueDetail() {
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-4">
+        {/* Badge visitas */}
+        <div className="absolute bottom-4 left-4 md:left-8">
           <div className="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium border border-white/10 flex items-center gap-2">
             <svg className="w-5 h-5 text-ozio-orange" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
@@ -210,108 +197,142 @@ export default function VenueDetail() {
         </div>
       </div>
 
-      {/* Contenido principal */}
-      <div className="px-4 -mt-6 relative z-10">
-        <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 shadow-2xl mb-6">
-          <h1 className="text-white text-3xl font-bold mb-4">{venue.name}</h1>
+      {/* ── Contenido ───────────────────────────────────────────────────────── */}
+      <div className="max-w-6xl mx-auto px-4 md:px-8 -mt-6 relative z-10">
 
-          {venue.description && (
-            <p className="text-gray-300 leading-relaxed mb-6">{venue.description}</p>
-          )}
+        {/*
+          Móvil/tablet: una columna
+          Desktop (lg): dos columnas — info+checkin a la izquierda, mapa+eventos a la derecha
+        */}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
 
-          {venue.address && (
-            <div className="flex items-start gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-400 text-sm mb-1">Dirección</p>
-                <p className="text-white font-semibold">{venue.address}</p>
-              </div>
+          {/* ── Columna izquierda ── */}
+          <div className="space-y-6">
+
+            {/* Info principal + check-in */}
+            <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 shadow-2xl">
+              <h1 className="text-white text-3xl font-bold mb-4">{venue.name}</h1>
+
+              {venue.description && (
+                <p className="text-gray-300 leading-relaxed mb-6">{venue.description}</p>
+              )}
+
+              {venue.address && (
+                <div className="flex items-start gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-400 text-sm mb-1">Dirección</p>
+                    <p className="text-white font-semibold">{venue.address}</p>
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={handleCheckIn}
+                disabled={hasCheckedIn || checkingIn}
+                className={`w-full py-4 rounded-2xl font-bold text-lg transition shadow-lg ${
+                  hasCheckedIn
+                    ? 'bg-green-600 text-white'
+                    : checkingIn
+                      ? 'bg-gray-600 text-white'
+                      : 'bg-gradient-to-r from-ozio-orange to-red-500 text-white hover:shadow-2xl hover:scale-[1.02]'
+                }`}
+              >
+                {hasCheckedIn ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    ¡Check-in realizado!
+                  </span>
+                ) : checkingIn ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
+                    Haciendo check-in...
+                  </span>
+                ) : (
+                  '📍 Hacer Check-in'
+                )}
+              </button>
             </div>
-          )}
 
-          <button
-            onClick={handleCheckIn}
-            disabled={hasCheckedIn || checkingIn}
-            className={`w-full py-4 rounded-2xl font-bold text-lg transition shadow-lg ${
-              hasCheckedIn
-                ? 'bg-green-600 text-white'
-                : checkingIn
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gradient-to-r from-ozio-orange to-red-500 text-white hover:shadow-2xl hover:scale-[1.02]'
-            }`}
-          >
-            {hasCheckedIn ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                ¡Check-in realizado!
-              </span>
-            ) : checkingIn ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                Haciendo check-in...
-              </span>
-            ) : (
-              '📍 Hacer Check-in'
+            {/* Eventos próximos — en móvil aparece debajo del mapa; en desktop en columna izquierda */}
+            {upcomingEvents.length > 0 && (
+              <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:block hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
+                  <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
+                    {upcomingEvents.length}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {upcomingEvents.map((event) => (
+                    <EventMiniCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
             )}
-          </button>
-        </div>
+          </div>
 
-        {/* Mapa */}
-        <div className="bg-ozio-card border border-gray-700/50 rounded-3xl overflow-hidden mb-6">
-          <div className="p-4 border-b border-gray-700/50">
-            <h2 className="text-white font-bold text-lg">Ubicación</h2>
-          </div>
-          <div className="h-64 relative overflow-hidden">
-            <iframe
-              src={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}&z=15&output=embed`}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-          <div className="p-4">
-            <button
-              onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, '_blank')}
-              className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Abrir en Google Maps
-            </button>
+          {/* ── Columna derecha ── */}
+          <div className="space-y-6 mt-6 lg:mt-0">
+
+            {/* Mapa */}
+            <div className="bg-ozio-card border border-gray-700/50 rounded-3xl overflow-hidden">
+              <div className="p-4 border-b border-gray-700/50">
+                <h2 className="text-white font-bold text-lg">Ubicación</h2>
+              </div>
+              <div className="h-64 md:h-80 relative overflow-hidden">
+                <iframe
+                  src={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}&z=15&output=embed`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="p-4">
+                <button
+                  onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, '_blank')}
+                  className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Abrir en Google Maps
+                </button>
+              </div>
+            </div>
+
+            {/* Eventos próximos — visibles en móvil/tablet (en desktop se muestran en col izquierda) */}
+            {upcomingEvents.length > 0 && (
+              <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
+                  <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
+                    {upcomingEvents.length}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {upcomingEvents.map((event) => (
+                    <EventMiniCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Eventos próximos */}
-        {upcomingEvents.length > 0 && (
-          <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
-              <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
-                {upcomingEvents.length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {upcomingEvents.map((event) => (
-                <EventMiniCard key={event.id} event={event} />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Share menu */}
+      {/* ── Share menu ──────────────────────────────────────────────────────── */}
       {showShareMenu && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center p-4"

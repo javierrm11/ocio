@@ -4,13 +4,7 @@ import { NextResponse } from "next/server";
 
 // obtener todas las companies, con filtro opcional por cualquier campo
 export async function GET(request: Request) {
-  const userId = await getUserId();
-  if (!userId) {
-    return NextResponse.json(
-      { error: 'No autenticado' },
-      { status: 401 }
-    );
-  }
+
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
 

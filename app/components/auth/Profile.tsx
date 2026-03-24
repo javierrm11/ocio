@@ -382,7 +382,6 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <div className="space-y-3">
               <SettingsItem icon="🔔" title="Notificaciones" />
               <SettingsItem icon="🔒" title="Privacidad" />
-              <SettingsItem icon="🌙" title="Modo oscuro" toggle />
               {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
               <SettingsItem icon="ℹ️" title="Acerca de" />
               <SettingsItem icon="👤" title="Información de cuenta" />

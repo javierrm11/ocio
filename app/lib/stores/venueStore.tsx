@@ -35,11 +35,13 @@ interface AppStore {
   currentUser: any | null;
   loaded: boolean;
   events: Event[];
+  userLocation: { latitude: number; longitude: number } | null;
   setVenues: (v: Venue[]) => void;
   setUserFavorites: (ids: number[]) => void;
   setCurrentUser: (u: any | null) => void;
   setEvents: (events: Event[]) => void;
   setLoaded: (v: boolean) => void;
+  setUserLocation: (location: { latitude: number; longitude: number } | null) => void;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -48,9 +50,11 @@ export const useAppStore = create<AppStore>((set) => ({
   currentUser: null,
   loaded: false,
   events: [],
+  userLocation: null,
   setVenues: (venues) => set({ venues }),
   setUserFavorites: (userFavorites) => set({ userFavorites }),
   setCurrentUser: (currentUser) => set({ currentUser }),
   setEvents: (events) => set({ events }),
   setLoaded: (loaded) => set({ loaded }),
+  setUserLocation: (userLocation) => set({ userLocation }),
 }));

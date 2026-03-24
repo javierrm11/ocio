@@ -102,7 +102,7 @@ function MyMap() {
   const router = useRouter();
 
   // ✅ Datos del store global — no se vuelven a cargar al navegar
-  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded } = useAppStore();
+  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded, userLocation } = useAppStore();
 
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
@@ -224,7 +224,13 @@ function MyMap() {
   return (
     <>
       <MapContainer
-        center={[37.8787857, -4.766206] as [number, number]}
+        center={
+          Array.isArray(userLocation)
+            ? userLocation
+            : userLocation
+              ? [userLocation.latitude, userLocation.longitude]
+              : [37.8787857, -4.766206]
+        }
         zoom={14}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
@@ -233,6 +239,22 @@ function MyMap() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
         />
+        {userLocation && (
+          <CircleMarker
+            center={[userLocation.latitude, userLocation.longitude]}
+            radius={8}
+            pathOptions={{
+              color: "#3b82f6",
+              fillColor: "#60a5fa",
+              fillOpacity: 0.9,
+              weight: 3,
+            }}
+          >
+            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+              📍 Tu ubicación
+            </Tooltip>
+          </CircleMarker>
+        )}
 
         {venues.map((venue) => {
           const eventStatus = getEventStatus(venue);

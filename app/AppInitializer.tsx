@@ -10,10 +10,34 @@ export function AppInitializer() {
     setCurrentUser,
     setLoaded,
     setEvents,
+    setUserLocation,
   } = useAppStore();
 
   useEffect(() => {
     if (loaded) return;
+    // ✅ NUEVO: obtener ubicación del usuario
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        () => {
+          // fallback Córdoba
+          setUserLocation({
+            latitude: 37.8787857,
+            longitude: -4.766206,
+          });
+        },
+      );
+    } else {
+      setUserLocation({
+        latitude: 37.8787857,
+        longitude: -4.766206,
+      });
+    }
 
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");

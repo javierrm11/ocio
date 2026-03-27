@@ -1,6 +1,6 @@
 "use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -82,12 +82,33 @@ function formatEventTime(event: Event): string {
 
 function MyMap() {
   const router = useRouter();
-  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded, userLocation } = useAppStore();
+  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded, userLocation,setUserLocation  } = useAppStore();
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
 
+  useEffect(() => {
+  if (!navigator.geolocation) return;
+
+  const watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      setUserLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    },
+    (error) => console.error('Geolocation error:', error),
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,      // acepta posiciones cacheadas de hasta 5s
+      timeout: 10000,
+    }
+  );
+
+  // Limpia el watcher al desmontar
+  return () => navigator.geolocation.clearWatch(watchId);
+}, []);
   const onCheckIn = (venueId: any) => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {

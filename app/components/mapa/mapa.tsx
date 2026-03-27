@@ -69,71 +69,129 @@ function formatEventTime(event: Event): string {
   const start = new Date(event.starts_at);
   const end = new Date(event.ends_at);
   if (now >= start && now <= end) {
-    const endTime = end.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+    const endTime = end.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     return `Activo hasta las ${endTime}`;
   }
-  const startTime = start.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+  const startTime = start.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   const diffMs = start.getTime() - now.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
   if (diffHours === 0) return `Empieza en ${diffMins}min`;
   return `Empieza a las ${startTime} (en ${diffHours}h)`;
 }
+function getDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): string {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const km = R * c;
+
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  return `${km.toFixed(1)}km`;
+}
 
 function MyMap() {
   const router = useRouter();
-  const { venues, setVenues, userFavorites, setUserFavorites, currentUser, loaded, userLocation,setUserLocation  } = useAppStore();
+  const {
+    venues,
+    setVenues,
+    userFavorites,
+    setUserFavorites,
+    currentUser,
+    loaded,
+    userLocation,
+    setUserLocation,
+  } = useAppStore();
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
 
   useEffect(() => {
-  if (!navigator.geolocation) return;
+    if (!navigator.geolocation) return;
 
-  const watchId = navigator.geolocation.watchPosition(
-    (position) => {
-      setUserLocation({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    },
-    (error) => console.error('Geolocation error:', error),
-    {
-      enableHighAccuracy: true,
-      maximumAge: 5000,      // acepta posiciones cacheadas de hasta 5s
-      timeout: 10000,
-    }
-  );
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
 
-  // Limpia el watcher al desmontar
-  return () => navigator.geolocation.clearWatch(watchId);
-}, []);
+        // ✅ Actualiza la distancia de cada venue en tiempo real
+        setVenues(
+          venues.map((v) => ({
+            ...v,
+            distance: getDistanceKm(
+              latitude,
+              longitude,
+              v.latitude,
+              v.longitude,
+            ),
+          })),
+        );
+      },
+      (error) => console.error("Geolocation error:", error),
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [venues]); // 👈 venues en dependencias para que setVenues tenga el array actualizado
   const onCheckIn = (venueId: any) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ venue_id: venueId }),
     })
       .then((res) => res.json())
       .then((data) => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data.data] } : v));
+        setVenues(
+          venues.map((v) =>
+            v.id === venueId
+              ? { ...v, check_ins: [...(v.check_ins || []), data.data] }
+              : v,
+          ),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
-          setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data.data] });
+          setSelectedVenue({
+            ...selectedVenue,
+            check_ins: [...(selectedVenue.check_ins || []), data.data],
+          });
         closeModal();
       });
   };
 
   const onCheckOut = (venueId: any) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then(() => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, check_ins: [] } : v));
+        setVenues(
+          venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, check_ins: [] });
         closeModal();
@@ -141,13 +199,18 @@ function MyMap() {
   };
 
   const toggleFavorite = (venueId: any, isFavorite: boolean) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (isFavorite) {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       }).then(() => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: false } : v));
+        setVenues(
+          venues.map((v) =>
+            v.id === venueId ? { ...v, is_favorite: false } : v,
+          ),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, is_favorite: false });
         setUserFavorites(userFavorites.filter((id) => id !== venueId));
@@ -155,10 +218,17 @@ function MyMap() {
     } else {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ venue_id: venueId }),
       }).then(() => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: true } : v));
+        setVenues(
+          venues.map((v) =>
+            v.id === venueId ? { ...v, is_favorite: true } : v,
+          ),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, is_favorite: true });
         setUserFavorites([...userFavorites, venueId]);
@@ -166,7 +236,8 @@ function MyMap() {
     }
   };
 
-  const isUserProfile = currentUser?.username !== undefined && currentUser?.username !== null;
+  const isUserProfile =
+    currentUser?.username !== undefined && currentUser?.username !== null;
 
   if (!loaded) {
     return (
@@ -177,7 +248,9 @@ function MyMap() {
             <div className="w-12 h-12 bg-gradient-to-br from-ozio-blue to-ozio-purple rounded-full opacity-50"></div>
           </div>
         </div>
-        <p className="text-white text-lg font-semibold mt-6 animate-pulse">Cargando mapa...</p>
+        <p className="text-white text-lg font-semibold mt-6 animate-pulse">
+          Cargando mapa...
+        </p>
       </div>
     );
   }
@@ -204,7 +277,12 @@ function MyMap() {
             <CircleMarker
               center={[userLocation.latitude, userLocation.longitude]}
               radius={8}
-              pathOptions={{ color: "#3b82f6", fillColor: "#60a5fa", fillOpacity: 0.9, weight: 3 }}
+              pathOptions={{
+                color: "#3b82f6",
+                fillColor: "#60a5fa",
+                fillOpacity: 0.9,
+                weight: 3,
+              }}
             >
               <Tooltip direction="top" offset={[0, -10]} opacity={1}>
                 📍 Tu ubicación
@@ -220,36 +298,72 @@ function MyMap() {
                 center={[venue.latitude, venue.longitude] as [number, number]}
                 radius={eventStatus !== "none" ? 11 : 8}
                 color={
-                  eventStatus === "active" ? "#a855f7"
-                  : eventStatus === "soon" ? "#f97316"
-                  : venue.check_ins?.length === 0 ? "#10b981"
-                  : (venue.check_ins?.length || 0) < 5 ? "#f59e0b"
-                  : "#ef4444"
+                  eventStatus === "active"
+                    ? "#a855f7"
+                    : eventStatus === "soon"
+                      ? "#f97316"
+                      : venue.check_ins?.length === 0
+                        ? "#10b981"
+                        : (venue.check_ins?.length || 0) < 5
+                          ? "#f59e0b"
+                          : "#ef4444"
                 }
                 fillColor={
-                  eventStatus === "active" ? "#d8b4fe"
-                  : eventStatus === "soon" ? "#fdba74"
-                  : venue.check_ins?.length === 0 ? "#6ee7b7"
-                  : (venue.check_ins?.length || 0) < 5 ? "#fcd34d"
-                  : "#fca5a5"
+                  eventStatus === "active"
+                    ? "#d8b4fe"
+                    : eventStatus === "soon"
+                      ? "#fdba74"
+                      : venue.check_ins?.length === 0
+                        ? "#6ee7b7"
+                        : (venue.check_ins?.length || 0) < 5
+                          ? "#fcd34d"
+                          : "#fca5a5"
                 }
                 fillOpacity={0.85}
                 weight={eventStatus === "active" ? 3 : 2}
                 className={
-                  eventStatus === "active" ? "event-active-pulse"
-                  : eventStatus === "soon" ? "event-soon-pulse"
-                  : ""
+                  eventStatus === "active"
+                    ? "event-active-pulse"
+                    : eventStatus === "soon"
+                      ? "event-soon-pulse"
+                      : ""
                 }
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
-                <Tooltip direction="bottom" offset={[0, 12] as [number, number]} opacity={1} permanent>
-                  <div style={{ cursor: "pointer", margin: 0 }} onClick={() => handleVenueClick(venue)}>
+                <Tooltip
+                  direction="bottom"
+                  offset={[0, 12] as [number, number]}
+                  opacity={1}
+                  permanent
+                >
+                  <div
+                    style={{ cursor: "pointer", margin: 0 }}
+                    onClick={() => handleVenueClick(venue)}
+                  >
                     <p style={{ margin: 0, fontWeight: 600 }}>{venue.name}</p>
                     {eventStatus === "active" && (
-                      <p style={{ margin: 0, fontSize: "10px", color: "#a855f7", fontWeight: 700 }}>🎉 Evento en curso</p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "10px",
+                          color: "#a855f7",
+                          fontWeight: 700,
+                        }}
+                      >
+                        🎉 Evento en curso
+                      </p>
                     )}
                     {eventStatus === "soon" && (
-                      <p style={{ margin: 0, fontSize: "10px", color: "#f97316", fontWeight: 700 }}>🕐 Hoy próximamente</p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "10px",
+                          color: "#f97316",
+                          fontWeight: 700,
+                        }}
+                      >
+                        🕐 Hoy próximamente
+                      </p>
                     )}
                   </div>
                 </Tooltip>
@@ -299,8 +413,18 @@ function MyMap() {
                 onClick={closeModal}
                 className="absolute top-4 right-4 bg-black/50 rounded-full p-2 hover:bg-black/70 transition"
               >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
 
@@ -309,16 +433,18 @@ function MyMap() {
                 className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full"
                 style={{
                   backgroundColor:
-                    (selectedVenue.check_ins?.length || 0) === 0 ? "#10b981"
-                    : (selectedVenue.check_ins?.length || 0) < 5 ? "#f59e0b"
-                    : "#ef4444",
+                    (selectedVenue.check_ins?.length || 0) === 0
+                      ? "#10b981"
+                      : (selectedVenue.check_ins?.length || 0) < 5
+                        ? "#f59e0b"
+                        : "#ef4444",
                 }}
               >
                 {(selectedVenue.check_ins?.length || 0) === 0
                   ? "Low Ambience"
                   : (selectedVenue.check_ins?.length || 0) < 5
-                  ? "Medium Ambience"
-                  : "High Ambience"}
+                    ? "Medium Ambience"
+                    : "High Ambience"}
               </div>
 
               {/* Banner evento activo/próximo */}
@@ -330,14 +456,21 @@ function MyMap() {
                   <div
                     className="absolute bottom-4 left-4 right-4 flex items-center gap-2 px-3 py-2 rounded-xl text-white text-xs font-semibold"
                     style={{
-                      backgroundColor: status === "active" ? "rgba(168,85,247,0.85)" : "rgba(249,115,22,0.85)",
+                      backgroundColor:
+                        status === "active"
+                          ? "rgba(168,85,247,0.85)"
+                          : "rgba(249,115,22,0.85)",
                       backdropFilter: "blur(4px)",
                     }}
                   >
-                    <span className="text-base">{status === "active" ? "🎉" : "🕐"}</span>
+                    <span className="text-base">
+                      {status === "active" ? "🎉" : "🕐"}
+                    </span>
                     <div>
                       <p className="font-bold leading-tight">{event.title}</p>
-                      <p className="opacity-90 leading-tight">{formatEventTime(event)}</p>
+                      <p className="opacity-90 leading-tight">
+                        {formatEventTime(event)}
+                      </p>
                     </div>
                   </div>
                 );
@@ -347,8 +480,12 @@ function MyMap() {
             {/* Contenido */}
             <div className="p-6 flex flex-col gap-4">
               <div>
-                <h2 className="text-white text-2xl font-bold mb-1">{selectedVenue.name}</h2>
-                <p className="text-gray-400 text-sm">{selectedVenue.check_ins?.length || 0} check-ins</p>
+                <h2 className="text-white text-2xl font-bold mb-1">
+                  {selectedVenue.name}
+                </h2>
+                <p className="text-gray-400 text-sm">
+                  {selectedVenue.check_ins?.length || 0} check-ins
+                </p>
                 <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
                   <span>{selectedVenue.distance || "940m away"}</span>
                 </div>
@@ -378,15 +515,26 @@ function MyMap() {
               {/* Acciones */}
               <div className="flex flex-wrap items-center gap-2">
                 {isUserProfile &&
-                  (selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
+                  (selectedVenue.check_ins &&
+                  selectedVenue.check_ins.length > 0 ? (
                     <button
                       type="button"
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                       onClick={() => onCheckOut(selectedVenue.id)}
                     >
                       Quitar check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   ) : (
@@ -396,8 +544,18 @@ function MyMap() {
                       onClick={() => onCheckIn(selectedVenue.id)}
                     >
                       Hacer check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </button>
                   ))}
@@ -419,11 +577,18 @@ function MyMap() {
                           ? "bg-red-600 hover:bg-red-700 text-white"
                           : "bg-gray-600 hover:bg-gray-500 text-white"
                       }`}
-                      onClick={() => toggleFavorite(selectedVenue.id, selectedVenue.is_favorite || false)}
+                      onClick={() =>
+                        toggleFavorite(
+                          selectedVenue.id,
+                          selectedVenue.is_favorite || false,
+                        )
+                      }
                     >
                       <svg
                         className="w-5 h-5"
-                        fill={selectedVenue.is_favorite ? "currentColor" : "none"}
+                        fill={
+                          selectedVenue.is_favorite ? "currentColor" : "none"
+                        }
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
@@ -474,16 +639,24 @@ function MyMap() {
 
         /* ── Animaciones ── */
         @keyframes slide-up {
-          from { transform: translateY(100%); }
-          to   { transform: translateY(0); }
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
         }
 
         @keyframes slide-right {
-          from { transform: translateX(100%); }
-          to   { transform: translateX(0); }
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
         }
         .animate-slide-right {
           animation: slide-right 0.3s ease-out;
@@ -491,8 +664,15 @@ function MyMap() {
 
         /* ── Pulsos de eventos ── */
         @keyframes event-pulse {
-          0%, 100% { stroke-opacity: 1;   stroke-width: 3px;  }
-          50%       { stroke-opacity: 0.2; stroke-width: 10px; }
+          0%,
+          100% {
+            stroke-opacity: 1;
+            stroke-width: 3px;
+          }
+          50% {
+            stroke-opacity: 0.2;
+            stroke-width: 10px;
+          }
         }
         .event-active-pulse path,
         .event-active-pulse circle {
@@ -500,8 +680,15 @@ function MyMap() {
         }
 
         @keyframes soon-pulse {
-          0%, 100% { stroke-opacity: 0.9; stroke-width: 2px; }
-          50%       { stroke-opacity: 0.4; stroke-width: 6px; }
+          0%,
+          100% {
+            stroke-opacity: 0.9;
+            stroke-width: 2px;
+          }
+          50% {
+            stroke-opacity: 0.4;
+            stroke-width: 6px;
+          }
         }
         .event-soon-pulse path,
         .event-soon-pulse circle {

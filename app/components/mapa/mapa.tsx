@@ -388,20 +388,11 @@ function MyMap() {
             DESKTOP→ panel lateral derecho más ancho (lg:w-[420px])
           */}
           <div
-            className={[
-              // Base compartido
-              "fixed z-[1002] bg-gray-900 overflow-y-auto",
-              // Móvil: bottom sheet
-              "bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up",
-              // Tablet+: panel lateral derecho
-              "md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:rounded-l-3xl md:w-96 md:max-h-full md:h-full md:animate-slide-right",
-              // Desktop: un poco más ancho
-              "lg:w-[420px]",
-            ].join(" ")}
+            className="fixed z-[1002] bg-gray-900 overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Imagen de cabecera */}
-            <div className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none md:rounded-tl-3xl flex-shrink-0">
+            <div className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none md:rounded-none flex-shrink-0">
               <img
                 src={selectedVenue.avatar_path}
                 alt={selectedVenue.name}

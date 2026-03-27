@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DatePicker from "react-datepicker";
 import { useAppStore } from '@/lib/stores/venueStore'; // 👈
+import { createClient } from "@/lib/supabase/client";
 
 interface UserProfile {
   id: string;
@@ -92,7 +93,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const supabase = createClient();
+  await supabase.auth.signOut();
   localStorage.removeItem('token');
   sessionStorage.removeItem('token');
 

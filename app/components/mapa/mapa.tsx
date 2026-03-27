@@ -487,7 +487,7 @@ function MyMap() {
                   {selectedVenue.check_ins?.length || 0} check-ins
                 </p>
                 <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
-                  <span>{selectedVenue.distance || "940m away"}</span>
+                  <span>{selectedVenue.distance || "Desconocida"}</span>
                 </div>
               </div>
 

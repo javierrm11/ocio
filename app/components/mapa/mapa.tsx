@@ -131,31 +131,36 @@ function MyMap() {
   const closeModal = () => setSelectedVenue(null);
 
   const venuesRef = useRef(venues);
-useEffect(() => {
-  venuesRef.current = venues;
-}, [venues]);
+  useEffect(() => {
+    venuesRef.current = venues;
+  }, [venues]);
 
-useEffect(() => {
-  if (!navigator.geolocation) return;
+  useEffect(() => {
+    if (!navigator.geolocation) return;
 
-  const watchId = navigator.geolocation.watchPosition(
-    (position) => {
-      const { latitude, longitude } = position.coords;
-      setUserLocation({ latitude, longitude });
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
 
-      setVenues(
-        venuesRef.current.map((v) => ({
-          ...v,
-          distance: getDistanceKm(latitude, longitude, v.latitude, v.longitude),
-        })),
-      );
-    },
-    (error) => console.error("Geolocation error:", error),
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
-  );
+        setVenues(
+          venuesRef.current.map((v) => ({
+            ...v,
+            distance: getDistanceKm(
+              latitude,
+              longitude,
+              v.latitude,
+              v.longitude,
+            ),
+          })),
+        );
+      },
+      (error) => console.error("Geolocation error:", error),
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
+    );
 
-  return () => navigator.geolocation.clearWatch(watchId);
-}, []); // 👈 array vacío: solo se monta una vez // 👈 venues en dependencias para que setVenues tenga el array actualizado
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []); // 👈 array vacío: solo se monta una vez // 👈 venues en dependencias para que setVenues tenga el array actualizado
   const onCheckIn = (venueId: any) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -243,9 +248,12 @@ useEffect(() => {
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
+    
   const filteredVenues = venues.filter((v) => {
     const dist =
-      typeof v.distance === "number" ? v.distance : parseFloat(v.distance || "0");
+      typeof v.distance === "number"
+        ? v.distance
+        : parseFloat(v.distance || "0");
     if (filters.maxDistance !== null && dist > filters.maxDistance)
       return false;
     const checkins = v.check_ins?.length || 0;
@@ -817,4 +825,3 @@ useEffect(() => {
 }
 
 export default MyMap;
-

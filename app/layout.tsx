@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Ozio",
   description: "Ozio es una aplicación para descubrir y compartir lugares de ocio en tu ciudad. Encuentra bares, restaurantes, parques y más, con opiniones y fotos de otros usuarios. ¡Explora tu ciudad como nunca antes con Ozio!",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

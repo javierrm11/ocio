@@ -397,9 +397,10 @@ function MyMap() {
         </MapContainer>
       </div>
       {/* Botón flotante filtros */}
-      <button
+      <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-15 left-4 right-0 z-[999]">
+          <button
         onClick={() => setShowFilters(!showFilters)}
-        className="fixed top-20 left-4 z-[999] bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border border-gray-700 hover:bg-gray-800 transition"
+        className="bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border border-gray-700 hover:bg-gray-800 transition"
       >
         <svg
           className="w-4 h-4"
@@ -421,6 +422,7 @@ function MyMap() {
           <span className="w-2 h-2 rounded-full bg-blue-500" />
         )}
       </button>
+      </div>
 
       {/* Panel de filtros */}
       {showFilters && (

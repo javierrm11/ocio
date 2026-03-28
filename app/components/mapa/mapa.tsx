@@ -120,6 +120,12 @@ function MyMap() {
     setUserLocation,
   } = useAppStore();
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [filters, setFilters] = useState({
+    maxDistance: null as number | null, // km: null = sin límite
+    minCheckins: 0,
+    maxCheckins: null as number | null,
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
@@ -238,6 +244,17 @@ function MyMap() {
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
+  const filteredVenues = venues.filter((v) => {
+    const dist =
+      typeof v.distance === "number" ? v.distance : parseFloat(v.distance);
+    if (filters.maxDistance !== null && dist > filters.maxDistance)
+      return false;
+    const checkins = v.check_ins?.length || 0;
+    if (checkins < filters.minCheckins) return false;
+    if (filters.maxCheckins !== null && checkins > filters.maxCheckins)
+      return false;
+    return true;
+  });
 
   if (!loaded) {
     return (
@@ -290,7 +307,7 @@ function MyMap() {
             </CircleMarker>
           )}
 
-          {venues.map((venue) => {
+          {filteredVenues.map((venue) => {
             const eventStatus = getEventStatus(venue);
             return (
               <CircleMarker
@@ -372,6 +389,113 @@ function MyMap() {
           })}
         </MapContainer>
       </div>
+      {/* Botón flotante filtros */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="fixed top-20 left-4 z-[999] bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border border-gray-700 hover:bg-gray-800 transition"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 4h18M7 8h10M11 12h2"
+          />
+        </svg>
+        Filtros
+        {(filters.maxDistance !== null ||
+          filters.minCheckins > 0 ||
+          filters.maxCheckins !== null) && (
+          <span className="w-2 h-2 rounded-full bg-blue-500" />
+        )}
+      </button>
+
+      {/* Panel de filtros */}
+      {showFilters && (
+        <div className="fixed top-34 left-4 z-[999] bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-xl w-72">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-white font-bold">Filtros</h3>
+            <button
+              onClick={() =>
+                setFilters({
+                  maxDistance: null,
+                  minCheckins: 0,
+                  maxCheckins: null,
+                })
+              }
+              className="text-gray-400 text-xs hover:text-white"
+            >
+              Resetear
+            </button>
+          </div>
+
+          {/* Distancia máxima */}
+          <div className="mb-4">
+            <label className="text-gray-400 text-sm mb-1 block">
+              Distancia máxima: {filters.maxDistance ?? "∞"} km
+            </label>
+            <input
+              type="range"
+              min={0.5}
+              max={20}
+              step={0.5}
+              value={filters.maxDistance ?? 20}
+              onChange={(e) =>
+                setFilters((f) => ({
+                  ...f,
+                  maxDistance:
+                    parseFloat(e.target.value) === 20
+                      ? null
+                      : parseFloat(e.target.value),
+                }))
+              }
+              className="w-full accent-blue-500"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0.5 km</span>
+              <span>Sin límite</span>
+            </div>
+          </div>
+
+          {/* Check-ins mínimos */}
+          <div className="mb-4">
+            <label className="text-gray-400 text-sm mb-2 block">
+              Ambiente mínimo
+            </label>
+            <div className="flex gap-2">
+              {[
+                { label: "Todos", value: 0 },
+                { label: "🟢 Bajo", value: 1 },
+                { label: "🟡 Medio", value: 5 },
+                { label: "🔴 Alto", value: 10 },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() =>
+                    setFilters((f) => ({ ...f, minCheckins: opt.value }))
+                  }
+                  className={`flex-1 text-xs py-1.5 rounded-full border transition ${
+                    filters.minCheckins === opt.value
+                      ? "bg-blue-600 border-blue-500 text-white"
+                      : "border-gray-600 text-gray-400 hover:border-gray-400"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-500 text-center">
+            {filteredVenues.length} de {venues.length} locales visibles
+          </div>
+        </div>
+      )}
 
       {/* ─── PANEL LATERAL / MODAL ─────────────────────────────────────────────── */}
       {selectedVenue && (

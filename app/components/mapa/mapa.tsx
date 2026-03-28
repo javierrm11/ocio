@@ -246,7 +246,7 @@ function MyMap() {
     currentUser?.username !== undefined && currentUser?.username !== null;
   const filteredVenues = venues.filter((v) => {
     const dist =
-      typeof v.distance === "number" ? v.distance : parseFloat(v.distance);
+      typeof v.distance === "number" ? v.distance : parseFloat(v.distance || "0");
     if (filters.maxDistance !== null && dist > filters.maxDistance)
       return false;
     const checkins = v.check_ins?.length || 0;

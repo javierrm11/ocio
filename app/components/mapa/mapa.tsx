@@ -426,83 +426,85 @@ function MyMap() {
 
       {/* Panel de filtros */}
       {showFilters && (
-        <div className="fixed top-34 left-4 z-[999] bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-xl w-72">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-white font-bold">Filtros</h3>
-            <button
-              onClick={() =>
-                setFilters({
-                  maxDistance: null,
-                  minCheckins: 0,
-                  maxCheckins: null,
-                })
-              }
-              className="text-gray-400 text-xs hover:text-white"
-            >
-              Resetear
-            </button>
-          </div>
+        <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-30 left-4 right-0 z-[999]">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-xl w-72">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-white font-bold">Filtros</h3>
+              <button
+                onClick={() =>
+                  setFilters({
+                    maxDistance: null,
+                    minCheckins: 0,
+                    maxCheckins: null,
+                  })
+                }
+                className="text-gray-400 text-xs hover:text-white"
+              >
+                Resetear
+              </button>
+            </div>
 
-          {/* Distancia máxima */}
-          <div className="mb-4">
-            <label className="text-gray-400 text-sm mb-1 block">
-              Distancia máxima: {filters.maxDistance ?? "∞"} km
-            </label>
-            <input
-              type="range"
-              min={0.5}
-              max={20}
-              step={0.5}
-              value={filters.maxDistance ?? 20}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  maxDistance:
-                    parseFloat(e.target.value) === 20
-                      ? null
-                      : parseFloat(e.target.value),
-                }))
-              }
-              className="w-full accent-blue-500"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>0.5 km</span>
-              <span>Sin límite</span>
+            {/* Distancia máxima */}
+            <div className="mb-4">
+              <label className="text-gray-400 text-sm mb-1 block">
+                Distancia máxima: {filters.maxDistance ?? "∞"} km
+              </label>
+              <input
+                type="range"
+                min={0.5}
+                max={20}
+                step={0.5}
+                value={filters.maxDistance ?? 20}
+                onChange={(e) =>
+                  setFilters((f) => ({
+                    ...f,
+                    maxDistance:
+                      parseFloat(e.target.value) === 20
+                        ? null
+                        : parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full accent-blue-500"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0.5 km</span>
+                <span>Sin límite</span>
+              </div>
+            </div>
+
+            {/* Check-ins mínimos */}
+            <div className="mb-4">
+              <label className="text-gray-400 text-sm mb-2 block">
+                Ambiente mínimo
+              </label>
+              <div className="flex gap-2">
+                {[
+                  { label: "Todos", value: 0 },
+                  { label: "🟡 Medio", value: 5 },
+                  { label: "🔴 Alto", value: 10 },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() =>
+                      setFilters((f) => ({ ...f, minCheckins: opt.value }))
+                    }
+                    className={`flex-1 text-xs py-1.5 rounded-full border transition ${
+                      filters.minCheckins === opt.value
+                        ? "bg-blue-600 border-blue-500 text-white"
+                        : "border-gray-600 text-gray-400 hover:border-gray-400"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-500 text-center">
+              {filteredVenues.length} de {venues.length} locales visibles
             </div>
           </div>
-
-          {/* Check-ins mínimos */}
-          <div className="mb-4">
-            <label className="text-gray-400 text-sm mb-2 block">
-              Ambiente mínimo
-            </label>
-            <div className="flex gap-2">
-              {[
-                { label: "Todos", value: 0 },
-                { label: "🟡 Medio", value: 5 },
-                { label: "🔴 Alto", value: 10 },
-              ].map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() =>
-                    setFilters((f) => ({ ...f, minCheckins: opt.value }))
-                  }
-                  className={`flex-1 text-xs py-1.5 rounded-full border transition ${
-                    filters.minCheckins === opt.value
-                      ? "bg-blue-600 border-blue-500 text-white"
-                      : "border-gray-600 text-gray-400 hover:border-gray-400"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
           </div>
-
-          <div className="text-xs text-gray-500 text-center">
-            {filteredVenues.length} de {venues.length} locales visibles
-          </div>
-        </div>
       )}
 
       {/* ─── PANEL LATERAL / MODAL ─────────────────────────────────────────────── */}

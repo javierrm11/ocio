@@ -1,6 +1,6 @@
 "use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -130,33 +130,32 @@ function MyMap() {
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
 
-  useEffect(() => {
-    if (!navigator.geolocation) return;
+  const venuesRef = useRef(venues);
+useEffect(() => {
+  venuesRef.current = venues;
+}, [venues]);
 
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setUserLocation({ latitude, longitude });
+useEffect(() => {
+  if (!navigator.geolocation) return;
 
-        // ✅ Actualiza la distancia de cada venue en tiempo real
-        setVenues(
-          venues.map((v) => ({
-            ...v,
-            distance: getDistanceKm(
-              latitude,
-              longitude,
-              v.latitude,
-              v.longitude,
-            ),
-          })),
-        );
-      },
-      (error) => console.error("Geolocation error:", error),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
-    );
+  const watchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      setUserLocation({ latitude, longitude });
 
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [venues]); // 👈 venues en dependencias para que setVenues tenga el array actualizado
+      setVenues(
+        venuesRef.current.map((v) => ({
+          ...v,
+          distance: getDistanceKm(latitude, longitude, v.latitude, v.longitude),
+        })),
+      );
+    },
+    (error) => console.error("Geolocation error:", error),
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
+  );
+
+  return () => navigator.geolocation.clearWatch(watchId);
+}, []); // 👈 array vacío: solo se monta una vez // 👈 venues en dependencias para que setVenues tenga el array actualizado
   const onCheckIn = (venueId: any) => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -818,3 +817,4 @@ function MyMap() {
 }
 
 export default MyMap;
+

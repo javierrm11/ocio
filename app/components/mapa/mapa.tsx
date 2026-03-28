@@ -470,7 +470,6 @@ function MyMap() {
             <div className="flex gap-2">
               {[
                 { label: "Todos", value: 0 },
-                { label: "🟢 Bajo", value: 1 },
                 { label: "🟡 Medio", value: 5 },
                 { label: "🔴 Alto", value: 10 },
               ].map((opt) => (

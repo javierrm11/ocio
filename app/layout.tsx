@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AppInitializer } from "./AppInitializer"; // 👈
+import { AppInitializer } from "./AppInitializer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,11 +14,55 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ozio",
-  description: "Ozio es una aplicación para descubrir y compartir lugares de ocio en tu ciudad. Encuentra bares, restaurantes, parques y más, con opiniones y fotos de otros usuarios. ¡Explora tu ciudad como nunca antes con Ozio!",
-  icons: {
-    icon: '/favicon.ico',
+  title: {
+    default: "Ozio — Descubre el ocio nocturno de tu ciudad",
+    template: "%s | Ozio",
   },
+  description:
+    "Ozio es la app para descubrir bares, discotecas y planes nocturnos cerca de ti. Consulta el ambiente en tiempo real, haz check-in y encuentra los mejores locales de tu ciudad.",
+  keywords: [
+    "ocio nocturno",
+    "bares",
+    "discotecas",
+    "planes nocturnos",
+    "vida nocturna",
+    "check-in",
+    "locales",
+    "nightlife",
+    "ozio",
+  ],
+  authors: [{ name: "Ozio" }],
+  creator: "Ozio",
+  applicationName: "Ozio",
+  category: "entertainment",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Ozio — Descubre el ocio nocturno de tu ciudad",
+    description:
+      "Consulta el ambiente en tiempo real, haz check-in y encuentra los mejores locales cerca de ti.",
+    url: "https://ocio-virid.vercel.app",
+    siteName: "Ozio",
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ozio — Descubre el ocio nocturno de tu ciudad",
+    description:
+      "Consulta el ambiente en tiempo real, haz check-in y encuentra los mejores locales cerca de ti.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -28,8 +72,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AppInitializer /> {/* 👈 Carga datos una sola vez */}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <AppInitializer />
         {children}
       </body>
     </html>

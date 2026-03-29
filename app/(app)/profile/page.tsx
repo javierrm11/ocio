@@ -53,7 +53,7 @@ export default function ProfilePage() {
       <div className="w-full bg-gradient-to-b from-gray-900 to-transparent absolute top-0 left-0 z-[991]">
         <Header />
       </div>
-      <main className="pt-16 px-4 flex flex-col justify-center min-h-screen pb-24">
+      <main className="pt-16 px-4 flex flex-col  min-h-screen pb-24">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">OZIO</h1>
           <p className="text-gray-400">Descubre la vida nocturna</p>

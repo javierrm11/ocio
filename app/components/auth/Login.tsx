@@ -54,7 +54,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="bg-ozio-dark flex items-center justify-center min-h-[600px]">
+    <div className="bg-ozio-dark flex items-center justify-center">
       <div className="w-full max-w-md bg-ozio-card rounded-3xl p-8 shadow-xl">
         <h2 className="text-2xl font-bold text-white mb-6">Iniciar sesión</h2>
 

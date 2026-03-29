@@ -169,7 +169,7 @@ export default function VenueDetail() {
               v.id === venueId ? { ...v, is_favorite: false } : v,
             ),
           );
-          setUserFavorites(userFavorites.filter((id) => id !== venueIdNum));
+          setUserFavorites(userFavorites.filter((id) => id !== venueId));
         })
         .finally(() => setTogglingFavorite(false));
     } else {
@@ -187,7 +187,7 @@ export default function VenueDetail() {
               v.id === venueId ? { ...v, is_favorite: true } : v,
             ),
           );
-          setUserFavorites([...userFavorites, venueIdNum]);
+          setUserFavorites([...userFavorites, venueId]);
         })
         .finally(() => setTogglingFavorite(false));
     }

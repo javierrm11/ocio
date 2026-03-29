@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore"; // 👈
 import { createClient } from "@/lib/supabase/client";
-import { getToken } from '@/lib/hooks/getToken';
+import { getToken } from "@/lib/hooks/getToken";
 import { Heart, MapPin, Settings, CalendarDays } from "lucide-react";
 
 interface CheckInHistory {
@@ -263,72 +263,72 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         </div>
 
         <div className="mt-8 flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
-  {isVenue ? (
-    <>
-      <button
-        onClick={() => setActiveTab("events")}
-        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-          activeTab === "events"
-            ? "bg-ozio-blue text-white shadow-lg"
-            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-        }`}
-      >
-        <CalendarDays size={18} />
-        <span>Eventos</span>
-      </button>
+          {isVenue ? (
+            <>
+              <button
+                onClick={() => setActiveTab("events")}
+                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+                  activeTab === "events"
+                    ? "bg-ozio-blue text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <CalendarDays size={18} />
+                <span>Eventos</span>
+              </button>
 
-      <button
-        onClick={() => setActiveTab("settings")}
-        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-          activeTab === "settings"
-            ? "bg-ozio-blue text-white shadow-lg"
-            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-        }`}
-      >
-        <Settings size={18} />
-        <span>Config</span>
-      </button>
-    </>
-  ) : (
-    <>
-      <button
-        onClick={() => setActiveTab("favorites")}
-        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-          activeTab === "favorites"
-            ? "bg-ozio-blue text-white shadow-lg"
-            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-        }`}
-      >
-        <Heart size={18} />
-        <span>Favoritos</span>
-      </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+                  activeTab === "settings"
+                    ? "bg-ozio-blue text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <Settings size={18} />
+                <span>Config</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setActiveTab("favorites")}
+                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+                  activeTab === "favorites"
+                    ? "bg-ozio-blue text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <Heart size={18} />
+                <span>Favoritos</span>
+              </button>
 
-      <button
-        onClick={() => setActiveTab("historial")}
-        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-          activeTab === "historial"
-            ? "bg-ozio-blue text-white shadow-lg"
-            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-        }`}
-      >
-        <MapPin size={18} />
-        <span>Historial</span>
-      </button>
+              <button
+                onClick={() => setActiveTab("historial")}
+                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+                  activeTab === "historial"
+                    ? "bg-ozio-blue text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <MapPin size={18} />
+                <span>Historial</span>
+              </button>
 
-      <button
-        onClick={() => setActiveTab("settings")}
-        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-          activeTab === "settings"
-            ? "bg-ozio-blue text-white shadow-lg"
-            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-        }`}
-      >
-        <Settings size={18} />
-        <span>Ajustes</span>
-      </button>
-    </>
-  )}
-</div>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+                  activeTab === "settings"
+                    ? "bg-ozio-blue text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <Settings size={18} />
+                <span>Ajustes</span>
+              </button>
+            </>
+          )}
+        </div>
 
         {/* Tab Content */}
         <div className="mt-6">
@@ -1540,8 +1540,18 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
                     </p>
                   )}
                   <p className="text-gray-400 text-xs mt-1 flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     {new Date(item.created_at).toLocaleTimeString("es-ES", {
                       month: "short",
@@ -1556,8 +1566,18 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
                   <span className="text-xs bg-ozio-orange/20 text-ozio-orange border border-ozio-orange/30 px-2.5 py-1 rounded-full font-medium">
                     📍 Check-in
                   </span>
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </div>
               </div>

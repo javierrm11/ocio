@@ -1,17 +1,17 @@
 "use client";
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Compass, Sparkles, Heart, User } from 'lucide-react';
+import { Compass, User, Search, CalendarDays } from 'lucide-react';
 
 function BottomNav() {
   const router = useRouter();
   const pathname = usePathname(); // ✅ Activo real según la ruta actual
 
   const navItems = [
-    { icon: <Compass size={20} />, label: 'Mapa',           path: '/mapa' },
-    { icon: <Sparkles size={20} />, label: 'Eventos',       path: '/events' },
-    { icon: <Heart size={20} />,    label: 'Buscar',    path: '/buscar' },
-    { icon: <User size={20} />,     label: 'Perfil',        path: '/profile' },
+    { icon: <Compass size={20} />,     label: 'Mapa',    path: '/mapa' },
+    { icon: <CalendarDays size={20} />, label: 'Eventos', path: '/events' },
+    { icon: <Search size={20} />,      label: 'Buscar',  path: '/buscar' },
+    { icon: <User size={20} />,        label: 'Perfil',  path: '/profile' },
   ];
 
   return (

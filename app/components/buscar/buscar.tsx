@@ -347,7 +347,7 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
     ? { bg: '#10b981', label: 'Tranquilo' }
     : checkins < 5
       ? { bg: '#f59e0b', label: 'Animado' }
-      : { bg: '#ef4444', label: 'Lleno' };
+      : { bg: '#ef4444', label: 'Muy Animado' };
 
   const dist = typeof venue.distance === 'number'
     ? venue.distance

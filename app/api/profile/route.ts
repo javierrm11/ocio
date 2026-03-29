@@ -27,7 +27,8 @@ export async function GET(request: Request) {
     favorites(
       *,
       venues(*)
-    )
+    ),
+    check_ins(*, venues(*))
   `)
   .eq("id", user.id);
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
-import { getToken } from '@/lib/hooks/getToken';
+import { getToken } from "@/lib/hooks/getToken";
 
 interface Event {
   id: string;
@@ -70,6 +70,8 @@ export default function VenueDetail() {
 
   // Sincronizar hasCheckedIn con el store
   useEffect(() => {
+    console.log(venueFromStore?.check_ins);
+    
     if (venueFromStore?.check_ins && venueFromStore.check_ins.length > 0) {
       setHasCheckedIn(true);
     } else {
@@ -133,11 +135,30 @@ export default function VenueDetail() {
   };
 
   const onCheckOut = () => {
+    
     setCheckingOut(true);
     const token = getToken();
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+    console.log(venueId);
+
+    // Coger el id del check-in desde el store
+    const venueFromStore = venues.find((v) => v.id === venueId);
+    console.log(venueFromStore);
+
+    const checkInId = venueFromStore?.check_ins?.[0]?.id;
+    console.log(checkInId);
+
+    if (!checkInId) {
+      setCheckingOut(false);
+      return;
+    }
+
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${checkInId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ active: false }),
     })
       .then((res) => res.json())
       .then(() => {
@@ -166,7 +187,9 @@ export default function VenueDetail() {
               v.id === venueId ? { ...v, is_favorite: false } : v,
             ),
           );
-          setUserFavorites(userFavorites.filter((id) => String(id) !== venueId));
+          setUserFavorites(
+            userFavorites.filter((id) => String(id) !== venueId),
+          );
         })
         .finally(() => setTogglingFavorite(false));
     } else {

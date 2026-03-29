@@ -163,49 +163,56 @@ function MyMap() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []); // 👈 array vacío: solo se monta una vez // 👈 venues en dependencias para que setVenues tenga el array actualizado
   const onCheckIn = (venueId: any) => {
-    const token = getToken();
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ venue_id: venueId }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setVenues(
-          venues.map((v) =>
-            v.id === venueId
-              ? { ...v, check_ins: [...(v.check_ins || []), data.data] }
-              : v,
-          ),
-        );
-        if (selectedVenue && selectedVenue.id === venueId)
-          setSelectedVenue({
-            ...selectedVenue,
-            check_ins: [...(selectedVenue.check_ins || []), data.data],
-          });
-        closeModal();
-      });
-  };
+  const token = getToken();
+  fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ venue_id: venueId }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // data.data tiene el check-in creado con su id
+      setVenues(
+        venues.map((v) =>
+          v.id === venueId
+            ? { ...v, check_ins: [...(v.check_ins || []), data.data] }
+            : v,
+        ),
+      );
+      if (selectedVenue && selectedVenue.id === venueId)
+        setSelectedVenue({
+          ...selectedVenue,
+          check_ins: [...(selectedVenue.check_ins || []), data.data],
+        });
+      closeModal();
+    });
+};
 
   const onCheckOut = (venueId: any) => {
-    const token = getToken();
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setVenues(
-          venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)),
-        );
-        if (selectedVenue && selectedVenue.id === venueId)
-          setSelectedVenue({ ...selectedVenue, check_ins: [] });
-        closeModal();
-      });
-  };
+  const token = getToken();
+  
+  // Coger el id del check-in del venue
+  const venue = venues.find((v) => v.id === venueId);
+  const checkInId = venue?.check_ins?.[0]?.id;
+
+  if (!checkInId) return;
+
+  fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${checkInId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ active: false }),
+  })
+    .then((res) => res.json())
+    .then(() => {
+      setVenues(venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)));
+      if (selectedVenue && selectedVenue.id === venueId)
+        setSelectedVenue({ ...selectedVenue, check_ins: [] });
+      closeModal();
+    });
+};
 
   const toggleFavorite = (venueId: any, isFavorite: boolean) => {
     const token = getToken();
@@ -560,10 +567,10 @@ function MyMap() {
                 }}
               >
                 {(selectedVenue.check_ins?.length || 0) === 0
-                  ? "Low Ambience"
+                  ? "Tranquilo"
                   : (selectedVenue.check_ins?.length || 0) < 5
-                    ? "Medium Ambience"
-                    : "High Ambience"}
+                    ? "Animado"
+                    : "Muy Animado"}
               </div>
 
               {/* Banner evento activo/próximo */}

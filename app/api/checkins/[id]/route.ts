@@ -2,6 +2,7 @@
 import { getUserId } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { act } from "react";
 
 export async function PUT(
     request: Request,
@@ -17,7 +18,7 @@ export async function PUT(
     const supabase = await createClient();
     const body = await request.json();
     const {
-        venue_id
+        active
     } = body;
     const { id } = await params;
 
@@ -46,7 +47,7 @@ export async function PUT(
     const { data, error } = await supabase
         .from('check_ins')
         .update({
-            venue_id
+            active
         })
         .eq('id', id)
         .select()

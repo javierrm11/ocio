@@ -38,9 +38,8 @@ export default function Eventos() {
     );
   }
 
-  const now = new Date();
-
-  const filteredEvents = useMemo(() => {
+  const filteredEvents = (() => {
+    const now = new Date();
     let result = [...events] as Event[];
 
     // Filtro búsqueda
@@ -102,7 +101,9 @@ export default function Eventos() {
     });
 
     return result;
-  }, [events, filter, search]);
+  })();
+
+  const now = new Date();
 
   const activeCount = events.filter(
     (e: Event) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,

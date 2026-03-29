@@ -39,7 +39,8 @@ export default function NotificationsPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Error al cargar notificaciones');
+        setNotifications([]); // En caso de error, array vacío
+        return;
       }
 
       const data = await response.json();

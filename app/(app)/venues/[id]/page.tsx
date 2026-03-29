@@ -60,9 +60,9 @@ export default function VenueDetail() {
   const [venue, setVenue] = useState<Venue | null>(venueWithEvents);
   const [loading, setLoading] = useState(!venueWithEvents);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
-  const [showShareMenu, setShowShareMenu] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [togglingFavorite, setTogglingFavorite] = useState(false);
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
@@ -153,6 +153,7 @@ export default function VenueDetail() {
   };
 
   const toggleFavorite = () => {
+    setTogglingFavorite(true);
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     const isFavorite = venueFromStore?.is_favorite || false;
@@ -161,14 +162,16 @@ export default function VenueDetail() {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
-      }).then(() => {
-        setVenues(
-          venues.map((v) =>
-            v.id === venueId ? { ...v, is_favorite: false } : v,
-          ),
-        );
-        setUserFavorites(userFavorites.filter((id) => String(id) !== venueId));
-      });
+      })
+        .then(() => {
+          setVenues(
+            venues.map((v) =>
+              v.id === venueId ? { ...v, is_favorite: false } : v,
+            ),
+          );
+          setUserFavorites(userFavorites.filter((id) => id !== venueIdNum));
+        })
+        .finally(() => setTogglingFavorite(false));
     } else {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
         method: "POST",
@@ -177,20 +180,17 @@ export default function VenueDetail() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ venue_id: venueId }),
-      }).then(() => {
-        setVenues(
-          venues.map((v) =>
-            v.id === venueId ? { ...v, is_favorite: true } : v,
-          ),
-        );
-        setUserFavorites([...userFavorites, venueId as unknown as number]);
-      });
+      })
+        .then(() => {
+          setVenues(
+            venues.map((v) =>
+              v.id === venueId ? { ...v, is_favorite: true } : v,
+            ),
+          );
+          setUserFavorites([...userFavorites, venueIdNum]);
+        })
+        .finally(() => setTogglingFavorite(false));
     }
-  };
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShowShareMenu(false);
   };
 
   if (loading) {
@@ -269,25 +269,30 @@ export default function VenueDetail() {
             {isUserProfile && (
               <button
                 onClick={toggleFavorite}
+                disabled={togglingFavorite}
                 className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center transition border border-white/10 ${
                   venueFromStore?.is_favorite
                     ? "bg-red-600/80"
                     : "bg-black/50 hover:bg-black/70"
-                }`}
+                } ${togglingFavorite ? "opacity-70" : ""}`}
               >
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill={venueFromStore?.is_favorite ? "currentColor" : "none"}
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
+                {togglingFavorite ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
+                ) : (
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill={venueFromStore?.is_favorite ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                )}
               </button>
             )}
           </div>
@@ -497,8 +502,6 @@ export default function VenueDetail() {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

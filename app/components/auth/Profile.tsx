@@ -6,6 +6,7 @@ import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore"; // 👈
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from '@/lib/hooks/getToken';
+import { Heart, MapPin, Settings, CalendarDays } from "lucide-react";
 
 interface CheckInHistory {
   id: string;
@@ -261,66 +262,73 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           )}
         </div>
 
-        {/* Tabs */}
         <div className="mt-8 flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
-          {isVenue ? (
-            <>
-              <button
-                onClick={() => setActiveTab("events")}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === "events"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
-              >
-                🎉 Eventos
-              </button>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === "settings"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
-              >
-                ⚙️ Config
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setActiveTab("favorites")}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === "favorites"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
-              >
-                ❤️ Favoritos
-              </button>
-              <button
-                onClick={() => setActiveTab("historial")}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === "historial"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
-              >
-                📍 Historial
-              </button>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-3 rounded-xl font-medium transition ${
-                  activeTab === "settings"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
-              >
-                ⚙️ Ajustes
-              </button>
-            </>
-          )}
-        </div>
+  {isVenue ? (
+    <>
+      <button
+        onClick={() => setActiveTab("events")}
+        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+          activeTab === "events"
+            ? "bg-ozio-blue text-white shadow-lg"
+            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+        }`}
+      >
+        <CalendarDays size={18} />
+        <span>Eventos</span>
+      </button>
+
+      <button
+        onClick={() => setActiveTab("settings")}
+        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+          activeTab === "settings"
+            ? "bg-ozio-blue text-white shadow-lg"
+            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+        }`}
+      >
+        <Settings size={18} />
+        <span>Config</span>
+      </button>
+    </>
+  ) : (
+    <>
+      <button
+        onClick={() => setActiveTab("favorites")}
+        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+          activeTab === "favorites"
+            ? "bg-ozio-blue text-white shadow-lg"
+            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+        }`}
+      >
+        <Heart size={18} />
+        <span>Favoritos</span>
+      </button>
+
+      <button
+        onClick={() => setActiveTab("historial")}
+        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+          activeTab === "historial"
+            ? "bg-ozio-blue text-white shadow-lg"
+            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+        }`}
+      >
+        <MapPin size={18} />
+        <span>Historial</span>
+      </button>
+
+      <button
+        onClick={() => setActiveTab("settings")}
+        className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
+          activeTab === "settings"
+            ? "bg-ozio-blue text-white shadow-lg"
+            : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+        }`}
+      >
+        <Settings size={18} />
+        <span>Ajustes</span>
+      </button>
+    </>
+  )}
+</div>
 
         {/* Tab Content */}
         <div className="mt-6">

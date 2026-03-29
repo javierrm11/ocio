@@ -24,7 +24,8 @@ function Header() {
 
         {/* Right: Icons */}
         <div className="flex items-center gap-4">
-          <button className="hover:text-blue-400 transition">
+          <button className="hover:text-blue-400 transition"
+          onClick={() => { router.push('/notificaciones') }}>
             <Bell size={18} />
           </button>
           <button 

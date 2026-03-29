@@ -10,7 +10,6 @@ function BottomNav() {
   const navItems = [
     { icon: <Compass size={20} />, label: 'Mapa',           path: '/mapa' },
     { icon: <Sparkles size={20} />, label: 'Destacados',    path: '/destacados' },
-    { icon: <Heart size={20} />,    label: 'Notificaciones', path: '/notificaciones' },
     { icon: <User size={20} />,     label: 'Perfil',         path: '/profile' },
   ];
 

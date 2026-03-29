@@ -395,7 +395,7 @@ function MyMap() {
         </MapContainer>
       </div>
       {/* Botón flotante filtros */}
-      <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-15 left-4 right-0 z-[999]">
+      <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-15  right-4 z-[999]">
           <button
         onClick={() => setShowFilters(!showFilters)}
         className="bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border border-gray-700 hover:bg-gray-800 transition "
@@ -424,7 +424,7 @@ function MyMap() {
 
       {/* Panel de filtros */}
       {showFilters && (
-        <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-30 left-4 right-0 z-[999] pointer-events-none">
+        <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto absolute top-30 right-4 z-[999] pointer-events-none">
           <div className="pointer-events-auto bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-xl w-72">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-white font-bold">Filtros</h3>

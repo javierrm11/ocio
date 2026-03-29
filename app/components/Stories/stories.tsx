@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Story {
   id?: string;
@@ -62,7 +63,7 @@ export default function Stories() {
 
   const fetchCurrentUser = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       if (!token) { setUserLoading(false); return; }
       const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -155,7 +156,7 @@ export default function Stories() {
     if (!selectedFile) return;
     setUploading(true);
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       const formData = new FormData();
       formData.append('media', selectedFile);
       formData.append('media_type', selectedFile.type.startsWith('video/') ? 'video' : 'image');

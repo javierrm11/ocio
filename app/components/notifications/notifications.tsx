@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Notification {
   id: string;
@@ -34,7 +35,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       const url = filter === 'unread' 
         ? `${process.env.NEXT_PUBLIC_APP_URL}/api/notifications?unread_only=true`
         : `${process.env.NEXT_PUBLIC_APP_URL}/api/notifications`;
@@ -61,7 +62,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'PATCH',
@@ -85,7 +86,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
   const markAllAsRead = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/actions`, {
         method: 'POST',
@@ -106,8 +107,8 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      
+      const token = getToken();
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {

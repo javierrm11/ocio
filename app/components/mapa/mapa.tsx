@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Event {
   id: string;
@@ -162,8 +163,7 @@ function MyMap() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []); // 👈 array vacío: solo se monta una vez // 👈 venues en dependencias para que setVenues tenga el array actualizado
   const onCheckIn = (venueId: any) => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
       headers: {
@@ -191,8 +191,7 @@ function MyMap() {
   };
 
   const onCheckOut = (venueId: any) => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -209,8 +208,7 @@ function MyMap() {
   };
 
   const toggleFavorite = (venueId: any, isFavorite: boolean) => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     if (isFavorite) {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
         method: "DELETE",

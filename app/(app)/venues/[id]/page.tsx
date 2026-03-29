@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Event {
   id: string;
@@ -81,8 +82,7 @@ export default function VenueDetail() {
 
     const fetchVenueDetail = async () => {
       try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
+        const token = getToken();
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`,
           {
@@ -104,8 +104,7 @@ export default function VenueDetail() {
 
   const onCheckIn = () => {
     setCheckingIn(true);
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
       headers: {
@@ -135,8 +134,7 @@ export default function VenueDetail() {
 
   const onCheckOut = () => {
     setCheckingOut(true);
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -154,8 +152,7 @@ export default function VenueDetail() {
 
   const toggleFavorite = () => {
     setTogglingFavorite(true);
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     const isFavorite = venueFromStore?.is_favorite || false;
 
     if (isFavorite) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Event {
   id: string;
@@ -132,7 +133,7 @@ export default function EventDetailPage() {
   };
 
   const handleAttend = async () => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     try {
       const res = await fetch(`http://localhost:3000/api/eventAttendees`, {
         method: "POST",
@@ -152,7 +153,7 @@ export default function EventDetailPage() {
   };
 
   const handleUnattend = async () => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
     const myAttendance = attendees.find((att) => att.profile_id === currentUser?.id);
     if (!myAttendance) return;
     try {

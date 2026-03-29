@@ -7,11 +7,12 @@ import Register from "@/components/auth/Register";
 import ProfileContent from "@/components/auth/ProfileWrapper";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
+import { getToken } from '@/lib/hooks/getToken';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = getToken();
     return !!token;
   });
 

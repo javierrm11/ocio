@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/header';
 import BottomNav from '@/components/Boton/BottomNav';
+import { getToken } from '@/lib/hooks/getToken';
 
 interface Notification {
   id: string;
@@ -30,7 +31,7 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications`, {
         headers: {
@@ -56,7 +57,7 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getToken();
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/${notificationId}`, {
         method: 'PATCH',

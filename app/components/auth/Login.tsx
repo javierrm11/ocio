@@ -12,7 +12,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const { setLoaded } = useAppStore(); // 👈
 
@@ -39,11 +38,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       }
 
       if (typeof window !== 'undefined') {
-        if (rememberMe) {
-          localStorage.setItem('token', data.session.access_token);
-        } else {
-          sessionStorage.setItem('token', data.session.access_token);
-        }
+        const maxAge =  60 * 60 * 24 * 30; // 30 días o sesión
+        document.cookie = `token=${data.session.access_token}; path=/; ${maxAge ? `max-age=${maxAge};` : ''} SameSite=Lax`;
       }
 
       // ✅ Forzar recarga del store con el nuevo token
@@ -102,16 +98,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-700 bg-ozio-dark text-ozio-blue focus:ring-ozio-blue focus:ring-offset-0"
-              />
-              <span className="text-sm text-gray-300">Recuérdame</span>
-            </label>
-
             <Link href="/forgot-password" className="text-sm text-ozio-blue hover:text-ozio-purple transition">
               ¿Olvidaste tu contraseña?
             </Link>
@@ -125,24 +111,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
         </form>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-ozio-card text-gray-400">O continúa con</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <button className="bg-ozio-dark border border-gray-700 text-white font-medium py-3 px-4 rounded-xl hover:bg-gray-800 transition flex items-center justify-center gap-2">
-            Google
-          </button>
-          <button className="bg-ozio-dark border border-gray-700 text-white font-medium py-3 px-4 rounded-xl hover:bg-gray-800 transition flex items-center justify-center gap-2">
-            Facebook
-          </button>
-        </div>
 
         <p className="text-center text-gray-400 text-sm mt-6">
           ¿No tienes cuenta?{' '}

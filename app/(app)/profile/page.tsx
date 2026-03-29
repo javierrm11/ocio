@@ -6,6 +6,7 @@ import Login from "@/components/auth/Login";
 import BottomNav from "@/components/Boton/BottomNav";
 import Header from "@/components/layout/header";
 import Register from "@/components/auth/Register";
+import { getToken } from '@/lib/hooks/getToken';
 
 const ProfileContent = dynamic(
   () => import("@/components/auth/Profile"),
@@ -18,7 +19,7 @@ export default function ProfilePage() {
 
   // Check token on client-side only
   useEffect(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = getToken();
     Promise.resolve().then(() => {
       setIsAuthenticated(!!token);
     });

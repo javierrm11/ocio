@@ -1,6 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import { useAppStore } from "@/lib/stores/venueStore";
+import { getToken } from '@/lib/hooks/getToken';
+
 
 export function AppInitializer() {
   const {
@@ -39,8 +41,7 @@ export function AppInitializer() {
       });
     }
 
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token = getToken();
 
     const loadData = async () => {
       const venuesRes = await fetch(

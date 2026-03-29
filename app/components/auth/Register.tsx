@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { getToken } from '@/lib/hooks/getToken';
 
 // Importar Leaflet dinámicamente solo en el cliente
 const MapWithNoSSR = dynamic(
@@ -157,10 +158,6 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
 
         if (!response.ok) {
           throw new Error(data.error || 'Error al registrarse');
-        }
-
-        if (data.session?.access_token) {
-          localStorage.setItem('token', data.session.access_token);
         }
 
         if (onRegisterSuccess) {

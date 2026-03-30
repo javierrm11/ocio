@@ -68,10 +68,7 @@ export default function VenueDetail() {
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
 
-  // Sincronizar hasCheckedIn con el store
   useEffect(() => {
-    console.log(venueFromStore?.check_ins);
-    
     if (venueFromStore?.check_ins && venueFromStore.check_ins.length > 0) {
       setHasCheckedIn(true);
     } else {
@@ -87,9 +84,7 @@ export default function VenueDetail() {
         const token = getToken();
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_APP_URL}/api/venues/${venueId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!response.ok) throw new Error("Error al cargar el local");
         const result = await response.json();
@@ -135,17 +130,11 @@ export default function VenueDetail() {
   };
 
   const onCheckOut = () => {
-    
     setCheckingOut(true);
     const token = getToken();
-    console.log(venueId);
 
-    // Coger el id del check-in desde el store
     const venueFromStore = venues.find((v) => v.id === venueId);
-    console.log(venueFromStore);
-
     const checkInId = venueFromStore?.check_ins?.[0]?.id;
-    console.log(checkInId);
 
     if (!checkInId) {
       setCheckingOut(false);
@@ -243,9 +232,16 @@ export default function VenueDetail() {
     );
   }
 
+  const now = new Date();
+
+  const activeEvents =
+    venue.events?.filter(
+      (e) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
+    ) || [];
+
   const upcomingEvents =
     venue.events
-      ?.filter((event) => new Date(event.starts_at) > new Date())
+      ?.filter((e) => new Date(e.starts_at) > now)
       .sort(
         (a, b) =>
           new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
@@ -270,18 +266,8 @@ export default function VenueDetail() {
             onClick={() => router.back()}
             className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition border border-white/10"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
@@ -305,12 +291,7 @@ export default function VenueDetail() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 )}
               </button>
@@ -321,11 +302,7 @@ export default function VenueDetail() {
         {/* Badge visitas */}
         <div className="absolute bottom-4 left-4 md:left-8">
           <div className="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium border border-white/10 flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-ozio-orange"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5 text-ozio-orange" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
             </svg>
             {totalCheckIns} visitas
@@ -336,41 +313,24 @@ export default function VenueDetail() {
       {/* ── Contenido ───────────────────────────────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 -mt-6 relative z-10">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+
           {/* ── Columna izquierda ── */}
           <div className="space-y-6">
+
             {/* Info principal + acciones */}
             <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 shadow-2xl">
-              <h1 className="text-white text-3xl font-bold mb-4">
-                {venue.name}
-              </h1>
+              <h1 className="text-white text-3xl font-bold mb-4">{venue.name}</h1>
 
               {venue.description && (
-                <p className="text-gray-300 leading-relaxed mb-6">
-                  {venue.description}
-                </p>
+                <p className="text-gray-300 leading-relaxed mb-6">{venue.description}</p>
               )}
 
               {venue.address && (
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-12 h-12 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -394,18 +354,8 @@ export default function VenueDetail() {
                       </>
                     ) : (
                       <>
-                        <svg
-                          className="w-6 h-6"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         Quitar check-in
                       </>
@@ -429,13 +379,31 @@ export default function VenueDetail() {
                 ))}
             </div>
 
-            {/* Eventos — columna izquierda en desktop */}
+            {/* Eventos activos — desktop */}
+            {activeEvents.length > 0 && (
+              <div className="bg-ozio-card border border-green-500/40 rounded-3xl p-6 lg:block hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
+                    Evento en curso
+                  </h2>
+                  <span className="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full font-medium border border-green-500/30">
+                    {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {activeEvents.map((event) => (
+                    <EventMiniCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Próximos eventos — desktop */}
             {upcomingEvents.length > 0 && (
               <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:block hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg">
-                    Próximos eventos
-                  </h2>
+                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
                   <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
                     {upcomingEvents.length}
                   </span>
@@ -451,6 +419,7 @@ export default function VenueDetail() {
 
           {/* ── Columna derecha ── */}
           <div className="space-y-6 mt-6 lg:mt-0">
+
             {/* Mapa */}
             <div className="bg-ozio-card border border-gray-700/50 rounded-3xl overflow-hidden">
               <div className="p-4 border-b border-gray-700/50">
@@ -477,37 +446,40 @@ export default function VenueDetail() {
                   }
                   className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   Abrir en Google Maps
                 </button>
               </div>
             </div>
 
-            {/* Eventos — móvil/tablet */}
+            {/* Eventos activos — móvil/tablet */}
+            {activeEvents.length > 0 && (
+              <div className="bg-ozio-card border border-green-500/40 rounded-3xl p-6 lg:hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
+                    Evento en curso
+                  </h2>
+                  <span className="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full font-medium border border-green-500/30">
+                    {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {activeEvents.map((event) => (
+                    <EventMiniCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Próximos eventos — móvil/tablet */}
             {upcomingEvents.length > 0 && (
               <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg">
-                    Próximos eventos
-                  </h2>
+                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
                   <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
                     {upcomingEvents.length}
                   </span>
@@ -529,6 +501,9 @@ export default function VenueDetail() {
 function EventMiniCard({ event }: { event: Event }) {
   const router = useRouter();
   const startDate = new Date(event.starts_at);
+  const endDate = new Date(event.ends_at);
+  const now = new Date();
+  const isActive = startDate <= now && endDate >= now;
 
   return (
     <div
@@ -539,70 +514,48 @@ function EventMiniCard({ event }: { event: Event }) {
       }}
     >
       <div className="flex gap-3">
-        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex flex-col items-center justify-center">
-          <span className="text-white text-xs font-medium">
-            {startDate
-              .toLocaleDateString("es-ES", { month: "short" })
-              .toUpperCase()}
-          </span>
-          <span className="text-white text-2xl font-bold">
-            {startDate.getDate()}
-          </span>
+        <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex flex-col items-center justify-center bg-gradient-to-br ${isActive ? "from-green-600 to-green-700" : "from-ozio-purple to-ozio-blue"}`}>
+          {isActive ? (
+            <>
+              <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse mb-1" />
+              <span className="text-white text-xs font-bold">LIVE</span>
+            </>
+          ) : (
+            <>
+              <span className="text-white text-xs font-medium">
+                {startDate.toLocaleDateString("es-ES", { month: "short" }).toUpperCase()}
+              </span>
+              <span className="text-white text-2xl font-bold">{startDate.getDate()}</span>
+            </>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold truncate mb-1">{event.title}</h3>
           {event.description && (
-            <p className="text-gray-400 text-sm line-clamp-1 mb-2">
-              {event.description}
-            </p>
+            <p className="text-gray-400 text-sm line-clamp-1 mb-2">{event.description}</p>
           )}
           <div className="flex items-center gap-2 text-gray-400 text-xs">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>
-              {startDate.toLocaleTimeString("es-ES", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {isActive
+                ? `Hasta las ${endDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
+                : startDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
         </div>
 
         {event.image_path && (
           <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden">
-            <img
-              src={event.image_path}
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={event.image_path} alt={event.title} className="w-full h-full object-cover" />
           </div>
         )}
 
         <div className="flex items-center">
-          <svg
-            className="w-5 h-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </div>

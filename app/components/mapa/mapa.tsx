@@ -70,8 +70,7 @@ function formatEventTime(event: Event): string {
   const start = new Date(event.starts_at);
   const end = new Date(event.ends_at);
   if (now >= start && now <= end) {
-    const endTime = end.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-    return `Activo hasta las ${endTime}`;
+    return `Activo hasta las ${end.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
   }
   const startTime = start.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
   const diffMs = start.getTime() - now.getTime();
@@ -127,20 +126,15 @@ function MyMap() {
   const closeModal = () => setSelectedVenue(null);
 
   const venuesRef = useRef(venues);
-  useEffect(() => {
-    venuesRef.current = venues;
-  }, [venues]);
+  useEffect(() => { venuesRef.current = venues; }, [venues]);
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowFilters(false);
       }
     }
-    if (showFilters) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (showFilters) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showFilters]);
 
@@ -172,11 +166,9 @@ function MyMap() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setVenues(
-          venues.map((v) =>
-            v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data.data] } : v,
-          ),
-        );
+        setVenues(venues.map((v) =>
+          v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data.data] } : v,
+        ));
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data.data] });
         closeModal();
@@ -232,8 +224,7 @@ function MyMap() {
     currentUser?.username !== undefined && currentUser?.username !== null;
 
   const filteredVenues = venues.filter((v) => {
-    const dist =
-      typeof v.distance === "number" ? v.distance : parseFloat(v.distance || "0");
+    const dist = typeof v.distance === "number" ? v.distance : parseFloat(v.distance || "0");
     if (filters.maxDistance !== null && dist > filters.maxDistance) return false;
     const checkins = v.check_ins?.length || 0;
     if (checkins < filters.minCheckins) return false;
@@ -331,115 +322,104 @@ function MyMap() {
       </div>
 
       {/* ─── BOTÓN + DROPDOWN FILTROS ─── */}
-      <div ref={dropdownRef} className="absolute top-15 right-4 z-[999]">
-
-        {/* Botón trigger */}
-        <button
-          onClick={() => setShowFilters((v) => !v)}
-          className={`bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border transition ${
-            showFilters ? "border-blue-500 bg-gray-800" : "border-gray-700 hover:bg-gray-800"
-          }`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
-          </svg>
-          Filtros
-          {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
-          <svg
-            className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div ref={dropdownRef} className="absolute top-15 right-4 z-[999] pointer-events-none">
+        <div className="pointer-events-auto">
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={`bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border transition ${
+              showFilters ? "border-blue-500 bg-gray-800" : "border-gray-700 hover:bg-gray-800"
+            }`}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
+            </svg>
+            Filtros
+            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+            <svg
+              className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
 
-        {/* Dropdown */}
-        <div
-          className={`absolute top-full right-0 mt-2 w-72 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden transition-all duration-200 origin-top-right ${
-            showFilters
-              ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-          }`}
-        >
-          {/* Cabecera */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-            <span className="text-white font-semibold text-sm">Filtros</span>
-            {hasActiveFilters && (
-              <button
-                onClick={() => setFilters({ maxDistance: null, minCheckins: 0, maxCheckins: null })}
-                className="text-xs text-blue-400 hover:text-blue-300 transition"
-              >
-                Resetear
-              </button>
-            )}
-          </div>
+          <div
+            className={`absolute top-full right-0 mt-2 w-72 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden transition-all duration-200 origin-top-right ${
+              showFilters
+                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+            }`}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+              <span className="text-white font-semibold text-sm">Filtros</span>
+              {hasActiveFilters && (
+                <button
+                  onClick={() => setFilters({ maxDistance: null, minCheckins: 0, maxCheckins: null })}
+                  className="text-xs text-blue-400 hover:text-blue-300 transition"
+                >
+                  Resetear
+                </button>
+              )}
+            </div>
 
-          <div className="px-4 py-4 flex flex-col gap-5">
-            {/* Distancia máxima */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
-                  Distancia máxima
+            <div className="px-4 py-4 flex flex-col gap-5">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
+                    Distancia máxima
+                  </label>
+                  <span className="text-blue-400 text-xs font-medium">
+                    {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
+                  </span>
+                </div>
+                <input
+                  type="range" min={0.5} max={20} step={0.5}
+                  value={filters.maxDistance ?? 20}
+                  onChange={(e) =>
+                    setFilters((f) => ({
+                      ...f,
+                      maxDistance: parseFloat(e.target.value) === 20 ? null : parseFloat(e.target.value),
+                    }))
+                  }
+                  className="w-full accent-blue-500"
+                />
+                <div className="flex justify-between text-xs text-gray-600 mt-1">
+                  <span>500m</span><span>Sin límite</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+                  Ambiente mínimo
                 </label>
-                <span className="text-blue-400 text-xs font-medium">
-                  {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
+                <div className="flex gap-2">
+                  {[
+                    { label: "Todos", value: 0 },
+                    { label: "🟡 Medio", value: 5 },
+                    { label: "🔴 Alto", value: 10 },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setFilters((f) => ({ ...f, minCheckins: opt.value }))}
+                      className={`flex-1 text-xs py-2 rounded-xl border transition font-medium ${
+                        filters.minCheckins === opt.value
+                          ? "bg-blue-600 border-blue-500 text-white"
+                          : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-1 border-t border-gray-800">
+                <span className="text-gray-500 text-xs">Locales visibles</span>
+                <span className="text-white text-sm font-bold">
+                  {filteredVenues.length}
+                  <span className="text-gray-500 font-normal"> / {venues.length}</span>
                 </span>
               </div>
-              <input
-                type="range"
-                min={0.5}
-                max={20}
-                step={0.5}
-                value={filters.maxDistance ?? 20}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    maxDistance: parseFloat(e.target.value) === 20 ? null : parseFloat(e.target.value),
-                  }))
-                }
-                className="w-full accent-blue-500"
-              />
-              <div className="flex justify-between text-xs text-gray-600 mt-1">
-                <span>500m</span>
-                <span>Sin límite</span>
-              </div>
-            </div>
-
-            {/* Ambiente mínimo */}
-            <div>
-              <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
-                Ambiente mínimo
-              </label>
-              <div className="flex gap-2">
-                {[
-                  { label: "Todos", value: 0 },
-                  { label: "🟡 Medio", value: 5 },
-                  { label: "🔴 Alto", value: 10 },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilters((f) => ({ ...f, minCheckins: opt.value }))}
-                    className={`flex-1 text-xs py-2 rounded-xl border transition font-medium ${
-                      filters.minCheckins === opt.value
-                        ? "bg-blue-600 border-blue-500 text-white"
-                        : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Contador */}
-            <div className="flex items-center justify-between pt-1 border-t border-gray-800">
-              <span className="text-gray-500 text-xs">Locales visibles</span>
-              <span className="text-white text-sm font-bold">
-                {filteredVenues.length}
-                <span className="text-gray-500 font-normal"> / {venues.length}</span>
-              </span>
             </div>
           </div>
         </div>
@@ -454,6 +434,7 @@ function MyMap() {
             className="fixed z-[1002] bg-gray-900 overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Imagen cabecera */}
             <div className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none flex-shrink-0">
               <img src={selectedVenue.avatar_path} alt={selectedVenue.name} className="w-full h-full object-cover" />
 
@@ -466,6 +447,7 @@ function MyMap() {
                 </svg>
               </button>
 
+              {/* Badge ambiente */}
               <div
                 className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full"
                 style={{
@@ -480,6 +462,7 @@ function MyMap() {
                   : "Muy Animado"}
               </div>
 
+              {/* Banner evento activo/próximo en imagen */}
               {(() => {
                 const status = getEventStatus(selectedVenue);
                 const event = getActiveOrSoonEvent(selectedVenue);
@@ -502,6 +485,7 @@ function MyMap() {
               })()}
             </div>
 
+            {/* Contenido */}
             <div className="p-6 flex flex-col gap-4">
               <div>
                 <h2 className="text-white text-2xl font-bold mb-1">{selectedVenue.name}</h2>
@@ -527,6 +511,96 @@ function MyMap() {
                 </p>
               )}
 
+              {/* ─── EVENTOS ACTIVOS ─── */}
+              {(() => {
+                const now = new Date();
+                const activeEvents = selectedVenue.events?.filter(
+                  (e) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
+                ) || [];
+                if (activeEvents.length === 0) return null;
+                return (
+                  <div className="bg-gray-800 border border-green-500/40 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                      <h3 className="text-white font-semibold text-sm">Evento en curso</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {activeEvents.map((event) => (
+                        <div
+                          key={event.id}
+                          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+                          onClick={() => {
+                            router.push(`/events/${event.id}`);
+                          }}
+                        >
+                          {event.image_path ? (
+                            <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center flex-shrink-0">
+                              <span className="text-white text-lg">🎉</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white text-sm font-semibold truncate">{event.title}</p>
+                            <p className="text-green-400 text-xs">{formatEventTime(event)}</p>
+                          </div>
+                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ─── EVENTOS PRÓXIMOS (hoy) ─── */}
+              {(() => {
+                const now = new Date();
+                const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                const soonEvents = selectedVenue.events?.filter((e) => {
+                  const start = new Date(e.starts_at);
+                  return start > now && start <= in24h;
+                }) || [];
+                if (soonEvents.length === 0) return null;
+                return (
+                  <div className="bg-gray-800 border border-orange-500/40 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-orange-400 text-sm">🕐</span>
+                      <h3 className="text-white font-semibold text-sm">Próximamente hoy</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {soonEvents.map((event) => (
+                        <div
+                          key={event.id}
+                          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+                          onClick={() => {
+                            const eventData = encodeURIComponent(JSON.stringify(event));
+                            router.push(`/events/${event.id}?data=${eventData}`);
+                          }}
+                        >
+                          {event.image_path ? (
+                            <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+                              <span className="text-white text-lg">🕐</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white text-sm font-semibold truncate">{event.title}</p>
+                            <p className="text-orange-400 text-xs">{formatEventTime(event)}</p>
+                          </div>
+                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Acciones */}
               <div className="flex flex-wrap items-center gap-2">
                 {isUserProfile &&
                   (selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
@@ -578,12 +652,7 @@ function MyMap() {
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </button>
                   )}

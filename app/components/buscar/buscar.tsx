@@ -126,9 +126,8 @@ export default function Buscar() {
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
       {/* Header sticky */}
-      <div className="bg-ozio-dark px-4 md:px-8 pt-14 pb-4 sticky top-0 z-10 border-b border-gray-800/50 backdrop-blur-sm">
+      <div className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-10 border-b border-gray-800/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-white text-2xl font-bold mb-4">Buscar</h1>
 
           {/* Input */}
           <div className="relative mb-4">

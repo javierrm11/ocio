@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from "react";
 
 interface Venue {
   id: string;
@@ -25,15 +25,17 @@ interface Event {
   ends_at: string;
 }
 
-type SortType = 'relevancia' | 'distancia' | 'ambiente' | 'favoritos';
+type SortType = "relevancia" | "distancia" | "ambiente" | "favoritos";
 
 export default function Buscar() {
   const router = useRouter();
   const { venues, events, loaded } = useAppStore();
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<SortType>('relevancia');
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortType>("relevancia");
   const [soloActivos, setSoloActivos] = useState(false);
-  const [generoSeleccionado, setGeneroSeleccionado] = useState<string | null>(null);
+  const [generoSeleccionado, setGeneroSeleccionado] = useState<string | null>(
+    null,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const now = new Date();
@@ -70,25 +72,38 @@ export default function Buscar() {
     if (soloActivos) {
       const venuesConEventoActivo = new Set(
         events
-          .filter((e: Event) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now)
+          .filter(
+            (e: Event) =>
+              new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
+          )
           .map((e: Event) => String(e.venue_id)),
       );
       result = result.filter((v) => venuesConEventoActivo.has(String(v.id)));
     }
 
     switch (sort) {
-      case 'distancia':
+      case "distancia":
         result.sort((a, b) => {
-          const da = typeof a.distance === 'number' ? a.distance : parseFloat(a.distance || '999');
-          const db = typeof b.distance === 'number' ? b.distance : parseFloat(b.distance || '999');
+          const da =
+            typeof a.distance === "number"
+              ? a.distance
+              : parseFloat(a.distance || "999");
+          const db =
+            typeof b.distance === "number"
+              ? b.distance
+              : parseFloat(b.distance || "999");
           return da - db;
         });
         break;
-      case 'ambiente':
-        result.sort((a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0));
+      case "ambiente":
+        result.sort(
+          (a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0),
+        );
         break;
-      case 'favoritos':
-        result.sort((a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0));
+      case "favoritos":
+        result.sort(
+          (a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0),
+        );
         break;
       default:
         break;
@@ -97,7 +112,8 @@ export default function Buscar() {
     return result;
   }, [venues, events, query, sort, soloActivos, generoSeleccionado]);
 
-  const hasQuery = query.trim().length > 0 || generoSeleccionado !== null || soloActivos;
+  const hasQuery =
+    query.trim().length > 0 || generoSeleccionado !== null || soloActivos;
 
   if (!loaded) {
     return (
@@ -122,7 +138,12 @@ export default function Buscar() {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <input
               ref={inputRef}
@@ -134,11 +155,21 @@ export default function Buscar() {
             />
             {query && (
               <button
-                onClick={() => setQuery('')}
+                onClick={() => setQuery("")}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
@@ -151,28 +182,30 @@ export default function Buscar() {
               onClick={() => setSoloActivos(!soloActivos)}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
                 soloActivos
-                  ? 'bg-green-600 border-green-500 text-white'
-                  : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white'
+                  ? "bg-green-600 border-green-500 text-white"
+                  : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${soloActivos ? 'bg-white animate-pulse' : 'bg-gray-500'}`} />
+              <span
+                className={`w-2 h-2 rounded-full ${soloActivos ? "bg-white animate-pulse" : "bg-gray-500"}`}
+              />
               Evento en curso
             </button>
 
             {/* Ordenar */}
             {[
-              { key: 'relevancia', label: '✨ Relevancia' },
-              { key: 'distancia', label: '📍 Distancia' },
-              { key: 'ambiente', label: '🔥 Ambiente' },
-              { key: 'favoritos', label: '❤️ Favoritos' },
+              { key: "relevancia", label: "✨ Relevancia" },
+              { key: "distancia", label: "📍 Distancia" },
+              { key: "ambiente", label: "🔥 Ambiente" },
+              { key: "favoritos", label: "❤️ Favoritos" },
             ].map((s) => (
               <button
                 key={s.key}
                 onClick={() => setSort(s.key as SortType)}
                 className={`flex-shrink-0 px-3 py-2 rounded-full text-xs font-medium transition border ${
                   sort === s.key
-                    ? 'bg-ozio-purple border-ozio-purple text-white'
-                    : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white'
+                    ? "bg-ozio-purple border-ozio-purple text-white"
+                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
                 }`}
               >
                 {s.label}
@@ -184,7 +217,6 @@ export default function Buscar() {
 
       <div className="px-4 md:px-8 pt-4">
         <div className="max-w-4xl mx-auto">
-
           {/* Géneros */}
           {generosDisponibles.length > 0 && (
             <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
@@ -192,8 +224,8 @@ export default function Buscar() {
                 onClick={() => setGeneroSeleccionado(null)}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                   !generoSeleccionado
-                    ? 'bg-ozio-blue border-ozio-blue text-white'
-                    : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white'
+                    ? "bg-ozio-blue border-ozio-blue text-white"
+                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
                 }`}
               >
                 Todos los géneros
@@ -201,11 +233,13 @@ export default function Buscar() {
               {generosDisponibles.map((g) => (
                 <button
                   key={g}
-                  onClick={() => setGeneroSeleccionado(generoSeleccionado === g ? null : g)}
+                  onClick={() =>
+                    setGeneroSeleccionado(generoSeleccionado === g ? null : g)
+                  }
                   className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                     generoSeleccionado === g
-                      ? 'bg-ozio-blue border-ozio-blue text-white'
-                      : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white'
+                      ? "bg-ozio-blue border-ozio-blue text-white"
+                      : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
                   }`}
                 >
                   🎵 {g}
@@ -216,17 +250,46 @@ export default function Buscar() {
 
           {/* Sin búsqueda activa — pantalla de inicio */}
           {!hasQuery && (
-            <div className="text-center py-16">
-              <div className="text-7xl mb-4">🏠</div>
-              <p className="text-white font-semibold text-lg mb-2">¿A dónde vas esta noche?</p>
-              <p className="text-gray-400 text-sm mb-8">Busca un local por nombre, dirección o género</p>
+            <div className="py-4">
+              {/* Top 3 más visitados — PRIMERO y visible sin scroll */}
+              <div className="mb-6">
+                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
+                  🔥 Más visitados ahora
+                </p>
+                <div className="space-y-3">
+                  {[...venues]
+                    .sort(
+                      (a: Venue, b: Venue) =>
+                        (b.check_ins?.length || 0) - (a.check_ins?.length || 0),
+                    )
+                    .slice(0, 3)
+                    .map((venue: Venue, i) => (
+                      <MiniVenueCard
+                        key={venue.id}
+                        venue={venue}
+                        rank={i + 1}
+                        events={events}
+                      />
+                    ))}
+                </div>
+              </div>
 
-              <div className="text-left">
+              {/* Búsquedas populares — debajo, siempre accesibles */}
+              <div>
                 <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
                   Búsquedas populares
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {['Reggaeton', 'House', 'Techno', 'Bar', 'Discoteca', 'Rooftop', 'Salsa', 'Pop'].map((s) => (
+                  {[
+                    "Reggaeton",
+                    "House",
+                    "Techno",
+                    "Bar",
+                    "Discoteca",
+                    "Rooftop",
+                    "Salsa",
+                    "Pop",
+                  ].map((s) => (
                     <button
                       key={s}
                       onClick={() => setQuery(s)}
@@ -237,21 +300,6 @@ export default function Buscar() {
                   ))}
                 </div>
               </div>
-
-              {/* Top 3 más populares */}
-              <div className="text-left mt-8">
-                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
-                  🔥 Más visitados ahora
-                </p>
-                <div className="space-y-3">
-                  {[...venues]
-                    .sort((a: Venue, b: Venue) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
-                    .slice(0, 3)
-                    .map((venue: Venue, i) => (
-                      <MiniVenueCard key={venue.id} venue={venue} rank={i + 1} events={events} />
-                    ))}
-                </div>
-              </div>
             </div>
           )}
 
@@ -259,19 +307,37 @@ export default function Buscar() {
           {hasQuery && (
             <>
               <p className="text-gray-500 text-sm mb-4">
-                {filteredVenues.length} local{filteredVenues.length !== 1 ? 'es' : ''}
-                {query && <> para <span className="text-white">"{query}"</span></>}
+                {filteredVenues.length} local
+                {filteredVenues.length !== 1 ? "es" : ""}
+                {query && (
+                  <>
+                    {" "}
+                    para <span className="text-white">"{query}"</span>
+                  </>
+                )}
               </p>
 
               {filteredVenues.length === 0 ? (
                 <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-12 text-center">
                   <div className="text-5xl mb-4">🏠</div>
-                  <p className="text-white font-semibold mb-1">Sin resultados</p>
+                  <p className="text-white font-semibold mb-1">
+                    Sin resultados
+                  </p>
                   <p className="text-gray-400 text-sm">
-                    No encontramos locales{query && <> para <span className="text-white">"{query}"</span></>}
+                    No encontramos locales
+                    {query && (
+                      <>
+                        {" "}
+                        para <span className="text-white">"{query}"</span>
+                      </>
+                    )}
                   </p>
                   <button
-                    onClick={() => { setQuery(''); setGeneroSeleccionado(null); setSoloActivos(false); }}
+                    onClick={() => {
+                      setQuery("");
+                      setGeneroSeleccionado(null);
+                      setSoloActivos(false);
+                    }}
                     className="mt-4 text-ozio-blue text-sm hover:underline"
                   >
                     Limpiar filtros
@@ -292,7 +358,15 @@ export default function Buscar() {
   );
 }
 
-function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; events: Event[] }) {
+function MiniVenueCard({
+  venue,
+  rank,
+  events,
+}: {
+  venue: Venue;
+  rank: number;
+  events: Event[];
+}) {
   const router = useRouter();
   const now = new Date();
   const tieneEventoActivo = events.some(
@@ -302,7 +376,7 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
       new Date(e.ends_at) >= now,
   );
 
-  const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+  const rankEmoji = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
 
   return (
     <div
@@ -311,21 +385,33 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
     >
       <span className="text-2xl w-8 text-center">{rankEmoji}</span>
       <img
-        src={venue.avatar_path || 'https://via.placeholder.com/80'}
+        src={venue.avatar_path || "https://via.placeholder.com/80"}
         alt={venue.name}
         className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
       />
       <div className="flex-1 min-w-0">
         <p className="text-white font-semibold truncate">{venue.name}</p>
-        <p className="text-gray-400 text-xs">{venue.check_ins?.length || 0} visitas</p>
+        <p className="text-gray-400 text-xs">
+          {venue.check_ins?.length || 0} visitas
+        </p>
       </div>
       {tieneEventoActivo && (
         <span className="text-xs bg-ozio-purple/20 text-ozio-purple border border-ozio-purple/30 px-2 py-1 rounded-full flex-shrink-0">
           🎉 Evento
         </span>
       )}
-      <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      <svg
+        className="w-5 h-5 text-gray-500 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
       </svg>
     </div>
   );
@@ -343,15 +429,17 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
       new Date(e.ends_at) >= now,
   );
 
-  const ambience = checkins === 0
-    ? { bg: '#10b981', label: 'Tranquilo' }
-    : checkins < 5
-      ? { bg: '#f59e0b', label: 'Animado' }
-      : { bg: '#ef4444', label: 'Muy Animado' };
+  const ambience =
+    checkins === 0
+      ? { bg: "#10b981", label: "Tranquilo" }
+      : checkins < 5
+        ? { bg: "#f59e0b", label: "Animado" }
+        : { bg: "#ef4444", label: "Muy Animado" };
 
-  const dist = typeof venue.distance === 'number'
-    ? venue.distance
-    : parseFloat(venue.distance || '0');
+  const dist =
+    typeof venue.distance === "number"
+      ? venue.distance
+      : parseFloat(venue.distance || "0");
 
   return (
     <div
@@ -361,7 +449,7 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
       {/* Imagen */}
       <div className="relative h-44 overflow-hidden">
         <img
-          src={venue.avatar_path || 'https://via.placeholder.com/400x200'}
+          src={venue.avatar_path || "https://via.placeholder.com/400x200"}
           alt={venue.name}
           className="w-full h-full object-cover transition group-hover:scale-105 duration-500"
         />
@@ -392,12 +480,24 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="text-white font-bold text-base mb-1 truncate">{venue.name}</h3>
+        <h3 className="text-white font-bold text-base mb-1 truncate">
+          {venue.name}
+        </h3>
 
         {venue.address && (
           <p className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1">
-            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <svg
+              className="w-3 h-3 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
             </svg>
             {venue.address}
           </p>
@@ -407,7 +507,10 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
           {/* Géneros */}
           <div className="flex gap-1.5 flex-wrap">
             {venue.genres?.slice(0, 2).map((g) => (
-              <span key={g} className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
+              <span
+                key={g}
+                className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
+              >
                 {g}
               </span>
             ))}
@@ -417,10 +520,22 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
           <div className="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
             {dist > 0 && (
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
                 </svg>
-                {dist < 1 ? `${(dist * 1000).toFixed(0)}m` : `${dist.toFixed(1)}km`}
+                {dist < 1
+                  ? `${(dist * 1000).toFixed(0)}m`
+                  : `${dist.toFixed(1)}km`}
               </span>
             )}
             <span className="flex items-center gap-1">

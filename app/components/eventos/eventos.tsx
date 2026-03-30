@@ -170,7 +170,7 @@ export default function Eventos() {
                 placeholder="Buscar eventos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-10 pr-10 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
+                className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-10 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
               />
               {search && (
                 <button
@@ -188,7 +188,7 @@ export default function Eventos() {
             <div className="relative" ref={panelRef}>
               <button
                 onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
-                className={`relative flex items-center justify-center w-14 h-14 rounded-md border transition flex-shrink-0 ${
+                className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
                   filtrosAbiertos || filtrosActivos > 0
                     ? 'bg-ozio-purple border-ozio-purple text-white'
                     : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500'

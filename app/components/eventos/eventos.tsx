@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAppStore } from "@/lib/stores/venueStore";
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 
 interface Event {
   id: string;
@@ -29,6 +29,21 @@ export default function Eventos() {
   const { events, venues, loaded } = useAppStore();
   const [filter, setFilter] = useState<FilterType>('todos');
   const [search, setSearch] = useState('');
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar panel al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setFiltrosAbiertos(false);
+      }
+    }
+    if (filtrosAbiertos) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [filtrosAbiertos]);
 
   if (!loaded) {
     return (
@@ -38,11 +53,11 @@ export default function Eventos() {
     );
   }
 
+  const now = new Date();
+
   const filteredEvents = (() => {
-    const now = new Date();
     let result = [...events] as Event[];
 
-    // Filtro búsqueda
     if (search.trim()) {
       result = result.filter((e) =>
         e.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -50,16 +65,13 @@ export default function Eventos() {
       );
     }
 
-    // Filtro temporal
     switch (filter) {
       case 'activos':
         result = result.filter((e) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now);
         break;
       case 'hoy': {
-        const startOfDay = new Date(now);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(now);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(now); endOfDay.setHours(23, 59, 59, 999);
         result = result.filter((e) => {
           const start = new Date(e.starts_at);
           return start >= startOfDay && start <= endOfDay;
@@ -76,23 +88,19 @@ export default function Eventos() {
         break;
       }
       default:
-        // todos — mostrar próximos primero, luego pasados
         break;
     }
 
-    // Ordenar: activos primero, luego próximos, luego pasados
     result.sort((a, b) => {
       const aStart = new Date(a.starts_at).getTime();
       const aEnd = new Date(a.ends_at).getTime();
       const bStart = new Date(b.starts_at).getTime();
       const bEnd = new Date(b.ends_at).getTime();
       const nowMs = now.getTime();
-
       const aActive = aStart <= nowMs && aEnd >= nowMs;
       const bActive = bStart <= nowMs && bEnd >= nowMs;
       const aFuture = aStart > nowMs;
       const bFuture = bStart > nowMs;
-
       if (aActive && !bActive) return -1;
       if (!aActive && bActive) return 1;
       if (aFuture && !bFuture) return -1;
@@ -103,8 +111,6 @@ export default function Eventos() {
     return result;
   })();
 
-  const now = new Date();
-
   const activeCount = events.filter(
     (e: Event) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
   ).length;
@@ -114,11 +120,31 @@ export default function Eventos() {
     return start.toDateString() === now.toDateString();
   }).length;
 
+  const weekCount = events.filter((e: Event) => {
+    const start = new Date(e.starts_at);
+    const endOfWeek = new Date(now); endOfWeek.setDate(now.getDate() + 7);
+    return start >= now && start <= endOfWeek;
+  }).length;
+
+  const filtrosActivos = filter !== 'todos' ? 1 : 0;
+
+  const filterOptions = [
+    { key: 'todos', label: 'Todos los eventos', icon: '📋', desc: 'Ver toda la agenda completa', count: events.length },
+    { key: 'activos', label: 'En curso ahora', icon: '🟢', desc: 'Eventos que están pasando', count: activeCount },
+    { key: 'hoy', label: 'Hoy', icon: '📅', desc: 'Solo eventos de hoy', count: todayCount },
+    { key: 'semana', label: 'Esta semana', icon: '🗓️', desc: 'Próximos 7 días', count: weekCount },
+  ];
+
+  const currentFilter = filterOptions.find(f => f.key === filter);
+
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
+
       {/* Header */}
       <div className="bg-gradient-to-b from-ozio-purple/80 to-ozio-dark px-4 md:px-8 pt-14 pb-6">
         <div className="max-w-4xl mx-auto">
+
+          {/* Título + badge activos */}
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-white text-2xl font-bold">Eventos</h1>
             {activeCount > 0 && (
@@ -129,61 +155,128 @@ export default function Eventos() {
             )}
           </div>
 
-          {/* Buscador */}
-          <div className="relative mb-4">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Buscar eventos..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-ozio-card border border-gray-700/50 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+          {/* Buscador + botón filtros */}
+          <div className="flex items-center gap-2">
+            {/* Input búsqueda */}
+            <div className="relative flex-1">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar eventos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-10 pr-10 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
 
-          {/* Filtros */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {[
-              { key: 'todos', label: '📋 Todos' },
-              { key: 'activos', label: '🟢 En curso', count: activeCount },
-              { key: 'hoy', label: '📅 Hoy', count: todayCount },
-              { key: 'semana', label: '🗓️ Esta semana' },
-            ].map((f) => (
+            {/* Botón filtros */}
+            <div className="relative" ref={panelRef}>
               <button
-                key={f.key}
-                onClick={() => setFilter(f.key as FilterType)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition border ${
-                  filter === f.key
-                    ? 'bg-ozio-blue border-ozio-blue text-white'
+                onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
+                className={`relative flex items-center justify-center w-14 h-14 rounded-md border transition flex-shrink-0 ${
+                  filtrosAbiertos || filtrosActivos > 0
+                    ? 'bg-ozio-purple border-ozio-purple text-white'
                     : 'bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500'
                 }`}
               >
-                {f.label}
-                {f.count !== undefined && f.count > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${filter === f.key ? 'bg-white/20' : 'bg-gray-700'}`}>
-                    {f.count}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2M9 16h6" />
+                </svg>
+                {filtrosActivos > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white text-ozio-purple text-xs font-bold rounded-full flex items-center justify-center leading-none">
+                    {filtrosActivos}
                   </span>
                 )}
               </button>
-            ))}
+
+              {/* Panel desplegable */}
+              {filtrosAbiertos && (
+                <div className="absolute right-0 top-16 w-72 bg-ozio-card border border-gray-700/50 rounded-md shadow-2xl z-30 overflow-hidden">
+
+                  {/* Cabecera */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+                    <span className="text-white font-semibold text-sm">Filtrar eventos</span>
+                    {filter !== 'todos' && (
+                      <button
+                        onClick={() => { setFilter('todos'); setFiltrosAbiertos(false); }}
+                        className="text-xs text-ozio-blue hover:underline"
+                      >
+                        Ver todos
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="p-3 flex flex-col gap-2">
+                    {filterOptions.map((f) => (
+                      <button
+                        key={f.key}
+                        onClick={() => { setFilter(f.key as FilterType); setFiltrosAbiertos(false); }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
+                          filter === f.key
+                            ? 'bg-ozio-purple/20 border-ozio-purple/50 text-white'
+                            : 'bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500'
+                        }`}
+                      >
+                        <span className="text-lg w-6 text-center flex-shrink-0">{f.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium leading-tight">{f.label}</p>
+                          <p className="text-xs text-gray-500 leading-tight mt-0.5">{f.desc}</p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {f.count > 0 && (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                              filter === f.key
+                                ? 'bg-ozio-purple/40 text-purple-200'
+                                : 'bg-gray-700 text-gray-400'
+                            }`}>
+                              {f.count}
+                            </span>
+                          )}
+                          {filter === f.key && (
+                            <svg className="w-4 h-4 text-ozio-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Chip del filtro activo */}
+          {filter !== 'todos' && (
+            <div className="flex items-center gap-2 mt-3">
+              <span className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-purple-300 text-xs font-medium px-3 py-1.5 rounded-full">
+                {currentFilter?.icon} {currentFilter?.label}
+                <button
+                  onClick={() => setFilter('todos')}
+                  className="ml-1 hover:text-white transition"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -191,17 +284,28 @@ export default function Eventos() {
       <div className="px-4 md:px-8 mt-4">
         <div className="max-w-4xl mx-auto">
           {filteredEvents.length === 0 ? (
-            <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-12 text-center mt-4">
+            <div className="bg-ozio-card border border-gray-700/50 rounded-md p-12 text-center mt-4">
               <div className="text-6xl mb-4">🎉</div>
               <p className="text-white font-semibold mb-1">No hay eventos</p>
               <p className="text-gray-400 text-sm">
                 {search ? 'Prueba con otra búsqueda' : 'No hay eventos para este filtro'}
               </p>
+              {filter !== 'todos' && (
+                <button
+                  onClick={() => setFilter('todos')}
+                  className="mt-4 text-ozio-blue text-sm hover:underline"
+                >
+                  Ver todos los eventos
+                </button>
+              )}
             </div>
           ) : (
             <>
               <p className="text-gray-500 text-sm mb-4">
                 {filteredEvents.length} evento{filteredEvents.length !== 1 ? 's' : ''}
+                {filter !== 'todos' && (
+                  <span className="text-gray-600"> · {currentFilter?.label}</span>
+                )}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredEvents.map((event) => {
@@ -255,14 +359,17 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
     return null;
   };
 
-  // Agrupar por día para mostrar separadores
   const isToday = startDate.toDateString() === now.toDateString();
   const isTomorrow = startDate.toDateString() === new Date(now.getTime() + 86400000).toDateString();
-  const dayLabel = isToday ? 'Hoy' : isTomorrow ? 'Mañana' : startDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  const dayLabel = isToday
+    ? 'Hoy'
+    : isTomorrow
+      ? 'Mañana'
+      : startDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
     <div
-      className={`bg-ozio-card border rounded-2xl overflow-hidden transition cursor-pointer group ${
+      className={`bg-ozio-card border rounded-md overflow-hidden transition cursor-pointer group ${
         isPast
           ? 'border-gray-800/50 opacity-60 hover:opacity-80'
           : isActive
@@ -283,12 +390,8 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ozio-card/80 via-transparent to-transparent" />
 
-        {/* Badge estado */}
-        <div className="absolute top-3 right-3">
-          {getStatusBadge()}
-        </div>
+        <div className="absolute top-3 right-3">{getStatusBadge()}</div>
 
-        {/* Badge fecha esquina inferior izquierda */}
         <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-xl border border-white/10 font-medium">
           {dayLabel}
         </div>
@@ -304,7 +407,6 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
           <p className="text-gray-500 text-sm mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
         )}
 
-        {/* Local */}
         {venue && (
           <div className="flex items-center gap-2 mb-3">
             {venue.avatar_path && (
@@ -314,7 +416,6 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
           </div>
         )}
 
-        {/* Hora */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-gray-400 text-sm">
             <svg className={`w-4 h-4 ${isPast ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,7 +428,6 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
             </span>
           </div>
 
-          {/* Asistentes */}
           <div className={`text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${
             isPast
               ? 'bg-gray-700/50 text-gray-500 border border-gray-700/30'

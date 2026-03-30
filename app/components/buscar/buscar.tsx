@@ -222,7 +222,7 @@ export default function Buscar() {
 
               {/* Panel de filtros desplegable */}
               {filtrosAbiertos && (
-                <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-gray-700/50 rounded-2xl shadow-2xl z-30 overflow-hidden">
+                <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-gray-700/50 rounded-md shadow-2xl z-30 overflow-hidden">
 
                   {/* Cabecera panel */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
@@ -446,7 +446,7 @@ export default function Buscar() {
               </p>
 
               {filteredVenues.length === 0 ? (
-                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-12 text-center">
+                <div className="bg-ozio-card border border-gray-700/50 rounded-md p-12 text-center">
                   <div className="text-5xl mb-4">🏠</div>
                   <p className="text-white font-semibold mb-1">Sin resultados</p>
                   <p className="text-gray-400 text-sm">
@@ -503,7 +503,7 @@ function MiniVenueCard({
 
   return (
     <div
-      className="bg-ozio-card border border-gray-700/50 rounded-2xl p-3 flex items-center gap-3 hover:border-ozio-blue/50 transition cursor-pointer"
+      className="bg-ozio-card border border-gray-700/50 rounded-md p-3 flex items-center gap-3 hover:border-ozio-blue/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       <span className="text-2xl w-8 text-center">{rankEmoji}</span>
@@ -561,7 +561,7 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
 
   return (
     <div
-      className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
+      className="bg-ozio-card border border-gray-700/50 rounded-md overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       {/* Imagen */}

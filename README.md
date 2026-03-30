@@ -162,9 +162,6 @@ Permitir a los usuarios dejar una valoración (1-5 estrellas) y un comentario tr
 
 ### 🟡 Media prioridad
 
-**Búsqueda de eventos**
-La sección de búsqueda actual solo busca locales. Añadir búsqueda de eventos con los mismos filtros (fecha, tipo, aforo) completaría la funcionalidad.
-
 **Reservas integradas**
 Añadir un flujo para reservar mesa o lista de espera directamente desde el detalle del local, con confirmación por email.
 

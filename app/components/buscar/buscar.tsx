@@ -33,10 +33,10 @@ export default function Buscar() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortType>("relevancia");
   const [soloActivos, setSoloActivos] = useState(false);
-  const [generoSeleccionado, setGeneroSeleccionado] = useState<string | null>(
-    null,
-  );
+  const [generoSeleccionado, setGeneroSeleccionado] = useState<string | null>(null);
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const now = new Date();
 
@@ -44,11 +44,30 @@ export default function Buscar() {
     inputRef.current?.focus();
   }, []);
 
+  // Cerrar panel al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setFiltrosAbiertos(false);
+      }
+    }
+    if (filtrosAbiertos) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [filtrosAbiertos]);
+
   // Géneros únicos
   const generosDisponibles = useMemo(() => {
     const all = venues.flatMap((v: Venue) => v.genres || []);
     return [...new Set(all)] as string[];
   }, [venues]);
+
+  // Cuenta filtros activos para el badge
+  const filtrosActivos =
+    (soloActivos ? 1 : 0) +
+    (sort !== "relevancia" ? 1 : 0) +
+    (generoSeleccionado ? 1 : 0);
 
   // Venues filtrados
   const filteredVenues = useMemo(() => {
@@ -115,6 +134,13 @@ export default function Buscar() {
   const hasQuery =
     query.trim().length > 0 || generoSeleccionado !== null || soloActivos;
 
+  function resetFiltros() {
+    setSort("relevancia");
+    setSoloActivos(false);
+    setGeneroSeleccionado(null);
+    setFiltrosAbiertos(false);
+  }
+
   if (!loaded) {
     return (
       <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
@@ -125,125 +151,241 @@ export default function Buscar() {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
+
       {/* Header sticky */}
-      <div className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-10 border-b border-gray-800/50 backdrop-blur-sm">
+      <div className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-gray-800/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto">
 
-          {/* Input */}
-          <div className="relative mb-4">
-            <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Busca locales, géneros, direcciones..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full bg-ozio-card border border-gray-700/50 rounded-2xl pl-12 pr-12 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
-            />
-            {query && (
-              <button
-                onClick={() => setQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+          {/* Input + botón filtros */}
+          <div className="relative flex items-center gap-2">
+            {/* Input */}
+            <div className="relative flex-1">
+              <svg
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Busca locales, géneros, direcciones..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-12 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
+              />
+              {query && (
+                <button
+                  onClick={() => setQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
                 >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Botón filtros */}
+            <div className="relative" ref={panelRef}>
+              <button
+                onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
+                className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
+                  filtrosAbiertos || filtrosActivos > 0
+                    ? "bg-ozio-purple border-ozio-purple text-white"
+                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                }`}
+              >
+                {/* Icono filtro */}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
+                    d="M3 4h18M7 8h10M11 12h2M9 16h6"
                   />
                 </svg>
+                {/* Badge contador */}
+                {filtrosActivos > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white text-ozio-purple text-xs font-bold rounded-full flex items-center justify-center leading-none">
+                    {filtrosActivos}
+                  </span>
+                )}
               </button>
-            )}
+
+              {/* Panel de filtros desplegable */}
+              {filtrosAbiertos && (
+                <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-gray-700/50 rounded-2xl shadow-2xl z-30 overflow-hidden">
+
+                  {/* Cabecera panel */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+                    <span className="text-white font-semibold text-sm">Filtros</span>
+                    {filtrosActivos > 0 && (
+                      <button
+                        onClick={resetFiltros}
+                        className="text-xs text-ozio-blue hover:underline"
+                      >
+                        Limpiar todo
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="p-4 flex flex-col gap-5">
+
+                    {/* Evento en curso */}
+                    <div>
+                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
+                        Estado
+                      </p>
+                      <button
+                        onClick={() => setSoloActivos(!soloActivos)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm font-medium ${
+                          soloActivos
+                            ? "bg-green-600/20 border-green-500/50 text-green-400"
+                            : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                        }`}
+                      >
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                            soloActivos ? "bg-green-400 animate-pulse" : "bg-gray-600"
+                          }`}
+                        />
+                        Evento en curso
+                        {soloActivos && (
+                          <svg className="w-4 h-4 ml-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Ordenar por */}
+                    <div>
+                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
+                        Ordenar por
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {[
+                          { key: "relevancia", label: "Relevancia", icon: "✨", desc: "Más completos primero" },
+                          { key: "distancia", label: "Distancia", icon: "📍", desc: "Los más cercanos" },
+                          { key: "ambiente", label: "Ambiente", icon: "🔥", desc: "Más check-ins ahora" },
+                          { key: "favoritos", label: "Favoritos", icon: "❤️", desc: "Tus guardados primero" },
+                        ].map((s) => (
+                          <button
+                            key={s.key}
+                            onClick={() => setSort(s.key as SortType)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
+                              sort === s.key
+                                ? "bg-ozio-purple/20 border-ozio-purple/50 text-white"
+                                : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                            }`}
+                          >
+                            <span className="text-base w-5 text-center flex-shrink-0">{s.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium leading-tight">{s.label}</p>
+                              <p className="text-xs text-gray-500 leading-tight mt-0.5">{s.desc}</p>
+                            </div>
+                            {sort === s.key && (
+                              <svg className="w-4 h-4 text-ozio-purple flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Géneros */}
+                    {generosDisponibles.length > 0 && (
+                      <div>
+                        <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
+                          Género musical
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => setGeneroSeleccionado(null)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                              !generoSeleccionado
+                                ? "bg-ozio-blue border-ozio-blue text-white"
+                                : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white"
+                            }`}
+                          >
+                            Todos
+                          </button>
+                          {generosDisponibles.map((g) => (
+                            <button
+                              key={g}
+                              onClick={() =>
+                                setGeneroSeleccionado(generoSeleccionado === g ? null : g)
+                              }
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                                generoSeleccionado === g
+                                  ? "bg-ozio-blue border-ozio-blue text-white"
+                                  : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white"
+                              }`}
+                            >
+                              🎵 {g}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Botón aplicar */}
+                    <button
+                      onClick={() => setFiltrosAbiertos(false)}
+                      className="w-full bg-ozio-purple hover:bg-ozio-purple/90 text-white font-semibold py-3 rounded-xl transition text-sm"
+                    >
+                      Aplicar filtros
+                      {filtrosActivos > 0 && (
+                        <span className="ml-2 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">
+                          {filtrosActivos}
+                        </span>
+                      )}
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Filtros rápidos */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {/* Solo activos */}
-            <button
-              onClick={() => setSoloActivos(!soloActivos)}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
-                soloActivos
-                  ? "bg-green-600 border-green-500 text-white"
-                  : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${soloActivos ? "bg-white animate-pulse" : "bg-gray-500"}`}
-              />
-              Evento en curso
-            </button>
-
-            {/* Ordenar */}
-            {[
-              { key: "relevancia", label: "✨ Relevancia" },
-              { key: "distancia", label: "📍 Distancia" },
-              { key: "ambiente", label: "🔥 Ambiente" },
-              { key: "favoritos", label: "❤️ Favoritos" },
-            ].map((s) => (
-              <button
-                key={s.key}
-                onClick={() => setSort(s.key as SortType)}
-                className={`flex-shrink-0 px-3 py-2 rounded-full text-xs font-medium transition border ${
-                  sort === s.key
-                    ? "bg-ozio-purple border-ozio-purple text-white"
-                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
       <div className="px-4 md:px-8 pt-4">
         <div className="max-w-4xl mx-auto">
-          {/* Géneros */}
-          {generosDisponibles.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-              <button
-                onClick={() => setGeneroSeleccionado(null)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                  !generoSeleccionado
-                    ? "bg-ozio-blue border-ozio-blue text-white"
-                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
-                }`}
-              >
-                Todos los géneros
-              </button>
-              {generosDisponibles.map((g) => (
-                <button
-                  key={g}
-                  onClick={() =>
-                    setGeneroSeleccionado(generoSeleccionado === g ? null : g)
-                  }
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                    generoSeleccionado === g
-                      ? "bg-ozio-blue border-ozio-blue text-white"
-                      : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white"
-                  }`}
-                >
-                  🎵 {g}
-                </button>
-              ))}
+
+          {/* Chips de filtros activos — solo cuando hay alguno */}
+          {filtrosActivos > 0 && (
+            <div className="flex gap-2 flex-wrap mb-4">
+              {soloActivos && (
+                <span className="flex items-center gap-1.5 bg-green-600/20 border border-green-500/40 text-green-400 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  Evento en curso
+                  <button onClick={() => setSoloActivos(false)} className="ml-1 hover:text-white transition">×</button>
+                </span>
+              )}
+              {sort !== "relevancia" && (
+                <span className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-ozio-purple text-xs font-medium px-3 py-1.5 rounded-full">
+                  {sort === "distancia" ? "📍" : sort === "ambiente" ? "🔥" : "❤️"}
+                  {sort.charAt(0).toUpperCase() + sort.slice(1)}
+                  <button onClick={() => setSort("relevancia")} className="ml-1 hover:text-white transition">×</button>
+                </span>
+              )}
+              {generoSeleccionado && (
+                <span className="flex items-center gap-1.5 bg-ozio-blue/20 border border-ozio-blue/40 text-ozio-blue text-xs font-medium px-3 py-1.5 rounded-full">
+                  🎵 {generoSeleccionado}
+                  <button onClick={() => setGeneroSeleccionado(null)} className="ml-1 hover:text-white transition">×</button>
+                </span>
+              )}
             </div>
           )}
 
@@ -273,22 +415,13 @@ export default function Buscar() {
                 </div>
               </div>
 
-              {/* Búsquedas populares — debajo, siempre accesibles */}
+              {/* Búsquedas populares */}
               <div>
                 <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
                   Búsquedas populares
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    "Reggaeton",
-                    "House",
-                    "Techno",
-                    "Bar",
-                    "Discoteca",
-                    "Rooftop",
-                    "Salsa",
-                    "Pop",
-                  ].map((s) => (
+                  {["Reggaeton", "House", "Techno", "Bar", "Discoteca", "Rooftop", "Salsa", "Pop"].map((s) => (
                     <button
                       key={s}
                       onClick={() => setQuery(s)}
@@ -306,29 +439,20 @@ export default function Buscar() {
           {hasQuery && (
             <>
               <p className="text-gray-500 text-sm mb-4">
-                {filteredVenues.length} local
-                {filteredVenues.length !== 1 ? "es" : ""}
+                {filteredVenues.length} local{filteredVenues.length !== 1 ? "es" : ""}
                 {query && (
-                  <>
-                    {" "}
-                    para <span className="text-white">"{query}"</span>
-                  </>
+                  <> para <span className="text-white">"{query}"</span></>
                 )}
               </p>
 
               {filteredVenues.length === 0 ? (
                 <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-12 text-center">
                   <div className="text-5xl mb-4">🏠</div>
-                  <p className="text-white font-semibold mb-1">
-                    Sin resultados
-                  </p>
+                  <p className="text-white font-semibold mb-1">Sin resultados</p>
                   <p className="text-gray-400 text-sm">
                     No encontramos locales
                     {query && (
-                      <>
-                        {" "}
-                        para <span className="text-white">"{query}"</span>
-                      </>
+                      <> para <span className="text-white">"{query}"</span></>
                     )}
                   </p>
                   <button
@@ -405,12 +529,7 @@ function MiniVenueCard({
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5l7 7-7 7"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </div>
   );
@@ -454,7 +573,6 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ozio-card/80 via-transparent to-transparent" />
 
-        {/* Badges top izquierda */}
         <div className="absolute top-3 left-3 flex gap-2">
           {tieneEventoActivo && (
             <span className="bg-ozio-purple/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
@@ -468,7 +586,6 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
           )}
         </div>
 
-        {/* Badge ambiente */}
         <div
           className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"
           style={{ backgroundColor: ambience.bg }}
@@ -479,62 +596,33 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="text-white font-bold text-base mb-1 truncate">
-          {venue.name}
-        </h3>
+        <h3 className="text-white font-bold text-base mb-1 truncate">{venue.name}</h3>
 
         {venue.address && (
           <p className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1">
-            <svg
-              className="w-3 h-3 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
+            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
             {venue.address}
           </p>
         )}
 
         <div className="flex items-center justify-between">
-          {/* Géneros */}
           <div className="flex gap-1.5 flex-wrap">
             {venue.genres?.slice(0, 2).map((g) => (
-              <span
-                key={g}
-                className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
-              >
+              <span key={g} className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
                 {g}
               </span>
             ))}
           </div>
 
-          {/* Stats */}
           <div className="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
             {dist > 0 && (
               <span className="flex items-center gap-1">
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 </svg>
-                {dist < 1
-                  ? `${(dist * 1000).toFixed(0)}m`
-                  : `${dist.toFixed(1)}km`}
+                {dist < 1 ? `${(dist * 1000).toFixed(0)}m` : `${dist.toFixed(1)}km`}
               </span>
             )}
             <span className="flex items-center gap-1">

@@ -89,7 +89,7 @@ export default function ProfilePage() {
           {activeTab === "login" ? (
             <Login onLoginSuccess={() => setIsAuthenticated(true)} />
           ) : (
-            <Register onRegisterSuccess={() => setIsAuthenticated(true)} />
+            <Register onRegisterSuccess={() => setIsAuthenticated(false)} />
           )}
         </div>
       </main>

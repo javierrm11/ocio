@@ -161,7 +161,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         }
 
         if (onRegisterSuccess) {
-          onRegisterSuccess();
+          router.push('/');
         } else {
           router.push('/');
         }

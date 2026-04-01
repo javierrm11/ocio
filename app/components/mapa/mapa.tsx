@@ -1,6 +1,6 @@
 "use client";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -96,6 +96,17 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): 
   return `${km.toFixed(1)}km`;
 }
 
+function parseDistanceToKm(distance?: string): number {
+  if (!distance) return Number.POSITIVE_INFINITY;
+
+  const normalized = distance.toLowerCase().trim();
+  const value = parseFloat(normalized);
+
+  if (Number.isNaN(value)) return Number.POSITIVE_INFINITY;
+  if (normalized.endsWith("m")) return value / 1000;
+  return value;
+}
+
 function MyMap() {
   const router = useRouter();
   const {
@@ -112,31 +123,20 @@ function MyMap() {
   const [filters, setFilters] = useState({
     maxDistance: null as number | null,
     minCheckins: 0,
-    maxCheckins: null as number | null,
   });
   const [showFilters, setShowFilters] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const hasActiveFilters =
     filters.maxDistance !== null ||
-    filters.minCheckins > 0 ||
-    filters.maxCheckins !== null;
+    filters.minCheckins > 0;
+
+  const venuesRef = useRef(venues);
+  useEffect(() => {
+    venuesRef.current = venues;
+  }, [venues]);
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
-
-  const venuesRef = useRef(venues);
-  useEffect(() => { venuesRef.current = venues; }, [venues]);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowFilters(false);
-      }
-    }
-    if (showFilters) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showFilters]);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -155,7 +155,7 @@ function MyMap() {
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [setUserLocation, setVenues]);
 
   const onCheckIn = (venueId: any) => {
     const token = getToken();
@@ -224,11 +224,12 @@ function MyMap() {
     currentUser?.username !== undefined && currentUser?.username !== null;
 
   const filteredVenues = venues.filter((v) => {
-    const dist = typeof v.distance === "number" ? v.distance : parseFloat(v.distance || "0");
+    const dist = parseDistanceToKm(v.distance);
     if (filters.maxDistance !== null && dist > filters.maxDistance) return false;
+
     const checkins = v.check_ins?.length || 0;
     if (checkins < filters.minCheckins) return false;
-    if (filters.maxCheckins !== null && checkins > filters.maxCheckins) return false;
+
     return true;
   });
 
@@ -321,109 +322,135 @@ function MyMap() {
         </MapContainer>
       </div>
 
-      {/* ─── BOTÓN + DROPDOWN FILTROS ─── */}
-      <div ref={dropdownRef} className="absolute top-15 right-4 z-[999] pointer-events-none">
-        <div className="pointer-events-auto">
-          <button
-            onClick={() => setShowFilters((v) => !v)}
-            className={`bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg border transition ${
-              showFilters ? "border-blue-500 bg-gray-800" : "border-gray-700 hover:bg-gray-800"
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
-            </svg>
-            Filtros
-            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
-            <svg
-              className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`}
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+      {/* ─── FILTROS RESPONSIVE ─── */}
+      <div className="absolute top-16 right-3 z-[1000] pointer-events-none">
+        <button
+          type="button"
+          onClick={() => setShowFilters(true)}
+          className="pointer-events-auto bg-gray-900/95 text-white px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-gray-700 hover:bg-gray-800 transition"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
+          </svg>
+          <span className="text-sm font-medium">Filtros</span>
+          {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+        </button>
+      </div>
 
-          <div
-            className={`absolute top-full right-0 mt-2 w-72 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden transition-all duration-200 origin-top-right ${
-              showFilters
-                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-            }`}
-          >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-              <span className="text-white font-semibold text-sm">Filtros</span>
+      {/* Backdrop móvil */}
+      {showFilters && (
+        <div className="fixed inset-0 bg-black/60 z-[1001] md:hidden" onClick={() => setShowFilters(false)} />
+      )}
+
+      {/* Drawer móvil + sidebar desktop */}
+      <aside
+        className={`fixed top-0 right-0 z-[1002] h-full w-full md:w-80 lg:w-96 bg-gray-900 border-l border-gray-700 shadow-2xl transform transition-transform duration-300 ${
+          showFilters ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="h-full flex flex-col">
+          <div className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
+            <div>
+              <h3 className="text-white font-semibold">Filtros</h3>
+              <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
+            </div>
+
+            <div className="flex items-center gap-2">
               {hasActiveFilters && (
                 <button
-                  onClick={() => setFilters({ maxDistance: null, minCheckins: 0, maxCheckins: null })}
+                  type="button"
+                  onClick={() =>
+                    setFilters({
+                      maxDistance: null,
+                      minCheckins: 0,
+                    })
+                  }
                   className="text-xs text-blue-400 hover:text-blue-300 transition"
                 >
                   Resetear
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => setShowFilters(false)}
+                className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800"
+                aria-label="Cerrar filtros"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-5 overflow-y-auto flex-1 space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Distancia máxima</label>
+                <span className="text-blue-400 text-xs font-medium">
+                  {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0.5}
+                max={20}
+                step={0.5}
+                title="Distancia máxima"
+                value={filters.maxDistance ?? 20}
+                onChange={(e) =>
+                  setFilters((f) => ({
+                    ...f,
+                    maxDistance: parseFloat(e.target.value) === 20 ? null : parseFloat(e.target.value),
+                  }))
+                }
+                className="w-full accent-blue-500"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>500m</span>
+                <span>20km+</span>
+              </div>
             </div>
 
-            <div className="px-4 py-4 flex flex-col gap-5">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
-                    Distancia máxima
-                  </label>
-                  <span className="text-blue-400 text-xs font-medium">
-                    {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
-                  </span>
-                </div>
-                <input
-                  type="range" min={0.5} max={20} step={0.5}
-                  value={filters.maxDistance ?? 20}
-                  onChange={(e) =>
-                    setFilters((f) => ({
-                      ...f,
-                      maxDistance: parseFloat(e.target.value) === 20 ? null : parseFloat(e.target.value),
-                    }))
-                  }
-                  className="w-full accent-blue-500"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>500m</span><span>Sin límite</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
-                  Ambiente mínimo
-                </label>
-                <div className="flex gap-2">
-                  {[
-                    { label: "Todos", value: 0 },
-                    { label: "🟡 Medio", value: 5 },
-                    { label: "🔴 Alto", value: 10 },
-                  ].map((opt) => (
+            <div>
+              <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">Ambiente mínimo</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Todos", value: 0 },
+                  { label: "🟡 Medio", value: 5 },
+                  { label: "🔴 Alto", value: 10 },
+                ].map((option) => {
+                  const active = filters.minCheckins === option.value;
+                  return (
                     <button
-                      key={opt.value}
-                      onClick={() => setFilters((f) => ({ ...f, minCheckins: opt.value }))}
-                      className={`flex-1 text-xs py-2 rounded-xl border transition font-medium ${
-                        filters.minCheckins === opt.value
+                      key={option.value}
+                      type="button"
+                      onClick={() => setFilters((f) => ({ ...f, minCheckins: option.value }))}
+                      className={`text-xs py-2 rounded-xl border transition font-medium ${
+                        active
                           ? "bg-blue-600 border-blue-500 text-white"
-                          : "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
+                          : "border-gray-700 text-gray-300 hover:border-gray-500"
                       }`}
                     >
-                      {opt.label}
+                      {option.label}
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-1 border-t border-gray-800">
-                <span className="text-gray-500 text-xs">Locales visibles</span>
-                <span className="text-white text-sm font-bold">
-                  {filteredVenues.length}
-                  <span className="text-gray-500 font-normal"> / {venues.length}</span>
-                </span>
+                  );
+                })}
               </div>
             </div>
           </div>
+
+          <div className="px-5 py-4 border-t border-gray-700 bg-gray-900/95">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-xs">Locales visibles</span>
+              <span className="text-white text-sm font-bold">
+                {filteredVenues.length}
+                <span className="text-gray-500 font-normal"> / {venues.length}</span>
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      </aside>
 
       {/* ─── PANEL LATERAL / MODAL VENUE ─── */}
       {selectedVenue && (
@@ -440,6 +467,8 @@ function MyMap() {
 
               <button
                 onClick={closeModal}
+                aria-label="Cerrar panel"
+                title="Cerrar panel"
                 className="absolute top-4 right-4 bg-black/50 rounded-full p-2 hover:bg-black/70 transition"
               >
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -639,6 +668,8 @@ function MyMap() {
                   {isUserProfile && (
                     <button
                       type="button"
+                      aria-label={selectedVenue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+                      title={selectedVenue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
                       className={`aspect-square py-3 px-4 rounded-full flex items-center justify-center transition ${
                         selectedVenue.is_favorite
                           ? "bg-red-600 hover:bg-red-700 text-white"

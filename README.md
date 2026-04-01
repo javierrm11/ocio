@@ -147,8 +147,6 @@ npm run build
 ## 🛣️ Mejoras
 - Historias en las pestañas de las empresas
 - Cambiar checkin por barrita de temperatura
-- Actualizar Header
-- Actualizar Boton nav
 - Landing Page
 - Fix filtros z-index
 - Circulo mas grande en funcion del plan del usuario

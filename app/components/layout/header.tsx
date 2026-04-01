@@ -1,41 +1,74 @@
+'use client';
+
 import { Bell, User } from 'lucide-react';
-import Stories from '@/components/Stories/stories';
-import { ro } from 'date-fns/locale';
 import { useRouter } from 'next/navigation';
+import { useAppStore } from '@/lib/stores/venueStore';
 
 function Header() {
   const router = useRouter();
+  const { currentUser } = useAppStore();
+
   return (
-    <header className="w-full bg-gradient-to-b from-gray-900 to-transparent text-white z-991">
+    <header className="w-full bg-ozio-darker text-white z-50">
+      {/* Línea neón superior */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-px bg-gradient-to-r from-transparent via-ozio-purple to-transparent" />
+
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-        
-        {/* Left: Logo + Title */}
-        <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <img src="logo.jpeg" alt="Logo" className="w-6 h-6 rounded" />
-            </div>
-          <div className="leading-tight">
-            <h1 className="text-sm font-semibold tracking-wide">OZIO</h1>
-            <span className="text-[10px] text-zinc-400 uppercase">
+
+        {/* Logo + wordmark */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-ozio-purple/10 border border-ozio-purple/40 flex items-center justify-center">
+            <img src="/logo.jpeg" alt="Ozio" className="w-5 h-5 rounded" />
+          </div>
+          <div className="leading-none">
+            <h1 className="text-sm font-semibold tracking-wide text-white">OZIO</h1>
+            <span className="text-[9px] tracking-[0.18em] uppercase text-ozio-purple">
               Nightlife
             </span>
           </div>
         </div>
 
-        {/* Right: Icons */}
-        <div className="flex items-center gap-4">
-          <button className="hover:text-blue-400 transition"
-          onClick={() => { router.push('/notificaciones') }}>
-            <Bell size={18} />
-          </button>
-          <button 
-          className="hover:text-blue-400 transition"
-          onClick={() => { router.push('/profile') }}
-          >
-            <User size={18} />
-          </button>
-        </div>
+        {/* Iconos */}
+        <div className="flex items-center gap-1">
 
+          {/* Notificaciones */}
+          <button
+            className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.06] transition-all"
+            onClick={() => router.push('/notificaciones')}
+            aria-label="Notificaciones"
+          >
+            <Bell size={17} strokeWidth={1.8} />
+          </button>
+
+          <div className="w-px h-4 bg-ozio-purple/25" />
+
+          {/* Avatar / Perfil */}
+          <button
+            className="w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-white/[0.06] transition-all"
+            onClick={() => router.push('/profile')}
+            aria-label="Perfil"
+          >
+            {currentUser?.avatar_path ? (
+              // Tiene foto de perfil
+              <img
+                src={currentUser.avatar_path}
+                alt={currentUser.name}
+                className="w-7 h-7 rounded-lg object-cover border border-ozio-purple/40"
+              />
+            ) : currentUser ? (
+              // Sesión iniciada pero sin foto → inicial
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center border border-ozio-purple/40">
+                <span className="text-white text-[11px] font-medium select-none">
+                  {currentUser.name?.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            ) : (
+              // Sin sesión → icono genérico
+              <User size={17} strokeWidth={1.8} className="text-white/50" />
+            )}
+          </button>
+
+        </div>
       </div>
     </header>
   );

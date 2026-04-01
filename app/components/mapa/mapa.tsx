@@ -107,6 +107,38 @@ function parseDistanceToKm(distance?: string): number {
   return value;
 }
 
+const HEAT_BAR_WIDTH_CLASSES = [
+  "w-0",
+  "w-[10%]",
+  "w-[20%]",
+  "w-[30%]",
+  "w-[40%]",
+  "w-[50%]",
+  "w-[60%]",
+  "w-[70%]",
+  "w-[80%]",
+  "w-[90%]",
+  "w-full",
+];
+
+function getHeatStep(checkins: number, maxReference: number): number {
+  if (checkins <= 0) return 0;
+  const ratio = Math.min(checkins / maxReference, 1);
+  return Math.max(1, Math.min(10, Math.ceil(ratio * 10)));
+}
+
+function getHeatLabel(checkins: number): string {
+  if (checkins === 0) return "Tranquilo";
+  if (checkins < 5) return "Animado";
+  return "Muy animado";
+}
+
+function getHeatGradient(checkins: number): string {
+  if (checkins === 0) return "from-emerald-400 via-lime-400 to-green-500";
+  if (checkins < 5) return "from-yellow-400 via-orange-400 to-amber-500";
+  return "from-orange-500 via-red-500 to-rose-500";
+}
+
 function MyMap() {
   const router = useRouter();
   const {
@@ -232,6 +264,15 @@ function MyMap() {
 
     return true;
   });
+
+  const selectedCheckins = selectedVenue?.check_ins?.length || 0;
+  const maxCheckinsReference = Math.max(
+    10,
+    ...venues.map((v) => v.check_ins?.length || 0),
+  );
+  const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
+  const selectedHeatLabel = getHeatLabel(selectedCheckins);
+  const selectedHeatGradient = getHeatGradient(selectedCheckins);
 
   if (!loaded) {
     return (
@@ -518,7 +559,21 @@ function MyMap() {
             <div className="p-6 flex flex-col gap-4">
               <div>
                 <h2 className="text-white text-2xl font-bold mb-1">{selectedVenue.name}</h2>
-                <p className="text-gray-400 text-sm">{selectedVenue.check_ins?.length || 0} check-ins</p>
+
+                <div className="mt-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-gray-300 text-xs uppercase tracking-wide font-semibold">Temperatura</p>
+                    <p className="text-xs font-semibold text-gray-300">{selectedHeatLabel}</p>
+                  </div>
+
+                  <div className="relative h-2.5 w-full rounded-full bg-gray-800 overflow-hidden border border-gray-700">
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r ${selectedHeatGradient} ${HEAT_BAR_WIDTH_CLASSES[selectedHeatStep]} transition-all duration-700 ease-out animate-heat-pulse`}
+                    />
+                    <div className="absolute inset-y-0 w-12 bg-white/20 blur-sm animate-heat-shine" />
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
                   <span>{selectedVenue.distance || "Desconocida"}</span>
                 </div>
@@ -736,6 +791,21 @@ function MyMap() {
           animation: soon-pulse 2.5s ease-in-out infinite;
         }
         .leaflet-bottom.leaflet-right { display: none; }
+        @keyframes heat-shine {
+          0% { transform: translateX(-180%); opacity: 0; }
+          20% { opacity: 0.8; }
+          100% { transform: translateX(650%); opacity: 0; }
+        }
+        .animate-heat-shine {
+          animation: heat-shine 2.2s linear infinite;
+        }
+        @keyframes heat-pulse {
+          0%, 100% { filter: saturate(1); }
+          50% { filter: saturate(1.25); }
+        }
+        .animate-heat-pulse {
+          animation: heat-pulse 1.8s ease-in-out infinite;
+        }
       `}</style>
     </>
   );

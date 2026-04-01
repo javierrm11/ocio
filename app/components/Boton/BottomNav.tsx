@@ -37,9 +37,9 @@ function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
       <div className="max-w-md mx-auto flex items-center justify-around relative py-2">
-        {navItems.map(({ icon, label, path, special }) => (
+        {navItems.map(({ icon, path, special }) => (
           <NavItem
-            key={label}
+            key={path}
             icon={icon}
             active={pathname === path}
             onClick={() => router.push(path)}
@@ -53,13 +53,11 @@ function BottomNav() {
 
 function NavItem({
   icon,
-  label,
   active,
   onClick,
   special,
 }: {
   icon: React.ReactNode;
-  label: string;
   active?: boolean;
   onClick?: () => void;
   special?: boolean;
@@ -80,7 +78,6 @@ function NavItem({
       `}
     >
       {icon}
-      {!special && <span>{label}</span>}
     </button>
   );
 }

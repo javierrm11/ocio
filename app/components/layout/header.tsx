@@ -19,7 +19,7 @@ function Header() {
             <img src="/logo.jpeg" alt="Ozio" className="w-5 h-5 rounded" />
           </div>
           <div className="leading-none">
-            <h1 className="text-sm font-semibold tracking-wide text-white">OZIO</h1>
+            <h1 className="text-xl font-semibold tracking-wide text-white">OZIO</h1>
           </div>
         </div>
 

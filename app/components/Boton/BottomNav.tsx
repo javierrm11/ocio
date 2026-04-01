@@ -22,16 +22,16 @@ function BottomNav() {
   const isBusiness = role === "business";
 
   const navItems = [
-    { icon: <Home size={20} />, label: 'Home', path: '/' },
-    { icon: <Compass size={20} />, label: 'Explorar', path: '/explorar' },
+    { icon: <Home size={25} />, label: 'Home', path: '/' },
+    { icon: <Compass size={25} />, label: 'Explorar', path: '/explorar' },
 
     // 🔁 BOTÓN DINÁMICO
     isBusiness
-      ? { icon: <Plus size={26} />, label: 'Añadir', path: '/anadir', special: true }
-      : { icon: <Heart size={22} />, label: 'Guardados', path: '/profile?favorites', special: true },
+      ? { icon: <Plus size={30} />, label: 'Añadir', path: '/anadir', special: true }
+      : { icon: <Heart size={30} />, label: 'Guardados', path: '/profile?favorites', special: true },
 
-    { icon: <Search size={20} />, label: 'Buscar', path: '/buscar' },
-    { icon: <User size={20} />, label: 'Perfil', path: '/profile' },
+    { icon: <Search size={25} />, label: 'Buscar', path: '/buscar' },
+    { icon: <User size={25} />, label: 'Perfil', path: '/profile' },
   ];
 
   return (
@@ -41,7 +41,6 @@ function BottomNav() {
           <NavItem
             key={label}
             icon={icon}
-            label={label}
             active={pathname === path}
             onClick={() => router.push(path)}
             special={special}
@@ -73,7 +72,7 @@ function NavItem({
         flex flex-col items-center justify-center text-xs transition relative
         
         ${special
-          ? 'bg-ozio-blue text-white p-3 rounded-full -mt-6 shadow-xl scale-110'
+          ? 'bg-ozio-blue text-white p-3 rounded-full shadow-xl'
           : active
             ? 'text-blue-500'
             : 'text-zinc-400 hover:text-zinc-200'

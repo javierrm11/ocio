@@ -139,6 +139,16 @@ function getHeatGradient(checkins: number): string {
   return "from-orange-500 via-red-500 to-rose-500";
 }
 
+function getMarkerRadius(checkins: number, maxReference: number, eventStatus: "active" | "soon" | "none"): number {
+  const minRadius = 7;
+  const maxRadius = 16;
+  const normalized = Math.min(checkins / maxReference, 1);
+  const baseRadius = minRadius + normalized * (maxRadius - minRadius);
+
+  const eventBoost = eventStatus === "active" ? 2 : eventStatus === "soon" ? 1 : 0;
+  return Number((baseRadius + eventBoost).toFixed(1));
+}
+
 function MyMap() {
   const router = useRouter();
   const {
@@ -157,6 +167,7 @@ function MyMap() {
     minCheckins: 0,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const currentProfileId = currentUser?.id;
 
   const hasActiveFilters =
     filters.maxDistance !== null ||
@@ -198,31 +209,80 @@ function MyMap() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setVenues(venues.map((v) =>
-          v.id === venueId ? { ...v, check_ins: [...(v.check_ins || []), data.data] } : v,
-        ));
-        if (selectedVenue && selectedVenue.id === venueId)
-          setSelectedVenue({ ...selectedVenue, check_ins: [...(selectedVenue.check_ins || []), data.data] });
-        closeModal();
+        const createdCheckIn = Array.isArray(data?.data) ? data.data[0] : data?.data;
+        if (!createdCheckIn) return;
+
+        const nextVenues = venuesRef.current.map((v) =>
+          v.id === venueId
+            ? {
+                ...v,
+                check_ins: [
+                  ...(v.check_ins || []).filter(
+                    (c: any) =>
+                      c.id !== createdCheckIn.id &&
+                      !(currentProfileId && c.profile_id === currentProfileId && c.active),
+                  ),
+                  createdCheckIn,
+                ],
+              }
+            : v,
+        );
+        venuesRef.current = nextVenues;
+        setVenues(nextVenues);
+
+        setSelectedVenue((prev) => {
+          if (!prev || prev.id !== venueId) return prev;
+          return {
+            ...prev,
+            check_ins: [
+              ...(prev.check_ins || []).filter(
+                (c: any) =>
+                  c.id !== createdCheckIn.id &&
+                  !(currentProfileId && c.profile_id === currentProfileId && c.active),
+              ),
+              createdCheckIn,
+            ],
+          };
+        });
       });
   };
 
   const onCheckOut = (venueId: any) => {
     const token = getToken();
-    const venue = venues.find((v) => v.id === venueId);
-    const checkInId = venue?.check_ins?.[0]?.id;
-    if (!checkInId) return;
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${checkInId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ active: false }),
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then(() => {
-        setVenues(venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)));
-        if (selectedVenue && selectedVenue.id === venueId)
-          setSelectedVenue({ ...selectedVenue, check_ins: [] });
-        closeModal();
+      .then((payload) => {
+        const deletedCheckInId = payload?.data?.id;
+
+        const nextVenues = venuesRef.current.map((v) =>
+          v.id === venueId
+            ? {
+                ...v,
+                check_ins: (v.check_ins || []).filter((c: any) => {
+                  if (deletedCheckInId) return c.id !== deletedCheckInId;
+                  if (currentProfileId) return !(c.profile_id === currentProfileId && c.active);
+                  return c.active;
+                }),
+              }
+            : v,
+        );
+        venuesRef.current = nextVenues;
+        setVenues(nextVenues);
+
+        setSelectedVenue((prev) => {
+          if (!prev || prev.id !== venueId) return prev;
+          return {
+            ...prev,
+            check_ins: (prev.check_ins || []).filter((c: any) => {
+              if (deletedCheckInId) return c.id !== deletedCheckInId;
+              if (currentProfileId) return !(c.profile_id === currentProfileId && c.active);
+              return c.active;
+            }),
+          };
+        });
       });
   };
 
@@ -273,6 +333,11 @@ function MyMap() {
   const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
   const selectedHeatLabel = getHeatLabel(selectedCheckins);
   const selectedHeatGradient = getHeatGradient(selectedCheckins);
+  const hasUserActiveCheckIn = Boolean(
+    selectedVenue?.check_ins?.some(
+      (c: any) => c.active && (!currentProfileId || c.profile_id === currentProfileId),
+    ),
+  );
 
   if (!loaded) {
     return (
@@ -314,11 +379,12 @@ function MyMap() {
 
           {filteredVenues.map((venue) => {
             const eventStatus = getEventStatus(venue);
+            const checkinsCount = venue.check_ins?.length || 0;
             return (
               <CircleMarker
                 key={`${venue.id}-${venue.check_ins?.length || 0}`}
                 center={[venue.latitude, venue.longitude] as [number, number]}
-                radius={eventStatus !== "none" ? 11 : 8}
+                radius={getMarkerRadius(checkinsCount, maxCheckinsReference, eventStatus)}
                 color={
                   eventStatus === "active" ? "#a855f7"
                   : eventStatus === "soon" ? "#f97316"
@@ -687,28 +753,28 @@ function MyMap() {
               {/* Acciones */}
               <div className="flex flex-wrap items-center gap-2">
                 {isUserProfile &&
-                  (selectedVenue.check_ins && selectedVenue.check_ins.length > 0 ? (
-                    <button
-                      type="button"
-                      className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                      onClick={() => onCheckOut(selectedVenue.id)}
-                    >
-                      Quitar check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                  (hasUserActiveCheckIn ? (
+                  <button
+                    type="button"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => onCheckOut(selectedVenue.id)}
+                  >
+                    Quitar check-in
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                   ) : (
-                    <button
-                      type="button"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                      onClick={() => onCheckIn(selectedVenue.id)}
-                    >
-                      Hacer check-in
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
+                  <button
+                    type="button"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => onCheckIn(selectedVenue.id)}
+                  >
+                    Hacer check-in
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                   ))}
 
                 <div className="flex gap-2 w-full">

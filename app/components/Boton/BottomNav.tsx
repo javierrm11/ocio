@@ -28,7 +28,7 @@ function BottomNav() {
     // 🔁 BOTÓN DINÁMICO
     isBusiness
       ? { icon: <Plus size={26} />, label: 'Añadir', path: '/anadir', special: true }
-      : { icon: <Heart size={22} />, label: 'Guardados', path: '/guardados', special: true },
+      : { icon: <Heart size={22} />, label: 'Guardados', path: '/profile?favorites', special: true },
 
     { icon: <Search size={20} />, label: 'Buscar', path: '/buscar' },
     { icon: <User size={20} />, label: 'Perfil', path: '/profile' },

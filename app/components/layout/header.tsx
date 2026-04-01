@@ -10,8 +10,6 @@ function Header() {
 
   return (
     <header className="w-full bg-ozio-darker text-white z-50">
-      {/* Línea neón superior */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/5 h-px bg-gradient-to-r from-transparent via-ozio-purple to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
 
@@ -22,9 +20,6 @@ function Header() {
           </div>
           <div className="leading-none">
             <h1 className="text-sm font-semibold tracking-wide text-white">OZIO</h1>
-            <span className="text-[9px] tracking-[0.18em] uppercase text-ozio-purple">
-              Nightlife
-            </span>
           </div>
         </div>
 

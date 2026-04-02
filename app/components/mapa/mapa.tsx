@@ -640,12 +640,6 @@ function MyMap() {
                         <p className="text-white text-xl font-black leading-tight">{selectedHeatLabel}</p>
                       </div>
                     </div>
-                    <div className={`rounded-xl px-3 py-2 text-center min-w-[52px] heat-badge-${heatState}`}>
-                      <p className={`text-2xl font-black leading-none heat-count-${heatState}`}>
-                        {selectedCheckins}
-                      </p>
-                      <p className="text-white/35 text-[9px] uppercase tracking-wide mt-0.5">aquí</p>
-                    </div>
                   </div>
 
                   {/* Barra de temperatura protagonista */}

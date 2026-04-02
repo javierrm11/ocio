@@ -146,9 +146,7 @@ npm run build
 
 ## 🛣️ Mejoras
 - Historias en las pestañas de las empresas
-- Cambiar checkin por barrita de temperatura
 - Landing Page
 - Fix filtros z-index
 - Circulo mas grande en funcion del plan del usuario
-- Barrita de temperatura en mapa
 - Filtros

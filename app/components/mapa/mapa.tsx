@@ -315,6 +315,26 @@ function MyMap() {
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
 
+  const getMadridHour = () =>
+    parseInt(
+      new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", hour: "numeric", hour12: false }).format(new Date()),
+      10,
+    );
+
+  const [isNight, setIsNight] = useState(() => {
+    const h = getMadridHour();
+    return h >= 21 || h < 7;
+  });
+
+  useEffect(() => {
+    const check = () => {
+      const h = getMadridHour();
+      setIsNight(h >= 21 || h < 7);
+    };
+    const interval = setInterval(check, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const filteredVenues = venues.filter((v) => {
     const dist = parseDistanceToKm(v.distance);
     if (filters.maxDistance !== null && dist > filters.maxDistance) return false;
@@ -365,8 +385,17 @@ function MyMap() {
           zoomControl={false}
         >
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="© OpenStreetMap contributors"
+            key={isNight ? "night" : "day"}
+            url={
+              isNight
+                ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            }
+            attribution={
+              isNight
+                ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                : "© OpenStreetMap contributors"
+            }
           />
           {userLocation && (
             <CircleMarker
@@ -431,7 +460,7 @@ function MyMap() {
       </div>
 
       {/* ─── FILTROS RESPONSIVE ─── */}
-      <div className="absolute top-16 right-3 z-[1000] pointer-events-none">
+      <div className="absolute top-16 right-3 z-[992] pointer-events-none">
         <button
           type="button"
           onClick={() => setShowFilters(true)}

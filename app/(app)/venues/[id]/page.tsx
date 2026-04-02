@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
+import { CalendarDays, MapPin, Heart } from "lucide-react";
 
 interface Event {
   id: string;
@@ -19,8 +20,10 @@ interface Event {
 interface CheckIn {
   id: string;
   user_id: string;
+  profile_id: string;
   venue_id: string;
   created_at: string;
+  active: boolean;
 }
 
 interface Venue {
@@ -64,17 +67,18 @@ export default function VenueDetail() {
   const [checkingIn, setCheckingIn] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [togglingFavorite, setTogglingFavorite] = useState(false);
+  const [activeTab, setActiveTab] = useState<"events" | "location">("events");
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
+  const currentProfileId = currentUser?.id;
 
   useEffect(() => {
-    if (venueFromStore?.check_ins && venueFromStore.check_ins.length > 0) {
-      setHasCheckedIn(true);
-    } else {
-      setHasCheckedIn(false);
-    }
-  }, [venueFromStore]);
+    const hasActive = venueFromStore?.check_ins?.some(
+      (c: CheckIn) => c.active && (!currentProfileId || c.profile_id === currentProfileId),
+    ) ?? false;
+    setHasCheckedIn(hasActive);
+  }, [venueFromStore, currentProfileId]);
 
   useEffect(() => {
     if (venue) return;
@@ -104,58 +108,59 @@ export default function VenueDetail() {
     const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ venue_id: venueId }),
     })
       .then((res) => res.json())
       .then((data) => {
+        const created = Array.isArray(data?.data) ? data.data[0] : data?.data;
+        if (!created) return;
         setVenues(
           venues.map((v) =>
             v.id === venueId
-              ? { ...v, check_ins: [...(v.check_ins || []), data.data] }
+              ? { ...v, check_ins: [...(v.check_ins || []).filter((c: CheckIn) => c.id !== created.id), created] }
               : v,
           ),
         );
         setVenue((prev) =>
           prev
-            ? { ...prev, check_ins: [...(prev.check_ins || []), data.data] }
+            ? { ...prev, check_ins: [...(prev.check_ins || []).filter((c: CheckIn) => c.id !== created.id), created] }
             : prev,
         );
-        setHasCheckedIn(true);
       })
       .finally(() => setCheckingIn(false));
   };
 
   const onCheckOut = () => {
+    // Busca el check-in activo del usuario actual
+    const myCheckIn = venues
+      .find((v) => v.id === venueId)
+      ?.check_ins?.find((c: CheckIn) => c.profile_id === currentProfileId);
+
+    if (!myCheckIn) return;
     setCheckingOut(true);
     const token = getToken();
 
-    const venueFromStore = venues.find((v) => v.id === venueId);
-    const checkInId = venueFromStore?.check_ins?.[0]?.id;
-
-    if (!checkInId) {
-      setCheckingOut(false);
-      return;
-    }
-
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${checkInId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${myCheckIn.id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ active: false }),
     })
       .then((res) => res.json())
       .then(() => {
+        // Elimina del estado local (la API ya lo guarda como histórico con active:false)
         setVenues(
-          venues.map((v) => (v.id === venueId ? { ...v, check_ins: [] } : v)),
+          venues.map((v) =>
+            v.id === venueId
+              ? { ...v, check_ins: (v.check_ins || []).filter((c: CheckIn) => c.id !== myCheckIn.id) }
+              : v,
+          ),
         );
-        setVenue((prev) => (prev ? { ...prev, check_ins: [] } : prev));
-        setHasCheckedIn(false);
+        setVenue((prev) =>
+          prev
+            ? { ...prev, check_ins: (prev.check_ins || []).filter((c: CheckIn) => c.id !== myCheckIn.id) }
+            : prev,
+        );
       })
       .finally(() => setCheckingOut(false));
   };
@@ -250,250 +255,228 @@ export default function VenueDetail() {
   const totalCheckIns = venue.check_ins?.length || 0;
 
   return (
-    <div className="min-h-screen bg-ozio-dark pb-20">
-      {/* ── Imagen hero ─────────────────────────────────────────────────────── */}
-      <div className="relative h-72 md:h-96 lg:h-[460px]">
-        <img
-          src={venue.avatar_path || "https://via.placeholder.com/800x600"}
-          alt={venue.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-ozio-dark" />
+    <div className="bg-ozio-dark">
+    <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
-        {/* Botones top */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 pt-16 max-w-6xl mx-auto">
-          <button
-            onClick={() => router.back()}
-            className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition border border-white/10"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+      {/* Spacer for fixed header */}
+      <div className="h-[72px]" />
 
-          <div className="flex gap-2">
-            {isUserProfile && (
+      {/* ── Avatar + Stats (estilo Instagram) ── */}
+      <div className="px-4 pt-4">
+        <div className="flex items-center gap-5">
+
+          {/* Avatar con anillo degradado + botón volver */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => router.back()}
+              className="absolute -top-1 -left-1 w-6 h-6 bg-gray-800 hover:bg-gray-700 rounded-full border border-gray-700 flex items-center justify-center z-10 transition"
+            >
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="w-[82px] h-[82px] rounded-full p-[2.5px] bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue">
+              {venue.avatar_path ? (
+                <img
+                  src={venue.avatar_path}
+                  alt={venue.name}
+                  className="w-full h-full rounded-full object-cover border-2 border-ozio-dark"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full border-2 border-ozio-dark bg-gradient-to-br from-ozio-orange to-ozio-purple flex items-center justify-center">
+                  <span className="text-white text-2xl font-black">{venue.name?.charAt(0).toUpperCase()}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="flex flex-1 items-center justify-around">
+            <div className="text-center">
+              <p className="text-white text-xl font-black leading-none">{totalCheckIns}</p>
+              <p className="text-gray-400 text-xs mt-1">Visitas</p>
+            </div>
+            <div className="w-px h-8 bg-gray-800" />
+            <div className="text-center">
+              <p className="text-white text-xl font-black leading-none">{venue.events?.length || 0}</p>
+              <p className="text-gray-400 text-xs mt-1">Eventos</p>
+            </div>
+            <div className="w-px h-8 bg-gray-800" />
+            <div className="text-center">
+              <p className="text-white text-xl font-black leading-none">
+                {activeEvents.length > 0 ? (
+                  <span className="text-green-400">{activeEvents.length}</span>
+                ) : 0}
+              </p>
+              <p className="text-gray-400 text-xs mt-1">En curso</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Nombre + badge + dirección ── */}
+        <div className="mt-3 mb-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-white font-black text-base leading-tight">{venue.name}</h2>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25">
+              Local
+            </span>
+          </div>
+          {venue.address && (
+            <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-1">
+              <MapPin size={12} className="text-ozio-orange flex-shrink-0" />
+              {venue.address}
+            </p>
+          )}
+          {venue.description && (
+            <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{venue.description}</p>
+          )}
+        </div>
+
+        {/* ── Botones de acción ── */}
+        <div className="flex gap-2 mb-4">
+          {isUserProfile && (
+            hasCheckedIn ? (
               <button
-                onClick={toggleFavorite}
-                disabled={togglingFavorite}
-                className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center transition border border-white/10 ${
-                  venueFromStore?.is_favorite
-                    ? "bg-red-600/80"
-                    : "bg-black/50 hover:bg-black/70"
-                } ${togglingFavorite ? "opacity-70" : ""}`}
+                onClick={onCheckOut}
+                disabled={checkingOut}
+                className="flex-1 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-600/40 text-red-400 text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
               >
-                {togglingFavorite ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
+                {checkingOut ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-400" />
                 ) : (
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill={venueFromStore?.is_favorite ? "currentColor" : "none"}
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Quitar check-in
+                  </>
                 )}
               </button>
-            )}
-          </div>
-        </div>
-
-        {/* Badge visitas */}
-        <div className="absolute bottom-4 left-4 md:left-8">
-          <div className="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium border border-white/10 flex items-center gap-2">
-            <svg className="w-5 h-5 text-ozio-orange" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-            </svg>
-            {totalCheckIns} visitas
-          </div>
-        </div>
-      </div>
-
-      {/* ── Contenido ───────────────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8 -mt-6 relative z-10">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
-
-          {/* ── Columna izquierda ── */}
-          <div className="space-y-6">
-
-            {/* Info principal + acciones */}
-            <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 shadow-2xl">
-              <h1 className="text-white text-3xl font-bold mb-4">{venue.name}</h1>
-
-              {venue.description && (
-                <p className="text-gray-300 leading-relaxed mb-6">{venue.description}</p>
-              )}
-
-              {venue.address && (
-                <div className="flex items-start gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-ozio-purple to-ozio-blue rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-gray-400 text-sm mb-1">Dirección</p>
-                    <p className="text-white font-semibold">{venue.address}</p>
-                  </div>
-                </div>
-              )}
-
-              {isUserProfile &&
-                (hasCheckedIn ? (
-                  <button
-                    onClick={onCheckOut}
-                    disabled={checkingOut}
-                    className="w-full py-4 rounded-2xl font-bold text-lg bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white transition flex items-center justify-center gap-2"
-                  >
-                    {checkingOut ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
-                        Eliminando check-in...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Quitar check-in
-                      </>
-                    )}
-                  </button>
+            ) : (
+              <button
+                onClick={onCheckIn}
+                disabled={checkingIn}
+                className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-red-500 hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
+              >
+                {checkingIn ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
                 ) : (
-                  <button
-                    onClick={onCheckIn}
-                    disabled={checkingIn}
-                    className="w-full py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-ozio-orange to-red-500 disabled:opacity-70 text-white hover:shadow-2xl hover:scale-[1.02] transition flex items-center justify-center gap-2"
-                  >
-                    {checkingIn ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
-                        Haciendo check-in...
-                      </>
-                    ) : (
-                      "📍 Hacer Check-in"
-                    )}
-                  </button>
-                ))}
-            </div>
-
-            {/* Eventos activos — desktop */}
-            {activeEvents.length > 0 && (
-              <div className="bg-ozio-card border border-green-500/40 rounded-3xl p-6 lg:block hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
-                    Evento en curso
-                  </h2>
-                  <span className="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full font-medium border border-green-500/30">
-                    {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {activeEvents.map((event) => (
-                    <EventMiniCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Próximos eventos — desktop */}
-            {upcomingEvents.length > 0 && (
-              <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:block hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
-                  <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
-                    {upcomingEvents.length}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {upcomingEvents.map((event) => (
-                    <EventMiniCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ── Columna derecha ── */}
-          <div className="space-y-6 mt-6 lg:mt-0">
-
-            {/* Mapa */}
-            <div className="bg-ozio-card border border-gray-700/50 rounded-3xl overflow-hidden">
-              <div className="p-4 border-b border-gray-700/50">
-                <h2 className="text-white font-bold text-lg">Ubicación</h2>
-              </div>
-              <div className="h-64 md:h-80 relative overflow-hidden">
-                <iframe
-                  src={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}&z=15&output=embed`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-              <div className="p-4">
-                <button
-                  onClick={() =>
-                    window.open(
-                      `https://maps.google.com/?q=${venue.latitude},${venue.longitude}`,
-                      "_blank",
-                    )
-                  }
-                  className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Abrir en Google Maps
-                </button>
-              </div>
-            </div>
-
-            {/* Eventos activos — móvil/tablet */}
-            {activeEvents.length > 0 && (
-              <div className="bg-ozio-card border border-green-500/40 rounded-3xl p-6 lg:hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
-                    Evento en curso
-                  </h2>
-                  <span className="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full font-medium border border-green-500/30">
-                    {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {activeEvents.map((event) => (
-                    <EventMiniCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Próximos eventos — móvil/tablet */}
-            {upcomingEvents.length > 0 && (
-              <div className="bg-ozio-card border border-gray-700/50 rounded-3xl p-6 lg:hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white font-bold text-lg">Próximos eventos</h2>
-                  <span className="bg-ozio-purple/20 text-ozio-purple text-xs px-3 py-1 rounded-full font-medium">
-                    {upcomingEvents.length}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {upcomingEvents.map((event) => (
-                    <EventMiniCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+                  "📍 Hacer Check-in"
+                )}
+              </button>
+            )
+          )}
+          {isUserProfile && (
+            <button
+              onClick={toggleFavorite}
+              disabled={togglingFavorite}
+              className={`w-10 border rounded-xl transition flex items-center justify-center disabled:opacity-70 ${
+                venueFromStore?.is_favorite
+                  ? "bg-red-600/20 border-red-600/40 text-red-400"
+                  : "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              {togglingFavorite ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current" />
+              ) : (
+                <Heart size={16} fill={venueFromStore?.is_favorite ? "currentColor" : "none"} />
+              )}
+            </button>
+          )}
+          <button
+            onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, "_blank")}
+            className="w-10 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-xl transition flex items-center justify-center"
+          >
+            <MapPin size={16} />
+          </button>
         </div>
       </div>
+
+      {/* ── Tabs solo iconos ── */}
+      <div className="flex border-t border-b border-gray-800">
+        <button
+          onClick={() => setActiveTab("events")}
+          className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+        >
+          <CalendarDays size={22} />
+        </button>
+        <button
+          onClick={() => setActiveTab("location")}
+          className={`flex-1 py-3 flex justify-center transition ${activeTab === "location" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+        >
+          <MapPin size={22} />
+        </button>
+      </div>
+
+      {/* ── Tab content ── */}
+      <div className="px-4 pt-4 space-y-3">
+
+        {/* Eventos */}
+        {activeTab === "events" && (
+          <>
+            {activeEvents.length > 0 && (
+              <div className="bg-ozio-card border border-green-500/40 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-white font-bold text-sm flex items-center gap-2">
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    En curso
+                  </h2>
+                  <span className="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded-full font-medium border border-green-500/30">
+                    {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {activeEvents.map((event) => (
+                    <EventMiniCard key={event.id} event={event} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {upcomingEvents.length > 0 ? (
+              <div className="space-y-3">
+                <p className="text-gray-500 text-xs uppercase tracking-widest font-semibold px-1">Próximos</p>
+                {upcomingEvents.map((event) => (
+                  <EventMiniCard key={event.id} event={event} />
+                ))}
+              </div>
+            ) : activeEvents.length === 0 && (
+              <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
+                <p className="text-4xl mb-3">📅</p>
+                <p className="text-white font-semibold mb-1">Sin eventos</p>
+                <p className="text-gray-500 text-sm">No hay eventos programados</p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Ubicación */}
+        {activeTab === "location" && (
+          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden">
+            <div className="h-72 relative overflow-hidden">
+              <iframe
+                src={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}&z=15&output=embed`}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <div className="p-4">
+              <button
+                onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, "_blank")}
+                className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
+              >
+                <MapPin size={18} />
+                Abrir en Google Maps
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
     </div>
   );
 }

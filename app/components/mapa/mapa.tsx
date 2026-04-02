@@ -212,77 +212,50 @@ function MyMap() {
         const createdCheckIn = Array.isArray(data?.data) ? data.data[0] : data?.data;
         if (!createdCheckIn) return;
 
+        // Elimina cualquier check-in previo del mismo usuario antes de añadir el nuevo
+        const addCheckIn = (list: any[]) => [
+          ...list.filter((c: any) => c.id !== createdCheckIn.id && !(currentProfileId && c.profile_id === currentProfileId)),
+          createdCheckIn,
+        ];
+
         const nextVenues = venuesRef.current.map((v) =>
-          v.id === venueId
-            ? {
-                ...v,
-                check_ins: [
-                  ...(v.check_ins || []).filter(
-                    (c: any) =>
-                      c.id !== createdCheckIn.id &&
-                      !(currentProfileId && c.profile_id === currentProfileId && c.active),
-                  ),
-                  createdCheckIn,
-                ],
-              }
-            : v,
+          v.id === venueId ? { ...v, check_ins: addCheckIn(v.check_ins || []) } : v,
         );
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
-
-        setSelectedVenue((prev) => {
-          if (!prev || prev.id !== venueId) return prev;
-          return {
-            ...prev,
-            check_ins: [
-              ...(prev.check_ins || []).filter(
-                (c: any) =>
-                  c.id !== createdCheckIn.id &&
-                  !(currentProfileId && c.profile_id === currentProfileId && c.active),
-              ),
-              createdCheckIn,
-            ],
-          };
-        });
+        setSelectedVenue((prev) =>
+          prev?.id === venueId ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) } : prev,
+        );
       });
   };
 
   const onCheckOut = (venueId: any) => {
+    // Busca el check-in activo del usuario actual en este venue
+    const myCheckIn = venuesRef.current
+      .find((v) => v.id === venueId)
+      ?.check_ins?.find((c: any) => c.profile_id === currentProfileId);
+
+    if (!myCheckIn) return;
     const token = getToken();
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${venueId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${myCheckIn.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ active: false }),
     })
       .then((res) => res.json())
-      .then((payload) => {
-        const deletedCheckInId = payload?.data?.id;
+      .then(() => {
+        // Elimina del estado local (la API lo guarda como histórico con active:false)
+        const removeCheckIn = (list: any[]) => list.filter((c: any) => c.id !== myCheckIn.id);
 
         const nextVenues = venuesRef.current.map((v) =>
-          v.id === venueId
-            ? {
-                ...v,
-                check_ins: (v.check_ins || []).filter((c: any) => {
-                  if (deletedCheckInId) return c.id !== deletedCheckInId;
-                  if (currentProfileId) return !(c.profile_id === currentProfileId && c.active);
-                  return c.active;
-                }),
-              }
-            : v,
+          v.id === venueId ? { ...v, check_ins: removeCheckIn(v.check_ins || []) } : v,
         );
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
-
-        setSelectedVenue((prev) => {
-          if (!prev || prev.id !== venueId) return prev;
-          return {
-            ...prev,
-            check_ins: (prev.check_ins || []).filter((c: any) => {
-              if (deletedCheckInId) return c.id !== deletedCheckInId;
-              if (currentProfileId) return !(c.profile_id === currentProfileId && c.active);
-              return c.active;
-            }),
-          };
-        });
+        setSelectedVenue((prev) =>
+          prev?.id === venueId ? { ...prev, check_ins: removeCheckIn(prev.check_ins || []) } : prev,
+        );
       });
   };
 

@@ -333,6 +333,7 @@ function MyMap() {
   const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
   const selectedHeatLabel = getHeatLabel(selectedCheckins);
   const selectedHeatGradient = getHeatGradient(selectedCheckins);
+  const heatState = selectedCheckins === 0 ? "cool" : selectedCheckins < 5 ? "warm" : "hot";
   const hasUserActiveCheckIn = Boolean(
     selectedVenue?.check_ins?.some(
       (c: any) => c.active && (!currentProfileId || c.profile_id === currentProfileId),
@@ -626,17 +627,39 @@ function MyMap() {
               <div>
                 <h2 className="text-white text-2xl font-bold mb-1">{selectedVenue.name}</h2>
 
-                <div className="mt-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-gray-300 text-xs uppercase tracking-wide font-semibold">Temperatura</p>
-                    <p className="text-xs font-semibold text-gray-300">{selectedHeatLabel}</p>
+                {/* 🌡️ Temperatura — Feature Principal */}
+                <div className={`mt-3 rounded-2xl p-4 border heat-card-${heatState}`}>
+                  {/* Fila superior: icono + label + contador */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl leading-none">
+                        {selectedCheckins >= 5 ? '🔥' : selectedCheckins > 0 ? '✨' : '🌿'}
+                      </span>
+                      <div>
+                        <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold mb-0.5">Ambiente ahora</p>
+                        <p className="text-white text-xl font-black leading-tight">{selectedHeatLabel}</p>
+                      </div>
+                    </div>
+                    <div className={`rounded-xl px-3 py-2 text-center min-w-[52px] heat-badge-${heatState}`}>
+                      <p className={`text-2xl font-black leading-none heat-count-${heatState}`}>
+                        {selectedCheckins}
+                      </p>
+                      <p className="text-white/35 text-[9px] uppercase tracking-wide mt-0.5">aquí</p>
+                    </div>
                   </div>
 
-                  <div className="relative h-2.5 w-full rounded-full bg-gray-800 overflow-hidden border border-gray-700">
+                  {/* Barra de temperatura protagonista */}
+                  <div className="relative h-5 w-full rounded-full bg-black/50 overflow-hidden">
                     <div
-                      className={`h-full rounded-full bg-gradient-to-r ${selectedHeatGradient} ${HEAT_BAR_WIDTH_CLASSES[selectedHeatStep]} transition-all duration-700 ease-out animate-heat-pulse`}
+                      className={`h-full rounded-full bg-gradient-to-r ${selectedHeatGradient} ${HEAT_BAR_WIDTH_CLASSES[selectedHeatStep]} transition-all duration-700 ease-out animate-heat-pulse heat-bar-glow-${heatState}`}
                     />
-                    <div className="absolute inset-y-0 w-12 bg-white/20 blur-sm animate-heat-shine" />
+                    <div className="absolute inset-y-0 w-16 bg-white/10 blur-md animate-heat-shine" />
+                  </div>
+
+                  {/* Escala */}
+                  <div className="flex justify-between mt-2 px-0.5">
+                    <span className="text-[10px] text-white/25 font-medium">Tranquilo</span>
+                    <span className="text-[10px] text-white/25 font-medium">Llenazo</span>
                   </div>
                 </div>
 
@@ -872,6 +895,34 @@ function MyMap() {
         .animate-heat-pulse {
           animation: heat-pulse 1.8s ease-in-out infinite;
         }
+        /* Heat card states */
+        .heat-card-cool {
+          background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(10,10,20,0.85) 100%);
+          border-color: rgba(52,211,153,0.35);
+          box-shadow: 0 0 28px rgba(52,211,153,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .heat-card-warm {
+          background: linear-gradient(135deg, rgba(251,146,60,0.10) 0%, rgba(10,10,20,0.85) 100%);
+          border-color: rgba(251,146,60,0.35);
+          box-shadow: 0 0 28px rgba(251,146,60,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .heat-card-hot {
+          background: linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(10,10,20,0.85) 100%);
+          border-color: rgba(239,68,68,0.4);
+          box-shadow: 0 0 32px rgba(239,68,68,0.22), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        /* Heat badge backgrounds */
+        .heat-badge-cool { background: rgba(52,211,153,0.13); }
+        .heat-badge-warm { background: rgba(251,146,60,0.13); }
+        .heat-badge-hot  { background: rgba(239,68,68,0.16); }
+        /* Heat count colors */
+        .heat-count-cool { color: #34d399; }
+        .heat-count-warm { color: #fb923c; }
+        .heat-count-hot  { color: #f87171; }
+        /* Heat bar glow */
+        .heat-bar-glow-cool { box-shadow: 0 0 14px rgba(52,211,153,0.9), 0 0 28px rgba(52,211,153,0.4); }
+        .heat-bar-glow-warm { box-shadow: 0 0 14px rgba(251,146,60,0.9), 0 0 28px rgba(251,146,60,0.45); }
+        .heat-bar-glow-hot  { box-shadow: 0 0 16px rgba(239,68,68,1),    0 0 32px rgba(239,68,68,0.55); }
       `}</style>
     </>
   );

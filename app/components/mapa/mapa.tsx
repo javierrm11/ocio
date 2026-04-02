@@ -1,5 +1,6 @@
 "use client";
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Marker, Tooltip } from "react-leaflet";
+import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
@@ -147,6 +148,67 @@ function getMarkerRadius(checkins: number, maxReference: number, eventStatus: "a
 
   const eventBoost = eventStatus === "active" ? 2 : eventStatus === "soon" ? 1 : 0;
   return Number((baseRadius + eventBoost).toFixed(1));
+}
+
+function createVenueIcon(checkins: number, eventStatus: "active" | "soon" | "none"): L.DivIcon {
+  const isHot  = checkins >= 5;
+  const isWarm = checkins > 0 && checkins < 5;
+
+  // Gradiente igual que el heat-card del panel lateral
+  const bg =
+    eventStatus === "active" ? "linear-gradient(135deg,#8B5CF6,#6d28d9)"
+    : eventStatus === "soon"  ? "linear-gradient(135deg,#FF8A00,#ea580c)"
+    : isHot                   ? "linear-gradient(135deg,#ef4444,#dc2626)"
+    : isWarm                  ? "linear-gradient(135deg,#f59e0b,#d97706)"
+    :                           "linear-gradient(135deg,#10b981,#059669)";
+
+  const glow =
+    eventStatus === "active" ? "rgba(139,92,246,0.65)"
+    : eventStatus === "soon"  ? "rgba(255,138,0,0.65)"
+    : isHot                   ? "rgba(239,68,68,0.65)"
+    : isWarm                  ? "rgba(245,158,11,0.60)"
+    :                           "rgba(16,185,129,0.55)";
+
+  const tip =
+    eventStatus === "active" ? "#6d28d9"
+    : eventStatus === "soon"  ? "#ea580c"
+    : isHot                   ? "#dc2626"
+    : isWarm                  ? "#d97706"
+    :                           "#059669";
+
+  const label =
+    eventStatus === "active" ? "🎉"
+    : eventStatus === "soon"  ? "🕐"
+    : isHot                   ? "🔥"
+    : isWarm                  ? "✨"
+    :                           "💤";
+
+  // Tamaño crece con la actividad (mín 38px, máx 54px)
+  const size = Math.max(38, Math.min(54, 38 + checkins * 2));
+  const countSize = checkins > 9 ? 13 : 16;
+
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 6px 18px ${glow});">
+      <div style="
+        width:${size}px;height:${size}px;border-radius:50%;
+        background:${bg};
+        border:2.5px solid rgba(255,255,255,0.22);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+      ">
+        <span style="color:white;font-weight:900;font-size:${countSize}px;line-height:1;font-family:system-ui,sans-serif;">${checkins}</span>
+        <span style="font-size:10px;line-height:1;">${label}</span>
+      </div>
+      <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid ${tip};"></div>
+    </div>
+  `;
+
+  return L.divIcon({
+    className: "",
+    html,
+    iconSize: [size, size + 8] as L.PointExpression,
+    iconAnchor: [size / 2, size + 8] as L.PointExpression,
+    tooltipAnchor: [size / 2 - 4, -(size / 2 + 4)] as L.PointExpression,
+  });
 }
 
 function MyMap() {
@@ -384,49 +446,22 @@ function MyMap() {
             const eventStatus = getEventStatus(venue);
             const checkinsCount = venue.check_ins?.length || 0;
             return (
-              <CircleMarker
-                key={`${venue.id}-${venue.check_ins?.length || 0}`}
-                center={[venue.latitude, venue.longitude] as [number, number]}
-                radius={getMarkerRadius(checkinsCount, maxCheckinsReference, eventStatus)}
-                color={
-                  eventStatus === "active" ? "#a855f7"
-                  : eventStatus === "soon" ? "#f97316"
-                  : venue.check_ins?.length === 0 ? "#10b981"
-                  : (venue.check_ins?.length || 0) < 5 ? "#f59e0b"
-                  : "#ef4444"
-                }
-                fillColor={
-                  eventStatus === "active" ? "#d8b4fe"
-                  : eventStatus === "soon" ? "#fdba74"
-                  : venue.check_ins?.length === 0 ? "#6ee7b7"
-                  : (venue.check_ins?.length || 0) < 5 ? "#fcd34d"
-                  : "#fca5a5"
-                }
-                fillOpacity={0.85}
-                weight={eventStatus === "active" ? 3 : 2}
-                className={
-                  eventStatus === "active" ? "event-active-pulse"
-                  : eventStatus === "soon" ? "event-soon-pulse"
-                  : ""
-                }
+              <Marker
+                key={`${venue.id}-${checkinsCount}`}
+                position={[venue.latitude, venue.longitude] as [number, number]}
+                icon={createVenueIcon(checkinsCount, eventStatus)}
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
-                <Tooltip direction="bottom" offset={[0, 12] as [number, number]} opacity={1} permanent>
-                  <div style={{ cursor: "pointer", margin: 0 }} onClick={() => handleVenueClick(venue)}>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{venue.name}</p>
-                    {eventStatus === "active" && (
-                      <p style={{ margin: 0, fontSize: "10px", color: "#a855f7", fontWeight: 700 }}>
-                        🎉 Evento en curso
-                      </p>
-                    )}
-                    {eventStatus === "soon" && (
-                      <p style={{ margin: 0, fontSize: "10px", color: "#f97316", fontWeight: 700 }}>
-                        🕐 Hoy próximamente
-                      </p>
-                    )}
-                  </div>
+                <Tooltip direction="top" opacity={1} className="venue-tooltip">
+                  <p className="vt-name">{venue.name}</p>
+                  {eventStatus === "active" && (
+                    <p className="vt-event vt-event--active">🎉 Evento en curso</p>
+                  )}
+                  {eventStatus === "soon" && (
+                    <p className="vt-event vt-event--soon">🕐 Hoy próximamente</p>
+                  )}
                 </Tooltip>
-              </CircleMarker>
+              </Marker>
             );
           })}
         </MapContainer>
@@ -919,6 +954,31 @@ function MyMap() {
         .heat-bar-glow-cool { box-shadow: 0 0 14px rgba(52,211,153,0.9), 0 0 28px rgba(52,211,153,0.4); }
         .heat-bar-glow-warm { box-shadow: 0 0 14px rgba(251,146,60,0.9), 0 0 28px rgba(251,146,60,0.45); }
         .heat-bar-glow-hot  { box-shadow: 0 0 16px rgba(239,68,68,1),    0 0 32px rgba(239,68,68,0.55); }
+        /* Venue tooltip */
+        .venue-tooltip {
+          background: rgba(10,14,26,0.96) !important;
+          border: 1px solid rgba(255,255,255,0.10) !important;
+          border-radius: 12px !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important;
+          padding: 7px 11px !important;
+          backdrop-filter: blur(8px) !important;
+        }
+        .venue-tooltip::before { display: none !important; }
+        .vt-name {
+          margin: 0;
+          color: #ffffff;
+          font-weight: 700;
+          font-size: 13px;
+          line-height: 1.3;
+        }
+        .vt-event {
+          margin: 3px 0 0;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1;
+        }
+        .vt-event--active { color: #a78bfa; }
+        .vt-event--soon   { color: #fb923c; }
       `}</style>
     </>
   );

@@ -224,7 +224,7 @@ function MyMap() {
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
         setSelectedVenue((prev) =>
-          prev?.id === venueId ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) } : prev,
+          prev && prev.id === venueId ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) } : prev,
         );
       });
   };
@@ -254,7 +254,7 @@ function MyMap() {
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
         setSelectedVenue((prev) =>
-          prev?.id === venueId ? { ...prev, check_ins: removeCheckIn(prev.check_ins || []) } : prev,
+          prev && prev.id === venueId ? { ...prev, check_ins: removeCheckIn(prev.check_ins || []) } : prev,
         );
       });
   };

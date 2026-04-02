@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore"; // 👈
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from "@/lib/hooks/getToken";
-import { Heart, MapPin, Settings, CalendarDays } from "lucide-react";
+import { Heart, Clock, Settings, CalendarDays, Plus } from "lucide-react";
 
 interface CheckInHistory {
   id: string;
@@ -149,142 +149,141 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const isVenue = !user.username;
 
   return (
-    <div className="min-h-screen bg-ozio-dark pb-24">
+    <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
-      {/* ── Cover banner ── */}
-      <div className="relative h-44 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-ozio-purple via-[#1a2a6c] to-ozio-darker" />
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-ozio-purple/25 rounded-full blur-3xl" />
-        <div className="absolute -bottom-12 right-0 w-56 h-56 bg-ozio-blue/20 rounded-full blur-3xl" />
-        {/* Botón ajustes en cover */}
-        <button
-          onClick={() => setActiveTab("settings")}
-          className="absolute top-4 right-4 w-9 h-9 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-black/50 transition"
-        >
-          <Settings size={16} />
-        </button>
-      </div>
+      {/* Spacer for fixed header */}
+      <div className="h-[72px]" />
 
-      {/* ── Avatar + acciones ── */}
-      <div className="px-4 -mt-12 max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-5">
-          <div className="relative">
-            {user.avatar_path ? (
-              <img
-                src={user.avatar_path}
-                alt={user.name}
-                className="w-24 h-24 rounded-2xl border-4 border-ozio-dark object-cover shadow-2xl"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-2xl border-4 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center shadow-2xl">
-                <span className="text-white text-3xl font-black">
-                  {user.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
+      {/* ── Avatar + Stats (estilo Instagram) ── */}
+      <div className="px-4 pt-4">
+        <div className="flex items-center gap-5">
+
+          {/* Avatar con anillo degradado */}
+          <div className="relative flex-shrink-0">
+            <div className={`w-[82px] h-[82px] rounded-full p-[2.5px] ${isVenue ? "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue" : "bg-gradient-to-tr from-ozio-blue via-ozio-purple to-pink-500"}`}>
+              {user.avatar_path ? (
+                <img
+                  src={user.avatar_path}
+                  alt={user.name}
+                  className="w-full h-full rounded-full object-cover border-2 border-ozio-dark"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full border-2 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center">
+                  <span className="text-white text-2xl font-black">{user.name?.charAt(0).toUpperCase()}</span>
+                </div>
+              )}
+            </div>
+            {/* Botón editar foto */}
             <button
               onClick={() => setShowEditModal(true)}
-              className="absolute -bottom-2 -right-2 w-8 h-8 bg-ozio-blue rounded-xl border-2 border-ozio-dark hover:bg-ozio-purple transition flex items-center justify-center shadow-lg"
+              className="absolute -bottom-1 -right-1 w-6 h-6 bg-ozio-blue rounded-full border-2 border-ozio-dark hover:bg-ozio-purple transition flex items-center justify-center shadow-md"
             >
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
+              <Plus size={12} className="text-white" />
             </button>
           </div>
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-semibold rounded-xl transition"
-          >
-            Editar perfil
-          </button>
+
+          {/* Stats */}
+          <div className="flex flex-1 items-center justify-around">
+            <div className="text-center">
+              <p className="text-white text-xl font-black leading-none">
+                {isVenue ? user.events?.length || 0 : user.check_ins?.length || 0}
+              </p>
+              <p className="text-gray-400 text-xs mt-1">{isVenue ? "Eventos" : "Check-ins"}</p>
+            </div>
+            <div className="w-px h-8 bg-gray-800" />
+            <div className="text-center">
+              <p className="text-white text-xl font-black leading-none">
+                {isVenue ? user.check_ins?.length || 0 : user.favorites?.length || 0}
+              </p>
+              <p className="text-gray-400 text-xs mt-1">{isVenue ? "Visitas" : "Favoritos"}</p>
+            </div>
+          </div>
         </div>
 
         {/* ── Nombre + badge + bio ── */}
-        <div className="mb-5">
+        <div className="mt-3 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-white text-2xl font-black">{user.name}</h2>
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}>
-              {isVenue ? "🏢 Local" : "👤 Usuario"}
+            <h2 className="text-white font-black text-base leading-tight">{user.name}</h2>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}>
+              {isVenue ? "Local" : "Usuario"}
             </span>
           </div>
-          {user.username && (
-            <p className="text-gray-500 text-sm mt-0.5">@{user.username}</p>
-          )}
+          {user.username && <p className="text-gray-500 text-sm mt-0.5">@{user.username}</p>}
           {user.description && (
-            <p className="text-gray-400 text-sm mt-2 leading-relaxed">{user.description}</p>
+            <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{user.description}</p>
           )}
-          <p className="text-gray-600 text-xs mt-2">
+          <p className="text-gray-600 text-xs mt-1.5">
             Miembro desde {new Date(user.created_at).toLocaleDateString("es-ES", { year: "numeric", month: "long" })}
           </p>
         </div>
 
-        {/* ── Stats ── */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          {isVenue ? (
-            <>
-              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
-                <p className="text-ozio-orange text-3xl font-black">{user.events?.length || 0}</p>
-                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Eventos</p>
-              </div>
-              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
-                <p className="text-ozio-blue text-3xl font-black">{user.check_ins?.length || 0}</p>
-                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Visitas totales</p>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
-                <p className="text-ozio-orange text-3xl font-black">{user.check_ins?.length || 0}</p>
-                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Check-ins</p>
-              </div>
-              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
-                <p className="text-ozio-blue text-3xl font-black">{user.favorites?.length || 0}</p>
-                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Favoritos</p>
-              </div>
-            </>
+        {/* ── Botones de acción ── */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="flex-1 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-semibold rounded-xl transition"
+          >
+            Editar perfil
+          </button>
+          {isVenue && (
+            <button
+              onClick={() => setShowEventModal(true)}
+              className="flex-1 py-2 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5"
+            >
+              <Plus size={15} /> Crear evento
+            </button>
           )}
+          <button
+            onClick={() => setActiveTab("settings")}
+            className="w-10 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-xl transition flex items-center justify-center"
+          >
+            <Settings size={16} />
+          </button>
         </div>
+      </div>
 
-        {/* ── Tab navigation ── */}
-        <div className="flex gap-1.5 bg-gray-900/60 rounded-2xl p-1.5 border border-gray-800 mb-5">
-          {isVenue ? (
-            <>
-              <button
-                onClick={() => setActiveTab("events")}
-                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "events" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
-              >
-                <CalendarDays size={14} /> Eventos
-              </button>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "settings" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
-              >
-                <Settings size={14} /> Ajustes
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setActiveTab("favorites")}
-                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "favorites" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
-              >
-                <Heart size={14} /> Favoritos
-              </button>
-              <button
-                onClick={() => setActiveTab("historial")}
-                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "historial" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
-              >
-                <MapPin size={14} /> Historial
-              </button>
-              <button
-                onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "settings" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
-              >
-                <Settings size={14} /> Ajustes
-              </button>
-            </>
-          )}
-        </div>
+      {/* ── Tabs solo iconos (estilo Instagram) ── */}
+      <div className="flex border-t border-b border-gray-800">
+        {isVenue ? (
+          <>
+            <button
+              onClick={() => setActiveTab("events")}
+              className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <CalendarDays size={22} />
+            </button>
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <Settings size={22} />
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setActiveTab("favorites")}
+              className={`flex-1 py-3 flex justify-center transition ${activeTab === "favorites" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <Heart size={22} />
+            </button>
+            <button
+              onClick={() => setActiveTab("historial")}
+              className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <Clock size={22} />
+            </button>
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <Settings size={22} />
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="px-4 pt-4">
 
         {/* ── Tab Content ── */}
         <div className="space-y-3">

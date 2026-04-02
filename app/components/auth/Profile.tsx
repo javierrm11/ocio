@@ -166,7 +166,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       </div>
 
       {/* ── Avatar + acciones ── */}
-      <div className="px-4 -mt-12">
+      <div className="px-4 -mt-12 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-5">
           <div className="relative">
             {user.avatar_path ? (

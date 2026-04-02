@@ -149,314 +149,208 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const isVenue = !user.username;
 
   return (
-    <div className="min-h-screen bg-ozio-dark pb-20">
-      {/* Header con gradiente */}
-      <div className="relative bg-gradient-to-b from-ozio-purple to-ozio-card pb-38">
-        <div className="absolute top-15 right-0 p-4 flex justify-between items-center">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-full bg-red-500 backdrop-blur-sm text-white text-sm font-medium hover:bg-red-500/30 transition"
-          >
-            Cerrar sesión
-          </button>
-        </div>
+    <div className="min-h-screen bg-ozio-dark pb-24">
+
+      {/* ── Cover banner ── */}
+      <div className="relative h-44 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-ozio-purple via-[#1a2a6c] to-ozio-darker" />
+        <div className="absolute -top-20 -left-20 w-72 h-72 bg-ozio-purple/25 rounded-full blur-3xl" />
+        <div className="absolute -bottom-12 right-0 w-56 h-56 bg-ozio-blue/20 rounded-full blur-3xl" />
+        {/* Botón ajustes en cover */}
+        <button
+          onClick={() => setActiveTab("settings")}
+          className="absolute top-4 right-4 w-9 h-9 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-black/50 transition"
+        >
+          <Settings size={16} />
+        </button>
       </div>
 
-      {/* Avatar y nombre */}
-      <div className="px-4 -mt-16">
-        <div className="flex flex-col items-center">
+      {/* ── Avatar + acciones ── */}
+      <div className="px-4 -mt-12">
+        <div className="flex items-end justify-between mb-5">
           <div className="relative">
             {user.avatar_path ? (
               <img
                 src={user.avatar_path}
                 alt={user.name}
-                className="w-28 h-28 rounded-full border-4 border-ozio-dark object-cover bg-ozio-card"
+                className="w-24 h-24 rounded-2xl border-4 border-ozio-dark object-cover shadow-2xl"
               />
             ) : (
-              <div className="w-28 h-28 rounded-full border-4 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center">
-                <span className="text-white text-4xl font-bold">
+              <div className="w-24 h-24 rounded-2xl border-4 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center shadow-2xl">
+                <span className="text-white text-3xl font-black">
                   {user.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
-            <button className="absolute bottom-0 right-0 bg-ozio-blue p-2 rounded-full border-2 border-ozio-dark hover:bg-ozio-purple transition">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="absolute -bottom-2 -right-2 w-8 h-8 bg-ozio-blue rounded-xl border-2 border-ozio-dark hover:bg-ozio-purple transition flex items-center justify-center shadow-lg"
+            >
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
           </div>
-
-          <h2 className="text-white text-2xl font-bold mt-4">{user.name}</h2>
-          <p className="text-gray-400 text-sm">
-            {user.username ? `@${user.username}` : ""}
-          </p>
-
-          {user.description && (
-            <p className="text-gray-300 text-center mt-3 max-w-sm">
-              {user.description}
-            </p>
-          )}
-
-          <div className="flex gap-2 mt-3">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                isVenue
-                  ? "bg-ozio-orange/20 text-ozio-orange"
-                  : "bg-ozio-blue/20 text-ozio-blue"
-              }`}
-            >
-              {isVenue ? "🏢 Establecimiento" : "👤 Usuario"}
-            </span>
-          </div>
-
           <button
             onClick={() => setShowEditModal(true)}
-            className="mt-4 px-6 py-2 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-full transition"
+            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white text-sm font-semibold rounded-xl transition"
           >
-            ✏️ Editar Perfil
+            Editar perfil
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 mt-8 bg-ozio-card rounded-2xl p-6 border border-gray-700/50">
+        {/* ── Nombre + badge + bio ── */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-white text-2xl font-black">{user.name}</h2>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}>
+              {isVenue ? "🏢 Local" : "👤 Usuario"}
+            </span>
+          </div>
+          {user.username && (
+            <p className="text-gray-500 text-sm mt-0.5">@{user.username}</p>
+          )}
+          {user.description && (
+            <p className="text-gray-400 text-sm mt-2 leading-relaxed">{user.description}</p>
+          )}
+          <p className="text-gray-600 text-xs mt-2">
+            Miembro desde {new Date(user.created_at).toLocaleDateString("es-ES", { year: "numeric", month: "long" })}
+          </p>
+        </div>
+
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
           {isVenue ? (
             <>
-              <div className="text-center  border-r border-gray-700">
-                <div className="text-ozio-orange text-2xl font-bold">
-                  {user.events?.length || 0}
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Eventos</div>
+              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
+                <p className="text-ozio-orange text-3xl font-black">{user.events?.length || 0}</p>
+                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Eventos</p>
               </div>
-              <div className="text-center">
-                <div className="text-ozio-blue text-2xl font-bold">
-                  {user.check_ins?.length || 0}
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Visitas</div>
+              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
+                <p className="text-ozio-blue text-3xl font-black">{user.check_ins?.length || 0}</p>
+                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Visitas totales</p>
               </div>
             </>
           ) : (
             <>
-              <div className="text-center  border-r border-gray-700">
-                <div className="text-ozio-orange text-2xl font-bold">
-                  {user.check_ins?.length || 0}
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Check-ins</div>
+              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
+                <p className="text-ozio-orange text-3xl font-black">{user.check_ins?.length || 0}</p>
+                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Check-ins</p>
               </div>
-              <div className="text-center">
-                <div className="text-ozio-blue text-2xl font-bold">
-                  {user.favorites?.length || 0}
-                </div>
-                <div className="text-gray-400 text-xs mt-1">Favoritos</div>
+              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 text-center">
+                <p className="text-ozio-blue text-3xl font-black">{user.favorites?.length || 0}</p>
+                <p className="text-gray-500 text-xs mt-1 uppercase tracking-wide">Favoritos</p>
               </div>
             </>
           )}
         </div>
 
-        <div className="mt-8 flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
+        {/* ── Tab navigation ── */}
+        <div className="flex gap-1.5 bg-gray-900/60 rounded-2xl p-1.5 border border-gray-800 mb-5">
           {isVenue ? (
             <>
               <button
                 onClick={() => setActiveTab("events")}
-                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-                  activeTab === "events"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "events" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
               >
-                <CalendarDays size={18} />
-                <span>Eventos</span>
+                <CalendarDays size={14} /> Eventos
               </button>
-
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-                  activeTab === "settings"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "settings" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
               >
-                <Settings size={18} />
-                <span>Config</span>
+                <Settings size={14} /> Ajustes
               </button>
             </>
           ) : (
             <>
               <button
                 onClick={() => setActiveTab("favorites")}
-                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-                  activeTab === "favorites"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "favorites" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
               >
-                <Heart size={18} />
-                <span>Favoritos</span>
+                <Heart size={14} /> Favoritos
               </button>
-
               <button
                 onClick={() => setActiveTab("historial")}
-                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-                  activeTab === "historial"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "historial" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
               >
-                <MapPin size={18} />
-                <span>Historial</span>
+                <MapPin size={14} /> Historial
               </button>
-
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`flex-1 py-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs transition ${
-                  activeTab === "settings"
-                    ? "bg-ozio-blue text-white shadow-lg"
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                }`}
+                className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold transition ${activeTab === "settings" ? "bg-ozio-blue text-white shadow-lg" : "text-gray-500 hover:text-white"}`}
               >
-                <Settings size={18} />
-                <span>Ajustes</span>
+                <Settings size={14} /> Ajustes
               </button>
             </>
           )}
         </div>
 
-        {/* Tab Content */}
-        <div className="mt-6">
-          {/* EVENTOS PARA VENUES (Próximos y Pasados) */}
+        {/* ── Tab Content ── */}
+        <div className="space-y-3">
+
+          {/* EVENTOS PARA VENUES */}
           {isVenue && activeTab === "events" && (
             <div className="space-y-3">
               {user.events && user.events.length > 0 ? (
-                <div className="space-y-3">
-                  {user.events
-                    .sort(
-                      (a, b) =>
-                        new Date(b.starts_at).getTime() -
-                        new Date(a.starts_at).getTime(),
-                    )
-                    .map((event) => {
-                      const isPast = new Date(event.ends_at) <= new Date();
-                      return (
-                        <div
-                          key={event.id}
-                          className={`bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition ${
-                            isPast ? "opacity-60" : ""
-                          }`}
-                        >
-                          <img
-                            src={
-                              event.image_path ||
-                              "https://via.placeholder.com/80"
-                            }
-                            alt="Event"
-                            className={`w-20 h-20 rounded-xl object-cover ${isPast ? "grayscale" : ""}`}
-                          />
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold">
-                              {event.name || event.title}
-                            </h3>
-                            <p className="text-gray-400 text-sm">
-                              {new Date(event.starts_at).toLocaleDateString(
-                                "es-ES",
-                              )}{" "}
-                              {new Date(event.starts_at).toLocaleTimeString(
-                                "es-ES",
-                                { hour: "2-digit", minute: "2-digit" },
-                              )}{" "}
-                              -{" "}
-                              {new Date(event.ends_at).toLocaleTimeString(
-                                "es-ES",
-                                { hour: "2-digit", minute: "2-digit" },
-                              )}
-                            </p>
-                            <p className="text-gray-400 text-sm mt-1">
-                              👥 {event.event_attendees[0]?.count || 0}{" "}
-                              asistentes
-                            </p>
-                            <div className="flex items-center gap-2 mt-2">
-                              {isPast && (
-                                <span className="bg-gray-700/50 text-gray-400 text-xs px-2 py-1 rounded-full">
-                                  Finalizado
-                                </span>
-                              )}
-                              {event.featured && (
-                                <span
-                                  className={`text-xs px-2 py-1 rounded-full border ${
-                                    isPast
-                                      ? "bg-gray-700/20 text-gray-500 border-gray-600/30"
-                                      : "bg-ozio-blue/20 text-ozio-blue border-ozio-blue/30"
-                                  }`}
-                                >
-                                  Destacado
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              className={`transition ${
-                                isPast
-                                  ? "text-gray-500 hover:text-gray-400"
-                                  : "text-ozio-blue hover:text-ozio-purple"
-                              }`}
-                              onClick={() => setEditingEvent(event)}
-                              title="Editar evento"
-                            >
-                              <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              className="text-red-500 hover:text-red-600 transition"
-                              onClick={() => handleDeleteEvent(event.id)}
-                              title="Eliminar evento"
-                            >
-                              <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
+                user.events
+                  .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
+                  .map((event) => {
+                    const isPast = new Date(event.ends_at) <= new Date();
+                    return (
+                      <div
+                        key={event.id}
+                        className={`bg-ozio-card border border-gray-700/50 rounded-2xl flex gap-3 p-4 hover:bg-gray-800/50 transition ${isPast ? "opacity-55" : ""}`}
+                      >
+                        <img
+                          src={event.image_path || "https://via.placeholder.com/80"}
+                          alt="Event"
+                          className={`w-16 h-16 rounded-xl object-cover flex-shrink-0 ${isPast ? "grayscale" : ""}`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-semibold text-sm truncate">{event.name || event.title}</h3>
+                          <p className="text-gray-400 text-xs mt-0.5">
+                            {new Date(event.starts_at).toLocaleDateString("es-ES")} · {new Date(event.starts_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })} – {new Date(event.ends_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">👥 {event.event_attendees[0]?.count || 0} asistentes</p>
+                          <div className="flex items-center gap-1.5 mt-1.5">
+                            {isPast && <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">Finalizado</span>}
+                            {event.featured && (
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${isPast ? "bg-gray-700/20 text-gray-500 border-gray-600/30" : "bg-ozio-blue/20 text-ozio-blue border-ozio-blue/30"}`}>
+                                Destacado
+                              </span>
+                            )}
                           </div>
                         </div>
-                      );
-                    })}
-                </div>
+                        <div className="flex flex-col gap-2 flex-shrink-0">
+                          <button
+                            className={`transition ${isPast ? "text-gray-600 hover:text-gray-500" : "text-ozio-blue hover:text-ozio-purple"}`}
+                            onClick={() => setEditingEvent(event)}
+                            title="Editar"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                          <button className="text-red-500/70 hover:text-red-500 transition" onClick={() => handleDeleteEvent(event.id)} title="Eliminar">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
               ) : (
-                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
-                  <p className="text-gray-400">No hay eventos</p>
+                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
+                  <p className="text-4xl mb-3">🎉</p>
+                  <p className="text-white font-semibold mb-1">Sin eventos aún</p>
+                  <p className="text-gray-500 text-sm">Crea tu primer evento para que aparezca aquí</p>
                 </div>
               )}
               <button
                 onClick={() => setShowEventModal(true)}
-                className="w-full mt-4 px-6 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-2xl transition"
+                className="w-full py-3.5 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white font-semibold rounded-2xl transition"
               >
                 + Crear Evento
               </button>
@@ -467,90 +361,55 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           {!isVenue && activeTab === "favorites" && (
             <div className="space-y-3">
               {user.favorites && user.favorites.length > 0 ? (
-                <div className="space-y-3">
-                  {user.favorites.map((fav) => (
-                    <FavoriteSpotCard
-                      key={`${fav.user_id}${fav.venue_id}`}
-                      favorite={fav.venues}
-                    />
-                  ))}
-                </div>
+                user.favorites.map((fav) => (
+                  <FavoriteSpotCard key={`${fav.user_id}${fav.venue_id}`} favorite={fav.venues} />
+                ))
               ) : (
-                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-6 text-center">
-                  <p className="text-gray-400">No hay favoritos</p>
+                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
+                  <p className="text-4xl mb-3">❤️</p>
+                  <p className="text-white font-semibold mb-1">Sin favoritos</p>
+                  <p className="text-gray-500 text-sm">Guarda tus locales preferidos aquí</p>
                 </div>
               )}
             </div>
           )}
-          {/* HISTORIAL DE CHECKINS */}
-          {!isVenue && activeTab === "historial" && (
-            <CheckInHistoryTab userId={user.id} />
-          )}
 
-          {/* CONFIGURACIÓN (COMÚN PARA AMBOS) */}
+          {/* HISTORIAL */}
+          {!isVenue && activeTab === "historial" && <CheckInHistoryTab userId={user.id} />}
+
+          {/* AJUSTES */}
           {activeTab === "settings" && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <SettingsItem icon="🔔" title="Notificaciones" />
               <SettingsItem icon="🔒" title="Privacidad" />
-              {isVenue && (
-                <SettingsItem icon="🏢" title="Información del local" />
-              )}
+              {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
               <SettingsItem icon="ℹ️" title="Acerca de" />
               <SettingsItem icon="👤" title="Información de cuenta" />
-              <SettingsItem
-                icon="🚪"
-                title="Cerrar sesión"
-                onClick={handleLogout}
-              />
+              <div className="pt-2 mt-2 border-t border-gray-800/80">
+                <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />
+              </div>
             </div>
           )}
-        </div>
-
-        {/* Información adicional */}
-        <div className="mt-6 bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
-          <p className="text-gray-400 text-xs">
-            Miembro desde{" "}
-            {new Date(user.created_at).toLocaleDateString("es-ES", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
         </div>
       </div>
 
       {/* Modales */}
       {showEventModal && (
-        <CreateEventModal
-          venueId={user.id}
-          onClose={() => setShowEventModal(false)}
-          onEventCreated={fetchUserProfile}
-        />
+        <CreateEventModal venueId={user.id} onClose={() => setShowEventModal(false)} onEventCreated={fetchUserProfile} />
       )}
-
       {showEditModal && (
         <EditProfileModal
           user={user}
           onClose={() => setShowEditModal(false)}
-          onProfileUpdated={(updatedUser) => {
-            setUser({ ...user, ...updatedUser });
-            setShowEditModal(false);
-          }}
+          onProfileUpdated={(updatedUser) => { setUser({ ...user, ...updatedUser }); setShowEditModal(false); }}
         />
       )}
-
       {editingEvent && (
         <EditEventModal
           event={editingEvent}
           onClose={() => setEditingEvent(null)}
-          onEventUpdated={() => {
-            setEditingEvent(null);
-            fetchUserProfile();
-          }}
-          onEventDeleted={() => {
-            setEditingEvent(null);
-            fetchUserProfile();
-          }}
+          onEventUpdated={() => { setEditingEvent(null); fetchUserProfile(); }}
+          onEventDeleted={() => { setEditingEvent(null); fetchUserProfile(); }}
         />
       )}
     </div>

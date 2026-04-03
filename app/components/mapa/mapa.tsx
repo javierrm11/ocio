@@ -150,7 +150,7 @@ function getMarkerRadius(checkins: number, maxReference: number, eventStatus: "a
   return Number((baseRadius + eventBoost).toFixed(1));
 }
 
-function createVenueIcon(checkins: number, eventStatus: "active" | "soon" | "none"): L.DivIcon {
+function createVenueIcon(avatarPath: string | null, checkins: number, eventStatus: "active" | "soon" | "none"): L.DivIcon {
   const isHot  = checkins >= 5;
   const isWarm = checkins > 0 && checkins < 5;
 
@@ -192,11 +192,10 @@ function createVenueIcon(checkins: number, eventStatus: "active" | "soon" | "non
       <div style="
         width:${size}px;height:${size}px;border-radius:50%;
         background:${bg};
-        border:2.5px solid rgba(255,255,255,0.22);
+        border:4.5px solid rgba(255,255,255,0.22);
         display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
       ">
-        <span style="color:white;font-weight:900;font-size:${countSize}px;line-height:1;font-family:system-ui,sans-serif;">${checkins}</span>
-        <span style="font-size:10px;line-height:1;">${label}</span>
+        <img src="${avatarPath || "https://via.placeholder.com/40?text=?"}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:brightness(0.9);" />
       </div>
       <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid ${tip};"></div>
     </div>
@@ -449,7 +448,7 @@ function MyMap() {
               <Marker
                 key={`${venue.id}-${checkinsCount}`}
                 position={[venue.latitude, venue.longitude] as [number, number]}
-                icon={createVenueIcon(checkinsCount, eventStatus)}
+                icon={createVenueIcon(venue.avatar_path,checkinsCount, eventStatus)}
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
                 <Tooltip direction="top" opacity={1} className="venue-tooltip">

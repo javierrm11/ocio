@@ -20,6 +20,12 @@ interface CheckInHistory {
     address?: string | null;
   };
 }
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 interface UserProfile {
   id: string;
   name: string;
@@ -35,6 +41,7 @@ interface UserProfile {
   following?: number;
   events?: any[];
   checkInHistory?: CheckInHistory[];
+  genres?: { genre: Genre; genre_id: number }[];
 }
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
@@ -150,17 +157,17 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
-
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />
 
       {/* ── Avatar + Stats (estilo Instagram) ── */}
       <div className="px-4 pt-4">
         <div className="flex items-center gap-5">
-
           {/* Avatar con anillo degradado */}
           <div className="relative flex-shrink-0">
-            <div className={`w-[82px] h-[82px] rounded-full p-[2.5px] ${isVenue ? "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue" : "bg-gradient-to-tr from-ozio-blue via-ozio-purple to-pink-500"}`}>
+            <div
+              className={`w-[82px] h-[82px] rounded-full p-[2.5px] ${isVenue ? "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue" : "bg-gradient-to-tr from-ozio-blue via-ozio-purple to-pink-500"}`}
+            >
               {user.avatar_path ? (
                 <img
                   src={user.avatar_path}
@@ -169,7 +176,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                 />
               ) : (
                 <div className="w-full h-full rounded-full border-2 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center">
-                  <span className="text-white text-2xl font-black">{user.name?.charAt(0).toUpperCase()}</span>
+                  <span className="text-white text-2xl font-black">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </span>
                 </div>
               )}
             </div>
@@ -186,16 +195,24 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           <div className="flex flex-1 items-center justify-around">
             <div className="text-center">
               <p className="text-white text-xl font-black leading-none">
-                {isVenue ? user.events?.length || 0 : user.check_ins?.length || 0}
+                {isVenue
+                  ? user.events?.length || 0
+                  : user.check_ins?.length || 0}
               </p>
-              <p className="text-gray-400 text-xs mt-1">{isVenue ? "Eventos" : "Check-ins"}</p>
+              <p className="text-gray-400 text-xs mt-1">
+                {isVenue ? "Eventos" : "Check-ins"}
+              </p>
             </div>
             <div className="w-px h-8 bg-gray-800" />
             <div className="text-center">
               <p className="text-white text-xl font-black leading-none">
-                {isVenue ? user.check_ins?.length || 0 : user.favorites?.length || 0}
+                {isVenue
+                  ? user.check_ins?.length || 0
+                  : user.favorites?.length || 0}
               </p>
-              <p className="text-gray-400 text-xs mt-1">{isVenue ? "Visitas" : "Favoritos"}</p>
+              <p className="text-gray-400 text-xs mt-1">
+                {isVenue ? "Visitas" : "Favoritos"}
+              </p>
             </div>
           </div>
         </div>
@@ -203,18 +220,46 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         {/* ── Nombre + badge + bio ── */}
         <div className="mt-3 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-white font-black text-base leading-tight">{user.name}</h2>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}>
+            <h2 className="text-white font-black text-base leading-tight">
+              {user.name}
+            </h2>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}
+            >
               {isVenue ? "Local" : "Usuario"}
             </span>
           </div>
-          {user.username && <p className="text-gray-500 text-sm mt-0.5">@{user.username}</p>}
+          {user.username && (
+            <p className="text-gray-500 text-sm mt-0.5">@{user.username}</p>
+          )}
           {user.description && (
-            <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{user.description}</p>
+            <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">
+              {user.description}
+            </p>
           )}
           <p className="text-gray-600 text-xs mt-1.5">
-            Miembro desde {new Date(user.created_at).toLocaleDateString("es-ES", { year: "numeric", month: "long" })}
+            Miembro desde{" "}
+            {new Date(user.created_at).toLocaleDateString("es-ES", {
+              year: "numeric",
+              month: "long",
+            })}
           </p>
+          {/* ── Géneros musicales (solo venue) ── */}
+          {isVenue && user.genres && user.genres.length > 0 && (
+            <div className="mt-3">
+              <div className="flex flex-wrap gap-1.5">
+                {user.genres.map(({ genre }) => (
+                  <span
+                    key={genre.id}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
+                  >
+                    <span>{genre.emoji}</span>
+                    <span>{genre.name}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Botones de acción ── */}
@@ -284,16 +329,18 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       </div>
 
       <div className="px-4 pt-4">
-
         {/* ── Tab Content ── */}
         <div className="space-y-3">
-
           {/* EVENTOS PARA VENUES */}
           {isVenue && activeTab === "events" && (
             <div className="space-y-3">
               {user.events && user.events.length > 0 ? (
                 user.events
-                  .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())
+                  .sort(
+                    (a, b) =>
+                      new Date(b.starts_at).getTime() -
+                      new Date(a.starts_at).getTime(),
+                  )
                   .map((event) => {
                     const isPast = new Date(event.ends_at) <= new Date();
                     return (
@@ -302,20 +349,44 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                         className={`bg-ozio-card border border-gray-700/50 rounded-2xl flex gap-3 p-4 hover:bg-gray-800/50 transition ${isPast ? "opacity-55" : ""}`}
                       >
                         <img
-                          src={event.image_path || "https://via.placeholder.com/80"}
+                          src={
+                            event.image_path || "https://via.placeholder.com/80"
+                          }
                           alt="Event"
                           className={`w-16 h-16 rounded-xl object-cover flex-shrink-0 ${isPast ? "grayscale" : ""}`}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-white font-semibold text-sm truncate">{event.name || event.title}</h3>
+                          <h3 className="text-white font-semibold text-sm truncate">
+                            {event.name || event.title}
+                          </h3>
                           <p className="text-gray-400 text-xs mt-0.5">
-                            {new Date(event.starts_at).toLocaleDateString("es-ES")} · {new Date(event.starts_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })} – {new Date(event.ends_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+                            {new Date(event.starts_at).toLocaleDateString(
+                              "es-ES",
+                            )}{" "}
+                            ·{" "}
+                            {new Date(event.starts_at).toLocaleTimeString(
+                              "es-ES",
+                              { hour: "2-digit", minute: "2-digit" },
+                            )}{" "}
+                            –{" "}
+                            {new Date(event.ends_at).toLocaleTimeString(
+                              "es-ES",
+                              { hour: "2-digit", minute: "2-digit" },
+                            )}
                           </p>
-                          <p className="text-gray-500 text-xs mt-1">👥 {event.event_attendees[0]?.count || 0} asistentes</p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            👥 {event.event_attendees[0]?.count || 0} asistentes
+                          </p>
                           <div className="flex items-center gap-1.5 mt-1.5">
-                            {isPast && <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">Finalizado</span>}
+                            {isPast && (
+                              <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">
+                                Finalizado
+                              </span>
+                            )}
                             {event.featured && (
-                              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${isPast ? "bg-gray-700/20 text-gray-500 border-gray-600/30" : "bg-ozio-blue/20 text-ozio-blue border-ozio-blue/30"}`}>
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded-full border ${isPast ? "bg-gray-700/20 text-gray-500 border-gray-600/30" : "bg-ozio-blue/20 text-ozio-blue border-ozio-blue/30"}`}
+                              >
                                 Destacado
                               </span>
                             )}
@@ -327,13 +398,37 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                             onClick={() => setEditingEvent(event)}
                             title="Editar"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
                             </svg>
                           </button>
-                          <button className="text-red-500/70 hover:text-red-500 transition" onClick={() => handleDeleteEvent(event.id)} title="Eliminar">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <button
+                            className="text-red-500/70 hover:text-red-500 transition"
+                            onClick={() => handleDeleteEvent(event.id)}
+                            title="Eliminar"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -343,8 +438,12 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               ) : (
                 <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
                   <p className="text-4xl mb-3">🎉</p>
-                  <p className="text-white font-semibold mb-1">Sin eventos aún</p>
-                  <p className="text-gray-500 text-sm">Crea tu primer evento para que aparezca aquí</p>
+                  <p className="text-white font-semibold mb-1">
+                    Sin eventos aún
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    Crea tu primer evento para que aparezca aquí
+                  </p>
                 </div>
               )}
               <button
@@ -361,31 +460,44 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <div className="space-y-3">
               {user.favorites && user.favorites.length > 0 ? (
                 user.favorites.map((fav) => (
-                  <FavoriteSpotCard key={`${fav.user_id}${fav.venue_id}`} favorite={fav.venues} />
+                  <FavoriteSpotCard
+                    key={`${fav.user_id}${fav.venue_id}`}
+                    favorite={fav.venues}
+                  />
                 ))
               ) : (
                 <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
                   <p className="text-4xl mb-3">❤️</p>
                   <p className="text-white font-semibold mb-1">Sin favoritos</p>
-                  <p className="text-gray-500 text-sm">Guarda tus locales preferidos aquí</p>
+                  <p className="text-gray-500 text-sm">
+                    Guarda tus locales preferidos aquí
+                  </p>
                 </div>
               )}
             </div>
           )}
 
           {/* HISTORIAL */}
-          {!isVenue && activeTab === "historial" && <CheckInHistoryTab userId={user.id} />}
+          {!isVenue && activeTab === "historial" && (
+            <CheckInHistoryTab userId={user.id} />
+          )}
 
           {/* AJUSTES */}
           {activeTab === "settings" && (
             <div className="space-y-2">
               <SettingsItem icon="🔔" title="Notificaciones" />
               <SettingsItem icon="🔒" title="Privacidad" />
-              {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
+              {isVenue && (
+                <SettingsItem icon="🏢" title="Información del local" />
+              )}
               <SettingsItem icon="ℹ️" title="Acerca de" />
               <SettingsItem icon="👤" title="Información de cuenta" />
               <div className="pt-2 mt-2 border-t border-gray-800/80">
-                <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />
+                <SettingsItem
+                  icon="🚪"
+                  title="Cerrar sesión"
+                  onClick={handleLogout}
+                />
               </div>
             </div>
           )}
@@ -394,21 +506,34 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
       {/* Modales */}
       {showEventModal && (
-        <CreateEventModal venueId={user.id} onClose={() => setShowEventModal(false)} onEventCreated={fetchUserProfile} />
+        <CreateEventModal
+          venueId={user.id}
+          onClose={() => setShowEventModal(false)}
+          onEventCreated={fetchUserProfile}
+        />
       )}
       {showEditModal && (
         <EditProfileModal
           user={user}
           onClose={() => setShowEditModal(false)}
-          onProfileUpdated={(updatedUser) => { setUser({ ...user, ...updatedUser }); setShowEditModal(false); }}
+          onProfileUpdated={(updatedUser) => {
+            setUser({ ...user, ...updatedUser });
+            setShowEditModal(false);
+          }}
         />
       )}
       {editingEvent && (
         <EditEventModal
           event={editingEvent}
           onClose={() => setEditingEvent(null)}
-          onEventUpdated={() => { setEditingEvent(null); fetchUserProfile(); }}
-          onEventDeleted={() => { setEditingEvent(null); fetchUserProfile(); }}
+          onEventUpdated={() => {
+            setEditingEvent(null);
+            fetchUserProfile();
+          }}
+          onEventDeleted={() => {
+            setEditingEvent(null);
+            fetchUserProfile();
+          }}
         />
       )}
     </div>

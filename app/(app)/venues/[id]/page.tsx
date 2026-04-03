@@ -25,7 +25,13 @@ interface CheckIn {
   created_at: string;
   active: boolean;
 }
-
+interface Genre {
+  genre: any;
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 interface Venue {
   id: string;
   name: string;
@@ -38,6 +44,7 @@ interface Venue {
   check_ins?: CheckIn[];
   events?: Event[];
   is_favorite?: boolean;
+  genres?: Genre[];
 }
 
 export default function VenueDetail() {
@@ -330,6 +337,25 @@ export default function VenueDetail() {
           {venue.description && (
             <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{venue.description}</p>
           )}
+          {/* ── Géneros musicales (solo venue) ── */}
+              {venue.genres && venue.genres.length > 0 && (
+                <div className="mt-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {venue.genres.map((item) => {
+                      const genre = item.genre || item;
+                      return (
+                        <span
+                          key={genre.slug}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
+                        >
+                          <span>{genre.emoji}</span>
+                          <span>{genre.name}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
         </div>
 
         {/* ── Botones de acción ── */}
@@ -383,12 +409,6 @@ export default function VenueDetail() {
               )}
             </button>
           )}
-          <button
-            onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, "_blank")}
-            className="w-10 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-xl transition flex items-center justify-center"
-          >
-            <MapPin size={16} />
-          </button>
         </div>
       </div>
 

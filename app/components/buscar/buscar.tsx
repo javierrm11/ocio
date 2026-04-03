@@ -4,6 +4,13 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { useState, useMemo, useRef, useEffect } from "react";
 
+interface Genre {
+  genre?: any;
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 interface Venue {
   id: string;
   name: string;
@@ -15,7 +22,7 @@ interface Venue {
   check_ins?: any[];
   is_favorite?: boolean;
   distance?: number | string;
-  genres?: string[];
+  genres?: Genre[] | undefined; // Accept both string[] and undefined for compatibility
 }
 
 interface Event {

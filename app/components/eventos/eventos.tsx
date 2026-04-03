@@ -141,7 +141,7 @@ export default function Eventos() {
     <div className="min-h-screen bg-ozio-dark pb-24">
 
       {/* Header */}
-      <div className="bg-gradient-to-b from-ozio-purple/80 to-ozio-dark px-4 md:px-8 pt-4 pb-6">
+      <div className="bg-gradient-to-b from-ozio-purple/80 to-ozio-dark px-4 md:px-8 pt-4 pb-2">
         <div className="max-w-4xl mx-auto">
 
           {/* Título + badge activos */}

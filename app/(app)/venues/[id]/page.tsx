@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
 import { CalendarDays, MapPin, Heart } from "lucide-react";
+import Header from "@/components/layout/header";
 
 interface Event {
   id: string;
@@ -266,7 +267,7 @@ export default function VenueDetail() {
     <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
       {/* Spacer for fixed header */}
-      <div className="h-[72px]" />
+      <Header/>
 
       {/* ── Avatar + Stats (estilo Instagram) ── */}
       <div className="px-4 pt-4">

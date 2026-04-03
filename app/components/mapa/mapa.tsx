@@ -448,7 +448,7 @@ function MyMap() {
               <Marker
                 key={`${venue.id}-${checkinsCount}`}
                 position={[venue.latitude, venue.longitude] as [number, number]}
-                icon={createVenueIcon(venue.avatar_path,checkinsCount, eventStatus)}
+                icon={createVenueIcon(venue.avatar_path || null, checkinsCount, eventStatus)}
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
                 <Tooltip direction="top" opacity={1} className="venue-tooltip">

@@ -26,7 +26,7 @@ function BottomNav() {
   const isAuthenticated = Boolean(getToken());
 
   const navItems = [
-    { icon: <Home size={25} />, label: 'Home', path: '/' },
+    { icon: <Home size={25} />, label: 'Home', path: '/mapa' },
     { icon: <Compass size={25} />, label: 'Explorar', path: '/events' },
 
     // 🔁 BOTÓN DINÁMICO

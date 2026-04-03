@@ -5,12 +5,19 @@ import { useAppStore } from "@/lib/stores/venueStore";
 import { useState, useMemo, useRef, useEffect } from "react";
 
 interface Genre {
-  genre?: any;
-  id: number;
-  name: string;
-  slug: string;
-  emoji: string;
+  genre?: {
+    id: number;
+    name: string;
+    slug: string;
+    emoji: string;
+  };
+  genre_id?: number;
+  id?: number;
+  name?: string;
+  slug?: string;
+  emoji?: string;
 }
+
 interface Venue {
   id: string;
   name: string;
@@ -22,7 +29,7 @@ interface Venue {
   check_ins?: any[];
   is_favorite?: boolean;
   distance?: number | string;
-  genres?: Genre[] | undefined; // Accept both string[] and undefined for compatibility
+  genres?: Genre[];
 }
 
 interface Event {
@@ -51,7 +58,6 @@ export default function Buscar() {
     inputRef.current?.focus();
   }, []);
 
-  // Cerrar panel al hacer click fuera
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
@@ -64,19 +70,31 @@ export default function Buscar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filtrosAbiertos]);
 
-  // Géneros únicos
+  // Helper para extraer nombre y emoji de un género (estructura anidada o plana)
+  const getGenreName = (g: Genre): string => g.genre?.name ?? g.name ?? "";
+  const getGenreEmoji = (g: Genre): string => g.genre?.emoji ?? g.emoji ?? "🎵";
+
+  // Géneros únicos disponibles entre todos los venues
   const generosDisponibles = useMemo(() => {
-    const all = venues.flatMap((v: Venue) => v.genres || []);
-    return [...new Set(all)] as string[];
+    const all = venues.flatMap((v: Venue) =>
+      v.genres?.map((g) => ({
+        name: getGenreName(g),
+        emoji: getGenreEmoji(g),
+      })) || []
+    );
+    const seen = new Set<string>();
+    return all.filter(({ name }) => {
+      if (!name || seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
   }, [venues]);
 
-  // Cuenta filtros activos para el badge
   const filtrosActivos =
     (soloActivos ? 1 : 0) +
     (sort !== "relevancia" ? 1 : 0) +
     (generoSeleccionado ? 1 : 0);
 
-  // Venues filtrados
   const filteredVenues = useMemo(() => {
     let result = [...venues] as Venue[];
 
@@ -87,12 +105,14 @@ export default function Buscar() {
           v.name.toLowerCase().includes(q) ||
           v.description?.toLowerCase().includes(q) ||
           v.address?.toLowerCase().includes(q) ||
-          v.genres?.some((g) => g.toLowerCase().includes(q)),
+          v.genres?.some((g) => getGenreName(g).toLowerCase().includes(q))
       );
     }
 
     if (generoSeleccionado) {
-      result = result.filter((v) => v.genres?.includes(generoSeleccionado));
+      result = result.filter((v) =>
+        v.genres?.some((g) => getGenreName(g) === generoSeleccionado)
+      );
     }
 
     if (soloActivos) {
@@ -100,9 +120,9 @@ export default function Buscar() {
         events
           .filter(
             (e: Event) =>
-              new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
+              new Date(e.starts_at) <= now && new Date(e.ends_at) >= now
           )
-          .map((e: Event) => String(e.venue_id)),
+          .map((e: Event) => String(e.venue_id))
       );
       result = result.filter((v) => venuesConEventoActivo.has(String(v.id)));
     }
@@ -110,26 +130,16 @@ export default function Buscar() {
     switch (sort) {
       case "distancia":
         result.sort((a, b) => {
-          const da =
-            typeof a.distance === "number"
-              ? a.distance
-              : parseFloat(a.distance || "999");
-          const db =
-            typeof b.distance === "number"
-              ? b.distance
-              : parseFloat(b.distance || "999");
+          const da = typeof a.distance === "number" ? a.distance : parseFloat(a.distance || "999");
+          const db = typeof b.distance === "number" ? b.distance : parseFloat(b.distance || "999");
           return da - db;
         });
         break;
       case "ambiente":
-        result.sort(
-          (a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0),
-        );
+        result.sort((a, b) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0));
         break;
       case "favoritos":
-        result.sort(
-          (a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0),
-        );
+        result.sort((a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0));
         break;
       default:
         break;
@@ -138,8 +148,7 @@ export default function Buscar() {
     return result;
   }, [venues, events, query, sort, soloActivos, generoSeleccionado]);
 
-  const hasQuery =
-    query.trim().length > 0 || generoSeleccionado !== null || soloActivos;
+  const hasQuery = query.trim().length > 0 || generoSeleccionado !== null || soloActivos;
 
   function resetFiltros() {
     setSort("relevancia");
@@ -151,7 +160,7 @@ export default function Buscar() {
   if (!loaded) {
     return (
       <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ozio-blue"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ozio-blue" />
       </div>
     );
   }
@@ -162,23 +171,12 @@ export default function Buscar() {
       {/* Header sticky */}
       <div className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-gray-800/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto">
-
-          {/* Input + botón filtros */}
           <div className="relative flex items-center gap-2">
-            {/* Input */}
+
+            {/* Input búsqueda */}
             <div className="relative flex-1">
-              <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 ref={inputRef}
@@ -189,10 +187,7 @@ export default function Buscar() {
                 className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-12 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
               />
               {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
-                >
+                <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -210,16 +205,9 @@ export default function Buscar() {
                     : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
                 }`}
               >
-                {/* Icono filtro */}
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4h18M7 8h10M11 12h2M9 16h6"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2M9 16h6" />
                 </svg>
-                {/* Badge contador */}
                 {filtrosActivos > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white text-ozio-purple text-xs font-bold rounded-full flex items-center justify-center leading-none">
                     {filtrosActivos}
@@ -227,18 +215,13 @@ export default function Buscar() {
                 )}
               </button>
 
-              {/* Panel de filtros desplegable */}
+              {/* Panel de filtros */}
               {filtrosAbiertos && (
                 <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-gray-700/50 rounded-md shadow-2xl z-30 overflow-hidden">
-
-                  {/* Cabecera panel */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
                     <span className="text-white font-semibold text-sm">Filtros</span>
                     {filtrosActivos > 0 && (
-                      <button
-                        onClick={resetFiltros}
-                        className="text-xs text-ozio-blue hover:underline"
-                      >
+                      <button onClick={resetFiltros} className="text-xs text-ozio-blue hover:underline">
                         Limpiar todo
                       </button>
                     )}
@@ -246,11 +229,9 @@ export default function Buscar() {
 
                   <div className="p-4 flex flex-col gap-5">
 
-                    {/* Evento en curso */}
+                    {/* Estado */}
                     <div>
-                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
-                        Estado
-                      </p>
+                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Estado</p>
                       <button
                         onClick={() => setSoloActivos(!soloActivos)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm font-medium ${
@@ -259,11 +240,7 @@ export default function Buscar() {
                             : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
                         }`}
                       >
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                            soloActivos ? "bg-green-400 animate-pulse" : "bg-gray-600"
-                          }`}
-                        />
+                        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${soloActivos ? "bg-green-400 animate-pulse" : "bg-gray-600"}`} />
                         Evento en curso
                         {soloActivos && (
                           <svg className="w-4 h-4 ml-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,15 +252,13 @@ export default function Buscar() {
 
                     {/* Ordenar por */}
                     <div>
-                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
-                        Ordenar por
-                      </p>
+                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Ordenar por</p>
                       <div className="flex flex-col gap-2">
                         {[
                           { key: "relevancia", label: "Relevancia", icon: "✨", desc: "Más completos primero" },
-                          { key: "distancia", label: "Distancia", icon: "📍", desc: "Los más cercanos" },
-                          { key: "ambiente", label: "Ambiente", icon: "🔥", desc: "Más check-ins ahora" },
-                          { key: "favoritos", label: "Favoritos", icon: "❤️", desc: "Tus guardados primero" },
+                          { key: "distancia",  label: "Distancia",  icon: "📍", desc: "Los más cercanos" },
+                          { key: "ambiente",   label: "Ambiente",   icon: "🔥", desc: "Más check-ins ahora" },
+                          { key: "favoritos",  label: "Favoritos",  icon: "❤️", desc: "Tus guardados primero" },
                         ].map((s) => (
                           <button
                             key={s.key}
@@ -312,9 +287,7 @@ export default function Buscar() {
                     {/* Géneros */}
                     {generosDisponibles.length > 0 && (
                       <div>
-                        <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">
-                          Género musical
-                        </p>
+                        <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Género musical</p>
                         <div className="flex flex-wrap gap-2">
                           <button
                             onClick={() => setGeneroSeleccionado(null)}
@@ -326,26 +299,24 @@ export default function Buscar() {
                           >
                             Todos
                           </button>
-                          {generosDisponibles.map((g) => (
+                          {generosDisponibles.map(({ name, emoji }) => (
                             <button
-                              key={g}
-                              onClick={() =>
-                                setGeneroSeleccionado(generoSeleccionado === g ? null : g)
-                              }
+                              key={name}
+                              onClick={() => setGeneroSeleccionado(generoSeleccionado === name ? null : name)}
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                                generoSeleccionado === g
+                                generoSeleccionado === name
                                   ? "bg-ozio-blue border-ozio-blue text-white"
                                   : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white"
                               }`}
                             >
-                              🎵 {g}
+                              {emoji} {name}
                             </button>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Botón aplicar */}
+                    {/* Aplicar */}
                     <button
                       onClick={() => setFiltrosAbiertos(false)}
                       className="w-full bg-ozio-purple hover:bg-ozio-purple/90 text-white font-semibold py-3 rounded-xl transition text-sm"
@@ -357,20 +328,18 @@ export default function Buscar() {
                         </span>
                       )}
                     </button>
-
                   </div>
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </div>
 
       <div className="px-4 md:px-8 pt-4">
         <div className="max-w-4xl mx-auto">
 
-          {/* Chips de filtros activos — solo cuando hay alguno */}
+          {/* Chips filtros activos */}
           {filtrosActivos > 0 && (
             <div className="flex gap-2 flex-wrap mb-4">
               {soloActivos && (
@@ -396,37 +365,22 @@ export default function Buscar() {
             </div>
           )}
 
-          {/* Sin búsqueda activa — pantalla de inicio */}
+          {/* Pantalla inicio sin búsqueda */}
           {!hasQuery && (
             <div className="py-4">
-              {/* Top 3 más visitados — PRIMERO y visible sin scroll */}
               <div className="mb-6">
-                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
-                  🔥 Más visitados ahora
-                </p>
+                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">🔥 Más visitados ahora</p>
                 <div className="space-y-3">
                   {[...venues]
-                    .sort(
-                      (a: Venue, b: Venue) =>
-                        (b.check_ins?.length || 0) - (a.check_ins?.length || 0),
-                    )
+                    .sort((a: Venue, b: Venue) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
                     .slice(0, 3)
                     .map((venue: Venue, i) => (
-                      <MiniVenueCard
-                        key={venue.id}
-                        venue={venue}
-                        rank={i + 1}
-                        events={events}
-                      />
+                      <MiniVenueCard key={venue.id} venue={venue} rank={i + 1} events={events} />
                     ))}
                 </div>
               </div>
-
-              {/* Búsquedas populares */}
               <div>
-                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">
-                  Búsquedas populares
-                </p>
+                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">Búsquedas populares</p>
                 <div className="flex flex-wrap gap-2">
                   {["Reggaeton", "House", "Techno", "Bar", "Discoteca", "Rooftop", "Salsa", "Pop"].map((s) => (
                     <button
@@ -447,9 +401,7 @@ export default function Buscar() {
             <>
               <p className="text-gray-500 text-sm mb-4">
                 {filteredVenues.length} local{filteredVenues.length !== 1 ? "es" : ""}
-                {query && (
-                  <> para <span className="text-white">"{query}"</span></>
-                )}
+                {query && <> para <span className="text-white">"{query}"</span></>}
               </p>
 
               {filteredVenues.length === 0 ? (
@@ -457,17 +409,10 @@ export default function Buscar() {
                   <div className="text-5xl mb-4">🏠</div>
                   <p className="text-white font-semibold mb-1">Sin resultados</p>
                   <p className="text-gray-400 text-sm">
-                    No encontramos locales
-                    {query && (
-                      <> para <span className="text-white">"{query}"</span></>
-                    )}
+                    No encontramos locales{query && <> para <span className="text-white">"{query}"</span></>}
                   </p>
                   <button
-                    onClick={() => {
-                      setQuery("");
-                      setGeneroSeleccionado(null);
-                      setSoloActivos(false);
-                    }}
+                    onClick={() => { setQuery(""); setGeneroSeleccionado(null); setSoloActivos(false); }}
                     className="mt-4 text-ozio-blue text-sm hover:underline"
                   >
                     Limpiar filtros
@@ -476,7 +421,7 @@ export default function Buscar() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredVenues.map((venue) => (
-                    <VenueCard key={venue.id} venue={venue} events={events} />
+                    <VenueCard key={venue.id} venue={venue} events={events} getGenreName={getGenreName} getGenreEmoji={getGenreEmoji} />
                   ))}
                 </div>
               )}
@@ -488,24 +433,15 @@ export default function Buscar() {
   );
 }
 
-function MiniVenueCard({
-  venue,
-  rank,
-  events,
-}: {
-  venue: Venue;
-  rank: number;
-  events: Event[];
-}) {
+function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; events: Event[] }) {
   const router = useRouter();
   const now = new Date();
   const tieneEventoActivo = events.some(
     (e: Event) =>
       String(e.venue_id) === String(venue.id) &&
       new Date(e.starts_at) <= now &&
-      new Date(e.ends_at) >= now,
+      new Date(e.ends_at) >= now
   );
-
   const rankEmoji = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
 
   return (
@@ -521,37 +457,39 @@ function MiniVenueCard({
       />
       <div className="flex-1 min-w-0">
         <p className="text-white font-semibold truncate">{venue.name}</p>
-        <p className="text-gray-400 text-xs">
-          {venue.check_ins?.length || 0} visitas
-        </p>
+        <p className="text-gray-400 text-xs">{venue.check_ins?.length || 0} visitas</p>
       </div>
       {tieneEventoActivo && (
         <span className="text-xs bg-ozio-purple/20 text-ozio-purple border border-ozio-purple/30 px-2 py-1 rounded-full flex-shrink-0">
           🎉 Evento
         </span>
       )}
-      <svg
-        className="w-5 h-5 text-gray-500 flex-shrink-0"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </div>
   );
 }
 
-function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
+function VenueCard({
+  venue,
+  events,
+  getGenreName,
+  getGenreEmoji,
+}: {
+  venue: Venue;
+  events: Event[];
+  getGenreName: (g: Genre) => string;
+  getGenreEmoji: (g: Genre) => string;
+}) {
   const router = useRouter();
   const now = new Date();
-
   const checkins = venue.check_ins?.length || 0;
   const tieneEventoActivo = events.some(
     (e: Event) =>
       String(e.venue_id) === String(venue.id) &&
       new Date(e.starts_at) <= now &&
-      new Date(e.ends_at) >= now,
+      new Date(e.ends_at) >= now
   );
 
   const ambience =
@@ -571,7 +509,6 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
       className="bg-ozio-card border border-gray-700/50 rounded-md overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
-      {/* Imagen */}
       <div className="relative h-44 overflow-hidden">
         <img
           src={venue.avatar_path || "https://via.placeholder.com/400x200"}
@@ -579,7 +516,6 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
           className="w-full h-full object-cover transition group-hover:scale-105 duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ozio-card/80 via-transparent to-transparent" />
-
         <div className="absolute top-3 left-3 flex gap-2">
           {tieneEventoActivo && (
             <span className="bg-ozio-purple/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
@@ -587,12 +523,9 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
             </span>
           )}
           {venue.is_favorite && (
-            <span className="bg-red-600/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium">
-              ❤️
-            </span>
+            <span className="bg-red-600/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium">❤️</span>
           )}
         </div>
-
         <div
           className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"
           style={{ backgroundColor: ambience.bg }}
@@ -601,10 +534,8 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
         </div>
       </div>
 
-      {/* Info */}
       <div className="p-4">
         <h3 className="text-white font-bold text-base mb-1 truncate">{venue.name}</h3>
-
         {venue.address && (
           <p className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1">
             <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -615,10 +546,14 @@ function VenueCard({ venue, events }: { venue: Venue; events: Event[] }) {
         )}
 
         <div className="flex items-center justify-between">
+          {/* Géneros */}
           <div className="flex gap-1.5 flex-wrap">
             {venue.genres?.slice(0, 2).map((g) => (
-              <span key={g} className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
-                {g}
+              <span
+                key={getGenreName(g)}
+                className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
+              >
+                {getGenreEmoji(g)} {getGenreName(g)}
               </span>
             ))}
           </div>

@@ -11,7 +11,16 @@ export async function GET(request: Request) {
   .select(`
     *,
     events(*),
-    check_ins(*)
+    check_ins(*),
+    genres:venue_genres (
+      genre_id,
+      genre:genres (
+        id,
+        name,
+        slug,
+        emoji
+      )
+    )
   `)
   .eq('check_ins.active', true)
 

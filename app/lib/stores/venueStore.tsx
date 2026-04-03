@@ -10,6 +10,12 @@ interface Event {
   image_path: string | null;
   description: string;
 }
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 
 interface Venue {
   id: string;
@@ -20,11 +26,11 @@ interface Venue {
   description?: string;
   avatar_path?: string;
   distance?: string;
-  genres?: string[];
   rating?: number;
   check_ins?: any[];
   is_favorite?: boolean;
   events?: Event[];
+  genres?: Genre[];
 }
 
 

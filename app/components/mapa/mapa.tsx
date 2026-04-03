@@ -17,7 +17,13 @@ interface Event {
   image_path: string | null;
   description: string;
 }
-
+interface Genre {
+  genre?: any; // Para compatibilidad con venues que tienen un array de { genre: {...} }
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 interface Venue {
   id: string;
   latitude: number;
@@ -27,7 +33,7 @@ interface Venue {
   description?: string;
   avatar_path?: string;
   distance?: string;
-  genres?: string[];
+  genres?: Genre[];
   rating?: number;
   check_ins?: any[];
   is_favorite?: boolean;
@@ -698,15 +704,25 @@ function MyMap() {
                 </div>
               </div>
 
-              {selectedVenue.genres && selectedVenue.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedVenue.genres.map((genre) => (
-                    <span key={genre} className="text-xs bg-gray-700 text-gray-300 px-3 py-1 rounded-full">
-                      {genre}
+              {/* ── Géneros musicales (solo venue) ── */}
+                {selectedVenue.genres && selectedVenue.genres.length > 0 && (
+                <div className="mt-3">
+                  <div className="flex flex-wrap gap-1.5">
+                  {selectedVenue.genres.map((item) => {
+                    const genre = item.genre || item;
+                    return (
+                    <span
+                      key={genre.slug}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
+                    >
+                      <span>{genre.emoji}</span>
+                      <span>{genre.name}</span>
                     </span>
-                  ))}
+                    );
+                  })}
+                  </div>
                 </div>
-              )}
+                )}
 
               {selectedVenue.description && (
                 <p className="text-gray-400 text-sm leading-relaxed hidden md:block line-clamp-4">

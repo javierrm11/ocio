@@ -55,51 +55,71 @@ export async function POST(request: Request) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-    let avatar_path = null;
+  // Géneros: se envían como JSON string desde el frontend
+  const genreIds: number[] = JSON.parse(formData.get("genre_ids") as string || "[]");
 
-    // Si hay un archivo de avatar, subirlo a Supabase Storage
-    if (avatarFile && avatarFile.size > 0) {
-      const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `${name}-${Date.now()}.${fileExt}`;
-      const filePath = `venues/${fileName}`;
+  let avatar_path = null;
 
-      // Subir archivo al bucket 'avatar'
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('avatar')
-        .upload(filePath, avatarFile, {
-          contentType: avatarFile.type,
-          upsert: false
-        });
+  if (avatarFile && avatarFile.size > 0) {
+    const fileExt = avatarFile.name.split('.').pop();
+    const fileName = `${name}-${Date.now()}.${fileExt}`;
+    const filePath = `venues/${fileName}`;
 
-      if (uploadError) {
-        console.error('Error al subir avatar:', uploadError);
-        return NextResponse.json(
-          { error: 'Error al subir la imagen: ' + uploadError.message },
-          { status: 400 }
-        );
-      }
+    const { error: uploadError } = await supabase.storage
+      .from('avatar')
+      .upload(filePath, avatarFile, {
+        contentType: avatarFile.type,
+        upsert: false
+      });
 
-      // Obtener URL pública del avatar
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatar')
-        .getPublicUrl(filePath);
-
-      avatar_path = publicUrl;
+    if (uploadError) {
+      console.error('Error al subir avatar:', uploadError);
+      return NextResponse.json(
+        { error: 'Error al subir la imagen: ' + uploadError.message },
+        { status: 400 }
+      );
     }
 
-  // añadir a tabla profiles
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatar')
+      .getPublicUrl(filePath);
+
+    avatar_path = publicUrl;
+  }
+
+  // Crear usuario en auth
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { name, description, address, latitude, longitude, type, avatar_path },
     }
-  })
-    if (error) {
-        return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-        );
-    }  
+  });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Insertar géneros si se proporcionaron
+  if (genreIds.length > 0 && data.user?.id) {
+    const rows = genreIds.map(genre_id => ({
+      venue_id: data.user!.id,
+      genre_id,
+    }));
+
+    const { error: genreError } = await supabase
+      .from("venue_genres")
+      .insert(rows);
+
+    if (genreError) {
+      console.error("Error al insertar géneros:", genreError);
+      // No bloqueamos el registro, solo avisamos
+      return NextResponse.json({
+        ...data,
+        warning: "Venue creado pero hubo un error al guardar los géneros",
+      });
+    }
+  }
+
   return NextResponse.json(data);
 }

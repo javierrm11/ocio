@@ -146,7 +146,7 @@ export default function Eventos() {
 
           {/* Título + badge activos */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-white text-2xl font-bold">Eventos</h1>
+            <h1 className="text-white text-3xl font-bold">Eventos</h1>
             {activeCount > 0 && (
               <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />

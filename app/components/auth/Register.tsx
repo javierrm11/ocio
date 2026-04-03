@@ -156,7 +156,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || 'Error al registrarse');
-      router.push('/profile');
+      router.push('/mapa');
     } catch (err: any) {
       setError(err.message);
       setUploadProgress(0);

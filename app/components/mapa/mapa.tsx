@@ -1,11 +1,17 @@
 "use client";
-import { MapContainer, TileLayer, CircleMarker, Marker, Tooltip } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  Marker,
+  Tooltip,
+} from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
-import { getToken } from '@/lib/hooks/getToken';
+import { getToken } from "@/lib/hooks/getToken";
 
 interface Event {
   id: string;
@@ -79,7 +85,10 @@ function formatEventTime(event: Event): string {
   if (now >= start && now <= end) {
     return `Activo hasta las ${end.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
   }
-  const startTime = start.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+  const startTime = start.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   const diffMs = start.getTime() - now.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -87,7 +96,12 @@ function formatEventTime(event: Event): string {
   return `Empieza a las ${startTime} (en ${diffHours}h)`;
 }
 
-function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): string {
+function getDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): string {
   const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -146,48 +160,73 @@ function getHeatGradient(checkins: number): string {
   return "from-orange-500 via-red-500 to-rose-500";
 }
 
-function getMarkerRadius(checkins: number, maxReference: number, eventStatus: "active" | "soon" | "none"): number {
+function getMarkerRadius(
+  checkins: number,
+  maxReference: number,
+  eventStatus: "active" | "soon" | "none",
+): number {
   const minRadius = 7;
   const maxRadius = 16;
   const normalized = Math.min(checkins / maxReference, 1);
   const baseRadius = minRadius + normalized * (maxRadius - minRadius);
 
-  const eventBoost = eventStatus === "active" ? 2 : eventStatus === "soon" ? 1 : 0;
+  const eventBoost =
+    eventStatus === "active" ? 2 : eventStatus === "soon" ? 1 : 0;
   return Number((baseRadius + eventBoost).toFixed(1));
 }
 
-function createVenueIcon(avatarPath: string | null, checkins: number, eventStatus: "active" | "soon" | "none"): L.DivIcon {
-  const isHot  = checkins >= 5;
+function createVenueIcon(
+  avatarPath: string | null,
+  checkins: number,
+  eventStatus: "active" | "soon" | "none",
+): L.DivIcon {
+  const isHot = checkins >= 5;
   const isWarm = checkins > 0 && checkins < 5;
 
   // Gradiente igual que el heat-card del panel lateral
   const bg =
-    eventStatus === "active" ? "linear-gradient(135deg,#8B5CF6,#6d28d9)"
-    : eventStatus === "soon"  ? "linear-gradient(135deg,#FF8A00,#ea580c)"
-    : isHot                   ? "linear-gradient(135deg,#ef4444,#dc2626)"
-    : isWarm                  ? "linear-gradient(135deg,#f59e0b,#d97706)"
-    :                           "linear-gradient(135deg,#10b981,#059669)";
+    eventStatus === "active"
+      ? "linear-gradient(135deg,#8B5CF6,#6d28d9)"
+      : eventStatus === "soon"
+        ? "linear-gradient(135deg,#FF8A00,#ea580c)"
+        : isHot
+          ? "linear-gradient(135deg,#ef4444,#dc2626)"
+          : isWarm
+            ? "linear-gradient(135deg,#f59e0b,#d97706)"
+            : "linear-gradient(135deg,#10b981,#059669)";
 
   const glow =
-    eventStatus === "active" ? "rgba(139,92,246,0.65)"
-    : eventStatus === "soon"  ? "rgba(255,138,0,0.65)"
-    : isHot                   ? "rgba(239,68,68,0.65)"
-    : isWarm                  ? "rgba(245,158,11,0.60)"
-    :                           "rgba(16,185,129,0.55)";
+    eventStatus === "active"
+      ? "rgba(139,92,246,0.65)"
+      : eventStatus === "soon"
+        ? "rgba(255,138,0,0.65)"
+        : isHot
+          ? "rgba(239,68,68,0.65)"
+          : isWarm
+            ? "rgba(245,158,11,0.60)"
+            : "rgba(16,185,129,0.55)";
 
   const tip =
-    eventStatus === "active" ? "#6d28d9"
-    : eventStatus === "soon"  ? "#ea580c"
-    : isHot                   ? "#dc2626"
-    : isWarm                  ? "#d97706"
-    :                           "#059669";
+    eventStatus === "active"
+      ? "#6d28d9"
+      : eventStatus === "soon"
+        ? "#ea580c"
+        : isHot
+          ? "#dc2626"
+          : isWarm
+            ? "#d97706"
+            : "#059669";
 
   const label =
-    eventStatus === "active" ? "🎉"
-    : eventStatus === "soon"  ? "🕐"
-    : isHot                   ? "🔥"
-    : isWarm                  ? "✨"
-    :                           "💤";
+    eventStatus === "active"
+      ? "🎉"
+      : eventStatus === "soon"
+        ? "🕐"
+        : isHot
+          ? "🔥"
+          : isWarm
+            ? "✨"
+            : "💤";
 
   // Tamaño crece con la actividad (mín 38px, máx 54px)
   const size = Math.max(38, Math.min(54, 38 + checkins * 2));
@@ -237,8 +276,7 @@ function MyMap() {
   const currentProfileId = currentUser?.id;
 
   const hasActiveFilters =
-    filters.maxDistance !== null ||
-    filters.minCheckins > 0;
+    filters.maxDistance !== null || filters.minCheckins > 0;
 
   const venuesRef = useRef(venues);
   useEffect(() => {
@@ -257,7 +295,12 @@ function MyMap() {
         setVenues(
           venuesRef.current.map((v) => ({
             ...v,
-            distance: getDistanceKm(latitude, longitude, v.latitude, v.longitude),
+            distance: getDistanceKm(
+              latitude,
+              longitude,
+              v.latitude,
+              v.longitude,
+            ),
           })),
         );
       },
@@ -271,27 +314,40 @@ function MyMap() {
     const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ venue_id: venueId }),
     })
       .then((res) => res.json())
       .then((data) => {
-        const createdCheckIn = Array.isArray(data?.data) ? data.data[0] : data?.data;
+        const createdCheckIn = Array.isArray(data?.data)
+          ? data.data[0]
+          : data?.data;
         if (!createdCheckIn) return;
 
         // Elimina cualquier check-in previo del mismo usuario antes de añadir el nuevo
         const addCheckIn = (list: any[]) => [
-          ...list.filter((c: any) => c.id !== createdCheckIn.id && !(currentProfileId && c.profile_id === currentProfileId)),
+          ...list.filter(
+            (c: any) =>
+              c.id !== createdCheckIn.id &&
+              !(currentProfileId && c.profile_id === currentProfileId),
+          ),
           createdCheckIn,
         ];
 
         const nextVenues = venuesRef.current.map((v) =>
-          v.id === venueId ? { ...v, check_ins: addCheckIn(v.check_ins || []) } : v,
+          v.id === venueId
+            ? { ...v, check_ins: addCheckIn(v.check_ins || []) }
+            : v,
         );
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
         setSelectedVenue((prev) =>
-          prev && prev.id === venueId ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) } : prev,
+          prev && prev.id === venueId
+            ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) }
+            : prev,
         );
       });
   };
@@ -307,21 +363,29 @@ function MyMap() {
 
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins/${myCheckIn.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ active: false }),
     })
       .then((res) => res.json())
       .then(() => {
         // Elimina del estado local (la API lo guarda como histórico con active:false)
-        const removeCheckIn = (list: any[]) => list.filter((c: any) => c.id !== myCheckIn.id);
+        const removeCheckIn = (list: any[]) =>
+          list.filter((c: any) => c.id !== myCheckIn.id);
 
         const nextVenues = venuesRef.current.map((v) =>
-          v.id === venueId ? { ...v, check_ins: removeCheckIn(v.check_ins || []) } : v,
+          v.id === venueId
+            ? { ...v, check_ins: removeCheckIn(v.check_ins || []) }
+            : v,
         );
         venuesRef.current = nextVenues;
         setVenues(nextVenues);
         setSelectedVenue((prev) =>
-          prev && prev.id === venueId ? { ...prev, check_ins: removeCheckIn(prev.check_ins || []) } : prev,
+          prev && prev.id === venueId
+            ? { ...prev, check_ins: removeCheckIn(prev.check_ins || []) }
+            : prev,
         );
       });
   };
@@ -333,7 +397,11 @@ function MyMap() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       }).then(() => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: false } : v));
+        setVenues(
+          venues.map((v) =>
+            v.id === venueId ? { ...v, is_favorite: false } : v,
+          ),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, is_favorite: false });
         setUserFavorites(userFavorites.filter((id) => id !== venueId));
@@ -341,10 +409,17 @@ function MyMap() {
     } else {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ venue_id: venueId }),
       }).then(() => {
-        setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: true } : v));
+        setVenues(
+          venues.map((v) =>
+            v.id === venueId ? { ...v, is_favorite: true } : v,
+          ),
+        );
         if (selectedVenue && selectedVenue.id === venueId)
           setSelectedVenue({ ...selectedVenue, is_favorite: true });
         setUserFavorites([...userFavorites, venueId]);
@@ -357,7 +432,11 @@ function MyMap() {
 
   const getMadridHour = () =>
     parseInt(
-      new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", hour: "numeric", hour12: false }).format(new Date()),
+      new Intl.DateTimeFormat("es-ES", {
+        timeZone: "Europe/Madrid",
+        hour: "numeric",
+        hour12: false,
+      }).format(new Date()),
       10,
     );
 
@@ -377,7 +456,8 @@ function MyMap() {
 
   const filteredVenues = venues.filter((v) => {
     const dist = parseDistanceToKm(v.distance);
-    if (filters.maxDistance !== null && dist > filters.maxDistance) return false;
+    if (filters.maxDistance !== null && dist > filters.maxDistance)
+      return false;
 
     const checkins = v.check_ins?.length || 0;
     if (checkins < filters.minCheckins) return false;
@@ -393,10 +473,12 @@ function MyMap() {
   const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
   const selectedHeatLabel = getHeatLabel(selectedCheckins);
   const selectedHeatGradient = getHeatGradient(selectedCheckins);
-  const heatState = selectedCheckins === 0 ? "cool" : selectedCheckins < 5 ? "warm" : "hot";
+  const heatState =
+    selectedCheckins === 0 ? "cool" : selectedCheckins < 5 ? "warm" : "hot";
   const hasUserActiveCheckIn = Boolean(
     selectedVenue?.check_ins?.some(
-      (c: any) => c.active && (!currentProfileId || c.profile_id === currentProfileId),
+      (c: any) =>
+        c.active && (!currentProfileId || c.profile_id === currentProfileId),
     ),
   );
 
@@ -409,7 +491,9 @@ function MyMap() {
             <div className="w-12 h-12 bg-gradient-to-br from-ozio-blue to-ozio-purple rounded-full opacity-50"></div>
           </div>
         </div>
-        <p className="text-white text-lg font-semibold mt-6 animate-pulse">Cargando mapa...</p>
+        <p className="text-white text-lg font-semibold mt-6 animate-pulse">
+          Cargando mapa...
+        </p>
       </div>
     );
   }
@@ -419,7 +503,11 @@ function MyMap() {
       {/* ─── MAPA ─── */}
       <div className="fixed inset-0 md:right-0 md:left-0">
         <MapContainer
-          center={userLocation ? [userLocation.latitude, userLocation.longitude] : [37.8787857, -4.766206]}
+          center={
+            userLocation
+              ? [userLocation.latitude, userLocation.longitude]
+              : [37.8787857, -4.766206]
+          }
           zoom={14}
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
@@ -441,9 +529,16 @@ function MyMap() {
             <CircleMarker
               center={[userLocation.latitude, userLocation.longitude]}
               radius={8}
-              pathOptions={{ color: "#3b82f6", fillColor: "#60a5fa", fillOpacity: 0.9, weight: 3 }}
+              pathOptions={{
+                color: "#3b82f6",
+                fillColor: "#60a5fa",
+                fillOpacity: 0.9,
+                weight: 3,
+              }}
             >
-              <Tooltip direction="top" offset={[0, -10]} opacity={1}>📍 Tu ubicación</Tooltip>
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                📍 Tu ubicación
+              </Tooltip>
             </CircleMarker>
           )}
 
@@ -454,16 +549,24 @@ function MyMap() {
               <Marker
                 key={`${venue.id}-${checkinsCount}`}
                 position={[venue.latitude, venue.longitude] as [number, number]}
-                icon={createVenueIcon(venue.avatar_path || null, checkinsCount, eventStatus)}
+                icon={createVenueIcon(
+                  venue.avatar_path || null,
+                  checkinsCount,
+                  eventStatus,
+                )}
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
                 <Tooltip direction="top" opacity={1} className="venue-tooltip">
                   <p className="vt-name">{venue.name}</p>
                   {eventStatus === "active" && (
-                    <p className="vt-event vt-event--active">🎉 Evento en curso</p>
+                    <p className="vt-event vt-event--active">
+                      🎉 Evento en curso
+                    </p>
                   )}
                   {eventStatus === "soon" && (
-                    <p className="vt-event vt-event--soon">🕐 Hoy próximamente</p>
+                    <p className="vt-event vt-event--soon">
+                      🕐 Hoy próximamente
+                    </p>
                   )}
                 </Tooltip>
               </Marker>
@@ -479,17 +582,32 @@ function MyMap() {
           onClick={() => setShowFilters(true)}
           className="pointer-events-auto bg-gray-900/95 text-white px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-gray-700 hover:bg-gray-800 transition"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 4h18M7 8h10M11 12h2"
+            />
           </svg>
           <span className="text-sm font-medium">Filtros</span>
-          {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+          {hasActiveFilters && (
+            <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+          )}
         </button>
       </div>
 
       {/* Backdrop móvil */}
       {showFilters && (
-        <div className="fixed inset-0 bg-black/60 z-[1001] md:hidden" onClick={() => setShowFilters(false)} />
+        <div
+          className="fixed inset-0 bg-black/60 z-[1001] md:hidden"
+          onClick={() => setShowFilters(false)}
+        />
       )}
 
       {/* Drawer móvil + sidebar desktop */}
@@ -502,7 +620,9 @@ function MyMap() {
           <div className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
             <div>
               <h3 className="text-white font-semibold">Filtros</h3>
-              <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
+              <p className="text-xs text-gray-400">
+                Afina tu búsqueda rápidamente
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -526,8 +646,18 @@ function MyMap() {
                 className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800"
                 aria-label="Cerrar filtros"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -536,9 +666,13 @@ function MyMap() {
           <div className="p-5 overflow-y-auto flex-1 space-y-6">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Distancia máxima</label>
+                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
+                  Distancia máxima
+                </label>
                 <span className="text-blue-400 text-xs font-medium">
-                  {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
+                  {filters.maxDistance !== null
+                    ? `${filters.maxDistance} km`
+                    : "Sin límite"}
                 </span>
               </div>
               <input
@@ -551,7 +685,10 @@ function MyMap() {
                 onChange={(e) =>
                   setFilters((f) => ({
                     ...f,
-                    maxDistance: parseFloat(e.target.value) === 20 ? null : parseFloat(e.target.value),
+                    maxDistance:
+                      parseFloat(e.target.value) === 20
+                        ? null
+                        : parseFloat(e.target.value),
                   }))
                 }
                 className="w-full accent-blue-500"
@@ -563,7 +700,9 @@ function MyMap() {
             </div>
 
             <div>
-              <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">Ambiente mínimo</label>
+              <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+                Ambiente mínimo
+              </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { label: "Todos", value: 0 },
@@ -575,7 +714,9 @@ function MyMap() {
                     <button
                       key={option.value}
                       type="button"
-                      onClick={() => setFilters((f) => ({ ...f, minCheckins: option.value }))}
+                      onClick={() =>
+                        setFilters((f) => ({ ...f, minCheckins: option.value }))
+                      }
                       className={`text-xs py-2 rounded-xl border transition font-medium ${
                         active
                           ? "bg-blue-600 border-blue-500 text-white"
@@ -595,7 +736,10 @@ function MyMap() {
               <span className="text-gray-400 text-xs">Locales visibles</span>
               <span className="text-white text-sm font-bold">
                 {filteredVenues.length}
-                <span className="text-gray-500 font-normal"> / {venues.length}</span>
+                <span className="text-gray-500 font-normal">
+                  {" "}
+                  / {venues.length}
+                </span>
               </span>
             </div>
           </div>
@@ -605,7 +749,10 @@ function MyMap() {
       {/* ─── PANEL LATERAL / MODAL VENUE ─── */}
       {selectedVenue && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-[989] md:hidden" onClick={closeModal} />
+          <div
+            className="fixed inset-0 bg-black/40 z-[989] md:hidden"
+            onClick={closeModal}
+          />
 
           <div
             className="fixed z-[1002] bg-gray-900 overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
@@ -613,7 +760,11 @@ function MyMap() {
           >
             {/* Imagen cabecera */}
             <div className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none flex-shrink-0">
-              <img src={selectedVenue.avatar_path} alt={selectedVenue.name} className="w-full h-full object-cover" />
+              <img
+                src={selectedVenue.avatar_path}
+                alt={selectedVenue.name}
+                className="w-full h-full object-cover"
+              />
 
               <button
                 onClick={closeModal}
@@ -621,8 +772,18 @@ function MyMap() {
                 title="Cerrar panel"
                 className="absolute top-4 right-4 bg-black/50 rounded-full p-2 hover:bg-black/70 transition"
               >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
 
@@ -631,14 +792,18 @@ function MyMap() {
                 className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full"
                 style={{
                   backgroundColor:
-                    (selectedVenue.check_ins?.length || 0) === 0 ? "#10b981"
-                    : (selectedVenue.check_ins?.length || 0) < 5 ? "#f59e0b"
-                    : "#ef4444",
+                    (selectedVenue.check_ins?.length || 0) === 0
+                      ? "#10b981"
+                      : (selectedVenue.check_ins?.length || 0) < 5
+                        ? "#f59e0b"
+                        : "#ef4444",
                 }}
               >
-                {(selectedVenue.check_ins?.length || 0) === 0 ? "Tranquilo"
-                  : (selectedVenue.check_ins?.length || 0) < 5 ? "Animado"
-                  : "Muy Animado"}
+                {(selectedVenue.check_ins?.length || 0) === 0
+                  ? "Tranquilo"
+                  : (selectedVenue.check_ins?.length || 0) < 5
+                    ? "Animado"
+                    : "Muy Animado"}
               </div>
 
               {/* Banner evento activo/próximo en imagen */}
@@ -650,14 +815,21 @@ function MyMap() {
                   <div
                     className="absolute bottom-4 left-4 right-4 flex items-center gap-2 px-3 py-2 rounded-xl text-white text-xs font-semibold"
                     style={{
-                      backgroundColor: status === "active" ? "rgba(168,85,247,0.85)" : "rgba(249,115,22,0.85)",
+                      backgroundColor:
+                        status === "active"
+                          ? "rgba(168,85,247,0.85)"
+                          : "rgba(249,115,22,0.85)",
                       backdropFilter: "blur(4px)",
                     }}
                   >
-                    <span className="text-base">{status === "active" ? "🎉" : "🕐"}</span>
+                    <span className="text-base">
+                      {status === "active" ? "🎉" : "🕐"}
+                    </span>
                     <div>
                       <p className="font-bold leading-tight">{event.title}</p>
-                      <p className="opacity-90 leading-tight">{formatEventTime(event)}</p>
+                      <p className="opacity-90 leading-tight">
+                        {formatEventTime(event)}
+                      </p>
                     </div>
                   </div>
                 );
@@ -667,19 +839,31 @@ function MyMap() {
             {/* Contenido */}
             <div className="p-6 flex flex-col gap-4">
               <div>
-                <h2 className="text-white text-2xl font-bold mb-1">{selectedVenue.name}</h2>
+                <h2 className="text-white text-2xl font-bold mb-1">
+                  {selectedVenue.name}
+                </h2>
 
                 {/* 🌡️ Temperatura — Feature Principal */}
-                <div className={`mt-3 rounded-2xl p-4 border heat-card-${heatState}`}>
+                <div
+                  className={`mt-3 rounded-2xl p-4 border heat-card-${heatState}`}
+                >
                   {/* Fila superior: icono + label + contador */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl leading-none">
-                        {selectedCheckins >= 5 ? '🔥' : selectedCheckins > 0 ? '✨' : '🌿'}
+                        {selectedCheckins >= 5
+                          ? "🔥"
+                          : selectedCheckins > 0
+                            ? "✨"
+                            : "🌿"}
                       </span>
                       <div>
-                        <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold mb-0.5">Ambiente ahora</p>
-                        <p className="text-white text-xl font-black leading-tight">{selectedHeatLabel}</p>
+                        <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold mb-0.5">
+                          Ambiente ahora
+                        </p>
+                        <p className="text-white text-xl font-black leading-tight">
+                          {selectedHeatLabel}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -694,8 +878,12 @@ function MyMap() {
 
                   {/* Escala */}
                   <div className="flex justify-between mt-2 px-0.5">
-                    <span className="text-[10px] text-white/25 font-medium">Tranquilo</span>
-                    <span className="text-[10px] text-white/25 font-medium">Llenazo</span>
+                    <span className="text-[10px] text-white/25 font-medium">
+                      Tranquilo
+                    </span>
+                    <span className="text-[10px] text-white/25 font-medium">
+                      Llenazo
+                    </span>
                   </div>
                 </div>
 
@@ -705,24 +893,24 @@ function MyMap() {
               </div>
 
               {/* ── Géneros musicales (solo venue) ── */}
-                {selectedVenue.genres && selectedVenue.genres.length > 0 && (
+              {selectedVenue.genres && selectedVenue.genres.length > 0 && (
                 <div className="mt-3">
                   <div className="flex flex-wrap gap-1.5">
-                  {selectedVenue.genres.map((item) => {
-                    const genre = item.genre || item;
-                    return (
-                    <span
-                      key={genre.slug}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
-                    >
-                      <span>{genre.emoji}</span>
-                      <span>{genre.name}</span>
-                    </span>
-                    );
-                  })}
+                    {selectedVenue.genres.map((item) => {
+                      const genre = item.genre || item;
+                      return (
+                        <span
+                          key={genre.slug}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
+                        >
+                          <span>{genre.emoji}</span>
+                          <span>{genre.name}</span>
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
-                )}
+              )}
 
               {selectedVenue.description && (
                 <p className="text-gray-400 text-sm leading-relaxed hidden md:block line-clamp-4">
@@ -733,15 +921,20 @@ function MyMap() {
               {/* ─── EVENTOS ACTIVOS ─── */}
               {(() => {
                 const now = new Date();
-                const activeEvents = selectedVenue.events?.filter(
-                  (e) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
-                ) || [];
+                const activeEvents =
+                  selectedVenue.events?.filter(
+                    (e) =>
+                      new Date(e.starts_at) <= now &&
+                      new Date(e.ends_at) >= now,
+                  ) || [];
                 if (activeEvents.length === 0) return null;
                 return (
                   <div className="bg-gray-800 border border-green-500/40 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      <h3 className="text-white font-semibold text-sm">Evento en curso</h3>
+                      <h3 className="text-white font-semibold text-sm">
+                        Evento en curso
+                      </h3>
                     </div>
                     <div className="space-y-2">
                       {activeEvents.map((event) => (
@@ -753,18 +946,36 @@ function MyMap() {
                           }}
                         >
                           {event.image_path ? (
-                            <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                            <img
+                              src={event.image_path}
+                              alt={event.title}
+                              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                            />
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center flex-shrink-0">
                               <span className="text-white text-lg">🎉</span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-semibold truncate">{event.title}</p>
-                            <p className="text-green-400 text-xs">{formatEventTime(event)}</p>
+                            <p className="text-white text-sm font-semibold truncate">
+                              {event.title}
+                            </p>
+                            <p className="text-green-400 text-xs">
+                              {formatEventTime(event)}
+                            </p>
                           </div>
-                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <svg
+                            className="w-4 h-4 text-gray-500 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
                           </svg>
                         </div>
                       ))}
@@ -777,16 +988,19 @@ function MyMap() {
               {(() => {
                 const now = new Date();
                 const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-                const soonEvents = selectedVenue.events?.filter((e) => {
-                  const start = new Date(e.starts_at);
-                  return start > now && start <= in24h;
-                }) || [];
+                const soonEvents =
+                  selectedVenue.events?.filter((e) => {
+                    const start = new Date(e.starts_at);
+                    return start > now && start <= in24h;
+                  }) || [];
                 if (soonEvents.length === 0) return null;
                 return (
                   <div className="bg-gray-800 border border-orange-500/40 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-orange-400 text-sm">🕐</span>
-                      <h3 className="text-white font-semibold text-sm">Próximamente hoy</h3>
+                      <h3 className="text-white font-semibold text-sm">
+                        Próximamente hoy
+                      </h3>
                     </div>
                     <div className="space-y-2">
                       {soonEvents.map((event) => (
@@ -794,23 +1008,45 @@ function MyMap() {
                           key={event.id}
                           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
                           onClick={() => {
-                            const eventData = encodeURIComponent(JSON.stringify(event));
-                            router.push(`/events/${event.id}?data=${eventData}`);
+                            const eventData = encodeURIComponent(
+                              JSON.stringify(event),
+                            );
+                            router.push(
+                              `/events/${event.id}?data=${eventData}`,
+                            );
                           }}
                         >
                           {event.image_path ? (
-                            <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                            <img
+                              src={event.image_path}
+                              alt={event.title}
+                              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                            />
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
                               <span className="text-white text-lg">🕐</span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-semibold truncate">{event.title}</p>
-                            <p className="text-orange-400 text-xs">{formatEventTime(event)}</p>
+                            <p className="text-white text-sm font-semibold truncate">
+                              {event.title}
+                            </p>
+                            <p className="text-orange-400 text-xs">
+                              {formatEventTime(event)}
+                            </p>
                           </div>
-                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <svg
+                            className="w-4 h-4 text-gray-500 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
                           </svg>
                         </div>
                       ))}
@@ -823,27 +1059,47 @@ function MyMap() {
               <div className="flex flex-wrap items-center gap-2">
                 {isUserProfile &&
                   (hasUserActiveCheckIn ? (
-                  <button
-                    type="button"
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                    onClick={() => onCheckOut(selectedVenue.id)}
-                  >
-                    Quitar check-in
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                    <button
+                      type="button"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                      onClick={() => onCheckOut(selectedVenue.id)}
+                    >
+                      Quitar check-in
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
                   ) : (
-                  <button
-                    type="button"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
-                    onClick={() => onCheckIn(selectedVenue.id)}
-                  >
-                    Hacer check-in
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                    <button
+                      type="button"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                      onClick={() => onCheckIn(selectedVenue.id)}
+                    >
+                      Hacer check-in
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
                   ))}
 
                 <div className="flex gap-2 w-full">
@@ -858,22 +1114,42 @@ function MyMap() {
                   {isUserProfile && (
                     <button
                       type="button"
-                      aria-label={selectedVenue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
-                      title={selectedVenue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+                      aria-label={
+                        selectedVenue.is_favorite
+                          ? "Quitar de favoritos"
+                          : "Añadir a favoritos"
+                      }
+                      title={
+                        selectedVenue.is_favorite
+                          ? "Quitar de favoritos"
+                          : "Añadir a favoritos"
+                      }
                       className={`aspect-square py-3 px-4 rounded-full flex items-center justify-center transition ${
                         selectedVenue.is_favorite
                           ? "bg-red-600 hover:bg-red-700 text-white"
                           : "bg-gray-600 hover:bg-gray-500 text-white"
                       }`}
-                      onClick={() => toggleFavorite(selectedVenue.id, selectedVenue.is_favorite || false)}
+                      onClick={() =>
+                        toggleFavorite(
+                          selectedVenue.id,
+                          selectedVenue.is_favorite || false,
+                        )
+                      }
                     >
                       <svg
                         className="w-5 h-5"
-                        fill={selectedVenue.is_favorite ? "currentColor" : "none"}
+                        fill={
+                          selectedVenue.is_favorite ? "currentColor" : "none"
+                        }
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
                       </svg>
                     </button>
                   )}
@@ -882,7 +1158,10 @@ function MyMap() {
             </div>
           </div>
 
-          <div className="hidden md:block fixed inset-0 z-[988]" onClick={closeModal} />
+          <div
+            className="hidden md:block fixed inset-0 z-[988]"
+            onClick={closeModal}
+          />
         </>
       )}
 
@@ -896,89 +1175,180 @@ function MyMap() {
           margin: 0 !important;
         }
         @media (min-width: 768px) {
-          .leaflet-control-zoom { right: calc(24rem + 24px) !important; }
+          .leaflet-control-zoom {
+            right: calc(24rem + 24px) !important;
+          }
         }
         @media (min-width: 1024px) {
-          .leaflet-control-zoom { right: calc(420px + 24px) !important; }
+          .leaflet-control-zoom {
+            right: calc(420px + 24px) !important;
+          }
         }
         @keyframes slide-up {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
         }
-        .animate-slide-up { animation: slide-up 0.3s ease-out; }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
         @keyframes slide-right {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
         }
-        .animate-slide-right { animation: slide-right 0.3s ease-out; }
+        .animate-slide-right {
+          animation: slide-right 0.3s ease-out;
+        }
         @keyframes event-pulse {
-          0%, 100% { stroke-opacity: 1; stroke-width: 3px; }
-          50% { stroke-opacity: 0.2; stroke-width: 10px; }
+          0%,
+          100% {
+            stroke-opacity: 1;
+            stroke-width: 3px;
+          }
+          50% {
+            stroke-opacity: 0.2;
+            stroke-width: 10px;
+          }
         }
-        .event-active-pulse path, .event-active-pulse circle {
+        .event-active-pulse path,
+        .event-active-pulse circle {
           animation: event-pulse 1.5s ease-in-out infinite;
         }
         @keyframes soon-pulse {
-          0%, 100% { stroke-opacity: 0.9; stroke-width: 2px; }
-          50% { stroke-opacity: 0.4; stroke-width: 6px; }
+          0%,
+          100% {
+            stroke-opacity: 0.9;
+            stroke-width: 2px;
+          }
+          50% {
+            stroke-opacity: 0.4;
+            stroke-width: 6px;
+          }
         }
-        .event-soon-pulse path, .event-soon-pulse circle {
+        .event-soon-pulse path,
+        .event-soon-pulse circle {
           animation: soon-pulse 2.5s ease-in-out infinite;
         }
-        .leaflet-bottom.leaflet-right { display: none; }
+        .leaflet-bottom.leaflet-right {
+          display: none;
+        }
         @keyframes heat-shine {
-          0% { transform: translateX(-180%); opacity: 0; }
-          20% { opacity: 0.8; }
-          100% { transform: translateX(650%); opacity: 0; }
+          0% {
+            transform: translateX(-180%);
+            opacity: 0;
+          }
+          20% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(650%);
+            opacity: 0;
+          }
         }
         .animate-heat-shine {
           animation: heat-shine 2.2s linear infinite;
         }
         @keyframes heat-pulse {
-          0%, 100% { filter: saturate(1); }
-          50% { filter: saturate(1.25); }
+          0%,
+          100% {
+            filter: saturate(1);
+          }
+          50% {
+            filter: saturate(1.25);
+          }
         }
         .animate-heat-pulse {
           animation: heat-pulse 1.8s ease-in-out infinite;
         }
         /* Heat card states */
         .heat-card-cool {
-          background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(10,10,20,0.85) 100%);
-          border-color: rgba(52,211,153,0.35);
-          box-shadow: 0 0 28px rgba(52,211,153,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+          background: linear-gradient(
+            135deg,
+            rgba(16, 185, 129, 0.08) 0%,
+            rgba(10, 10, 20, 0.85) 100%
+          );
+          border-color: rgba(52, 211, 153, 0.35);
+          box-shadow:
+            0 0 28px rgba(52, 211, 153, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
         .heat-card-warm {
-          background: linear-gradient(135deg, rgba(251,146,60,0.10) 0%, rgba(10,10,20,0.85) 100%);
-          border-color: rgba(251,146,60,0.35);
-          box-shadow: 0 0 28px rgba(251,146,60,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+          background: linear-gradient(
+            135deg,
+            rgba(251, 146, 60, 0.1) 0%,
+            rgba(10, 10, 20, 0.85) 100%
+          );
+          border-color: rgba(251, 146, 60, 0.35);
+          box-shadow:
+            0 0 28px rgba(251, 146, 60, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
         .heat-card-hot {
-          background: linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(10,10,20,0.85) 100%);
-          border-color: rgba(239,68,68,0.4);
-          box-shadow: 0 0 32px rgba(239,68,68,0.22), inset 0 1px 0 rgba(255,255,255,0.04);
+          background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.14) 0%,
+            rgba(10, 10, 20, 0.85) 100%
+          );
+          border-color: rgba(239, 68, 68, 0.4);
+          box-shadow:
+            0 0 32px rgba(239, 68, 68, 0.22),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
         /* Heat badge backgrounds */
-        .heat-badge-cool { background: rgba(52,211,153,0.13); }
-        .heat-badge-warm { background: rgba(251,146,60,0.13); }
-        .heat-badge-hot  { background: rgba(239,68,68,0.16); }
+        .heat-badge-cool {
+          background: rgba(52, 211, 153, 0.13);
+        }
+        .heat-badge-warm {
+          background: rgba(251, 146, 60, 0.13);
+        }
+        .heat-badge-hot {
+          background: rgba(239, 68, 68, 0.16);
+        }
         /* Heat count colors */
-        .heat-count-cool { color: #34d399; }
-        .heat-count-warm { color: #fb923c; }
-        .heat-count-hot  { color: #f87171; }
+        .heat-count-cool {
+          color: #34d399;
+        }
+        .heat-count-warm {
+          color: #fb923c;
+        }
+        .heat-count-hot {
+          color: #f87171;
+        }
         /* Heat bar glow */
-        .heat-bar-glow-cool { box-shadow: 0 0 14px rgba(52,211,153,0.9), 0 0 28px rgba(52,211,153,0.4); }
-        .heat-bar-glow-warm { box-shadow: 0 0 14px rgba(251,146,60,0.9), 0 0 28px rgba(251,146,60,0.45); }
-        .heat-bar-glow-hot  { box-shadow: 0 0 16px rgba(239,68,68,1),    0 0 32px rgba(239,68,68,0.55); }
+        .heat-bar-glow-cool {
+          box-shadow:
+            0 0 14px rgba(52, 211, 153, 0.9),
+            0 0 28px rgba(52, 211, 153, 0.4);
+        }
+        .heat-bar-glow-warm {
+          box-shadow:
+            0 0 14px rgba(251, 146, 60, 0.9),
+            0 0 28px rgba(251, 146, 60, 0.45);
+        }
+        .heat-bar-glow-hot {
+          box-shadow:
+            0 0 16px rgba(239, 68, 68, 1),
+            0 0 32px rgba(239, 68, 68, 0.55);
+        }
         /* Venue tooltip */
         .venue-tooltip {
-          background: rgba(10,14,26,0.96) !important;
-          border: 1px solid rgba(255,255,255,0.10) !important;
+          background: rgba(10, 14, 26, 0.96) !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
           border-radius: 12px !important;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
           padding: 7px 11px !important;
           backdrop-filter: blur(8px) !important;
         }
-        .venue-tooltip::before { display: none !important; }
+        .venue-tooltip::before {
+          display: none !important;
+        }
         .vt-name {
           margin: 0;
           color: #ffffff;
@@ -992,8 +1362,12 @@ function MyMap() {
           font-weight: 600;
           line-height: 1;
         }
-        .vt-event--active { color: #a78bfa; }
-        .vt-event--soon   { color: #fb923c; }
+        .vt-event--active {
+          color: #a78bfa;
+        }
+        .vt-event--soon {
+          color: #fb923c;
+        }
       `}</style>
     </>
   );

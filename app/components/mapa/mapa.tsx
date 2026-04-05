@@ -1027,7 +1027,8 @@ function MyMap() {
                           key={event.id}
                           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
                           onClick={() => {
-                            router.push(`/events/${event.id}`);
+                            const eventData = encodeURIComponent(JSON.stringify(event));
+                            router.push(`/events/${event.id}?data=${eventData}`);
                           }}
                         >
                           {event.image_path ? (

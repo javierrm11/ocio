@@ -5,6 +5,13 @@ import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from '@/lib/hooks/getToken';
 
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
+
 interface Event {
   id: string;
   venue_id: string;
@@ -15,6 +22,7 @@ interface Event {
   image_path?: string;
   featured: boolean;
   created_at: string;
+  genres?: { genre: Genre; genre_id: number }[];
   venues: {
     id: string;
     name: string;
@@ -46,11 +54,13 @@ export default function EventDetailPage() {
   const eventFromUrl: Event | null = rawData ? JSON.parse(decodeURIComponent(rawData)) : null;
   const eventFromStore = events.find((e) => e.id === eventId) ?? null;
 
-  const [event, setEvent] = useState<Event | null>((eventFromUrl ?? eventFromStore ?? null) as Event | null);
-  const [loading, setLoading] = useState(!eventFromUrl && !eventFromStore);
+  const partialEvent = (eventFromUrl ?? eventFromStore ?? null) as Event | null;
+  const isComplete = !!(partialEvent as any)?.venues;
+  const [event, setEvent] = useState<Event | null>(isComplete ? partialEvent : null);
+  const [loading, setLoading] = useState(!isComplete);
 
   const isUserLoggedIn = !!currentUser;
-  const isAttendingInitial = event?.event_attendees.some(
+  const isAttendingInitial = event?.event_attendees?.some(
     (att) => att.profile_id === currentUser?.id,
   ) ?? false;
 
@@ -62,7 +72,7 @@ export default function EventDetailPage() {
   const isFutureEvent = event ? new Date(event.starts_at) > new Date() : false;
 
   useEffect(() => {
-    if (event) return;
+    if (isComplete) return;
 
     const fetchEvent = async () => {
       try {
@@ -254,6 +264,18 @@ export default function EventDetailPage() {
                 <p className={`text-base leading-relaxed ${isPastEvent ? 'text-gray-500' : 'text-gray-400'}`}>
                   {event.description}
                 </p>
+              )}
+              {event.genres && event.genres.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {event.genres.map((g) => (
+                    <span
+                      key={g.genre_id}
+                      className="flex items-center gap-1.5 text-sm bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-3 py-1 rounded-full"
+                    >
+                      {g.genre?.emoji} {g.genre?.name}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
 

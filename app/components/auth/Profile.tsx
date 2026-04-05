@@ -585,76 +585,113 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
-        <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-          <h2 className="text-white text-xl font-bold">✏️ Editar Evento</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-ozio-card border border-gray-700/60 rounded-3xl max-w-4xl w-full max-h-[80dvh] overflow-y-auto shadow-2xl">
+
+        {/* Header con gradiente */}
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-ozio-purple/20 to-ozio-blue/10 border-b border-gray-700/50 px-7 py-5 flex items-center justify-between rounded-t-3xl backdrop-blur-sm">
+          <div>
+            <h2 className="text-white text-2xl font-bold">Editar evento</h2>
+            <p className="text-gray-400 text-sm mt-0.5 truncate max-w-xs">{event.title}</p>
+          </div>
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition flex-shrink-0">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+        <form onSubmit={handleSubmit} className="p-7 space-y-6">
+
           {/* Imagen */}
           <div>
-            <label className="block text-white font-medium mb-2">Imagen del evento</label>
+            <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2">Imagen del evento</label>
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="edit-event-image" />
-            <label htmlFor="edit-event-image" className="block w-full h-48 border-2 border-dashed border-gray-700 rounded-2xl cursor-pointer hover:border-ozio-blue transition overflow-hidden">
+            <label htmlFor="edit-event-image" className="group relative block w-full h-56 border-2 border-dashed border-gray-700 rounded-2xl cursor-pointer hover:border-ozio-blue/60 transition overflow-hidden">
               {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                <>
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span className="text-white text-sm font-medium">Cambiar imagen</span>
+                  </div>
+                </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  <span>Click para cambiar imagen</span>
+                <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-2">
+                  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <span className="text-sm">Haz click para subir una imagen</span>
                 </div>
               )}
             </label>
           </div>
-          {/* Título */}
-          <div>
-            <label className="block text-white font-medium mb-2">Título *</label>
-            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none" placeholder="Nombre del evento" />
+
+          {/* Título + Descripción */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2">Título *</label>
+              <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full bg-ozio-dark border border-gray-700/80 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition"
+                placeholder="Nombre del evento" />
+            </div>
+            <div>
+              <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2">Descripción</label>
+              <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3} className="w-full bg-ozio-dark border border-gray-700/80 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition resize-none"
+                placeholder="Describe tu evento..." />
+            </div>
           </div>
-          {/* Descripción */}
-          <div>
-            <label className="block text-white font-medium mb-2">Descripción</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3} className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none resize-none" placeholder="Describe tu evento..." />
-          </div>
+
           {/* Fechas */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white font-medium mb-2">Inicio *</label>
-              <DatePicker selected={formData.starts_at} onChange={(date: Date | null) => setFormData({ ...formData, starts_at: date })}
-                showTimeSelect dateFormat="Pp" minDate={new Date()}
-                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
-            </div>
-            <div>
-              <label className="block text-white font-medium mb-2">Fin *</label>
-              <DatePicker selected={formData.ends_at} onChange={(date: Date | null) => setFormData({ ...formData, ends_at: date })}
-                showTimeSelect dateFormat="Pp" minDate={new Date()}
-                className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-ozio-blue focus:outline-none" />
+          <div>
+            <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-3">Fecha y hora</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-ozio-dark border border-gray-700/80 rounded-xl px-4 py-3">
+                <p className="text-gray-500 text-xs mb-1">Inicio</p>
+                <DatePicker selected={formData.starts_at} onChange={(date: Date | null) => setFormData({ ...formData, starts_at: date })}
+                  showTimeSelect dateFormat="Pp" minDate={new Date()}
+                  className="w-full bg-transparent text-white focus:outline-none text-sm" />
+              </div>
+              <div className="bg-ozio-dark border border-gray-700/80 rounded-xl px-4 py-3">
+                <p className="text-gray-500 text-xs mb-1">Fin</p>
+                <DatePicker selected={formData.ends_at} onChange={(date: Date | null) => setFormData({ ...formData, ends_at: date })}
+                  showTimeSelect dateFormat="Pp" minDate={new Date()}
+                  className="w-full bg-transparent text-white focus:outline-none text-sm" />
+              </div>
             </div>
           </div>
-          {/* Géneros ✨ — precargados con los actuales */}
-          <GenreSelector selected={selectedGenres} onChange={setSelectedGenres} />
+
+          {/* Géneros */}
+          <div>
+            <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-3">Géneros musicales</label>
+            <GenreSelector selected={selectedGenres} onChange={setSelectedGenres} />
+          </div>
+
           {/* Destacado */}
-          <div className="flex items-center justify-between bg-ozio-dark rounded-xl px-4 py-3 border border-gray-700">
-            <span className="text-white font-medium">⭐ Evento destacado</span>
+          <div className="flex items-center justify-between bg-ozio-dark/80 rounded-xl px-5 py-4 border border-gray-700/80">
+            <div>
+              <p className="text-white font-medium">Evento destacado</p>
+              <p className="text-gray-500 text-xs mt-0.5">Aparece en la sección de destacados</p>
+            </div>
             <button type="button" onClick={() => setFormData({ ...formData, featured: !formData.featured })}
-              className={`w-12 h-6 rounded-full transition relative ${formData.featured ? "bg-ozio-blue" : "bg-gray-700"}`}>
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform absolute top-0.5 ${formData.featured ? "translate-x-6" : "translate-x-0.5"}`} />
+              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${formData.featured ? "bg-ozio-blue" : "bg-gray-700"}`}>
+              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform absolute top-0.5 ${formData.featured ? "translate-x-6" : "translate-x-0.5"}`} />
             </button>
           </div>
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={handleDelete} disabled={loading} className="py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
-              {loading ? "..." : "🗑️"}
+
+          {/* Acciones */}
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={handleDelete} disabled={loading}
+              className="flex items-center gap-2 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 font-semibold rounded-xl transition disabled:opacity-50">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              {loading ? "..." : "Eliminar"}
             </button>
-            <button type="button" onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition">Cancelar</button>
-            <button type="submit" disabled={loading} className="flex-1 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-semibold rounded-xl border border-gray-700/50 transition">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 py-3 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-ozio-blue/20">
               {loading ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
+
         </form>
       </div>
     </div>

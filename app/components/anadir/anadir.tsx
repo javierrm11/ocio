@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
 import { ArrowLeft, Upload, X, ImageIcon, Video, Calendar, Star } from "lucide-react";
 
 type Tipo = "historia" | "evento" | null;
+
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 
 export default function AnadirPage() {
   const router = useRouter();
@@ -16,7 +23,6 @@ export default function AnadirPage() {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
-      {/* Header */}
       <div className="sticky top-0 z-20 bg-ozio-darker border-b border-gray-800/50 px-4 py-3 flex items-center gap-3">
         <button
           type="button"
@@ -121,7 +127,6 @@ function FormHistoria() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Drop zone */}
       <div
         className={`relative rounded-2xl border-2 border-dashed transition cursor-pointer overflow-hidden min-h-[280px] ${
           file ? "border-ozio-purple/50" : "border-gray-700 hover:border-gray-500"
@@ -138,13 +143,11 @@ function FormHistoria() {
           className="hidden"
           onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }}
         />
-
         {preview ? (
           <>
             {isVideo ? (
               <video src={preview} className="w-full h-full object-cover max-h-[400px]" controls />
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="Preview" className="w-full h-full object-cover max-h-[400px]" />
             )}
             <button
@@ -199,15 +202,18 @@ function FormHistoria() {
 /* ─── Formulario Evento ─── */
 function FormEvento() {
   const router = useRouter();
-  const { venues, currentUser } = useAppStore();
+  const { currentUser } = useAppStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const imageRef = useRef<HTMLInputElement>(null);
 
+  // Géneros
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+
   const [form, setForm] = useState({
-    venue_id: "",
     title: "",
     description: "",
     starts_at: "",
@@ -217,13 +223,27 @@ function FormEvento() {
 
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
 
+  // Cargar catálogo de géneros
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/genres`)
+      .then((r) => r.json())
+      .then(setGenres)
+      .catch(() => {});
+  }, []);
+
+  const toggleGenre = (id: number) => {
+    setSelectedGenres((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
+    );
+  };
+
   const handleImage = (f: File) => {
     setImageFile(f);
     setImagePreview(URL.createObjectURL(f));
   };
 
   const submit = async () => {
-    if (!currentUser?.id) { setError("Selecciona un local"); return; }
+    if (!currentUser?.id) { setError("No se encontró el local"); return; }
     if (!form.title.trim()) { setError("El título es obligatorio"); return; }
     if (!form.starts_at) { setError("Indica la fecha de inicio"); return; }
     if (!form.ends_at) { setError("Indica la fecha de fin"); return; }
@@ -243,6 +263,7 @@ function FormEvento() {
       fd.append("starts_at", form.starts_at);
       fd.append("ends_at", form.ends_at);
       fd.append("featured", String(form.featured));
+      fd.append("genre_ids", JSON.stringify(selectedGenres));
       if (imageFile) fd.append("image", imageFile);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events`, {
@@ -262,7 +283,6 @@ function FormEvento() {
 
   const inputClass =
     "w-full bg-ozio-card border border-gray-700/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
-
   const labelClass = "text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1.5 block";
 
   return (
@@ -325,6 +345,38 @@ function FormEvento() {
         </div>
       </div>
 
+      {/* Géneros musicales */}
+      {genres.length > 0 && (
+        <div>
+          <label className={labelClass}>Géneros musicales</label>
+          <div className="flex flex-wrap gap-2">
+            {genres.map((genre) => {
+              const selected = selectedGenres.includes(genre.id);
+              return (
+                <button
+                  key={genre.id}
+                  type="button"
+                  onClick={() => toggleGenre(genre.id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
+                    selected
+                      ? "bg-ozio-blue border-ozio-blue text-white scale-105"
+                      : "bg-ozio-card border-gray-700/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
+                  }`}
+                >
+                  <span>{genre.emoji}</span>
+                  <span>{genre.name}</span>
+                </button>
+              );
+            })}
+          </div>
+          {selectedGenres.length > 0 && (
+            <p className="text-xs text-ozio-blue mt-2">
+              {selectedGenres.length} género{selectedGenres.length > 1 ? "s" : ""} seleccionado{selectedGenres.length > 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Imagen */}
       <div>
         <label className={labelClass}>Imagen del evento</label>
@@ -342,7 +394,6 @@ function FormEvento() {
           />
           {imagePreview ? (
             <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imagePreview} alt="Preview" className="w-full object-cover max-h-[200px]" />
               <button
                 type="button"

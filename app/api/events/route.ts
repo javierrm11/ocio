@@ -71,10 +71,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const userId = await getUserId();
   if (!userId) {
-    return NextResponse.json(
-      { error: 'No autenticado' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   }
 
   const supabase = await createClient();
@@ -87,17 +84,16 @@ export async function POST(request: Request) {
   const ends_at = formData.get("ends_at") as string;
   const featured = formData.get("featured") === "true";
   const imageFile = formData.get("image") as File | null;
+  const genreIds: number[] = JSON.parse(formData.get("genre_ids") as string || "[]");
 
   let image_path = null;
 
-  // Si hay un archivo de imagen, subirlo a Supabase Storage
   if (imageFile && imageFile.size > 0) {
     const fileExt = imageFile.name.split('.').pop();
     const fileName = `${title.replace(/\s+/g, '-')}-${Date.now()}.${fileExt}`;
     const filePath = `events/${fileName}`;
 
-    // Subir archivo al bucket 'events'
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('events')
       .upload(filePath, imageFile, {
         contentType: imageFile.type,
@@ -112,7 +108,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Obtener URL pública de la imagen
     const { data: { publicUrl } } = supabase.storage
       .from('events')
       .getPublicUrl(filePath);
@@ -120,22 +115,36 @@ export async function POST(request: Request) {
     image_path = publicUrl;
   }
 
-  // Insertar evento en la base de datos
+  // Insertar evento
   const { data, error } = await supabase
     .from("events")
-    .insert({
-      venue_id,
-      title,
-      description,
-      starts_at,
-      ends_at,
-      featured,
-      image_path
-    })
-    .select();
+    .insert({ venue_id, title, description, starts_at, ends_at, featured, image_path })
+    .select()
+    .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Insertar géneros si se proporcionaron
+  if (genreIds.length > 0) {
+    const rows = genreIds.map((genre_id) => ({
+      event_id: data.id,
+      genre_id,
+    }));
+
+    const { error: genreError } = await supabase
+      .from("event_genres")
+      .insert(rows);
+
+    if (genreError) {
+      console.error("Error al insertar géneros del evento:", genreError);
+      return NextResponse.json({
+        success: true,
+        data,
+        warning: "Evento creado pero hubo un error al guardar los géneros",
+      });
+    }
   }
 
   return NextResponse.json({ success: true, data });

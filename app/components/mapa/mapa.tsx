@@ -598,7 +598,7 @@ function MyMap() {
       </div>
 
       {/* ─── FILTROS RESPONSIVE ─── */}
-      <div className="absolute top-16 right-3 z-[992] pointer-events-none">
+      <div className="absolute bottom-20 right-3 z-[992] pointer-events-none">
         <button
           type="button"
           onClick={() => setShowFilters(true)}

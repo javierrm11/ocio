@@ -37,7 +37,20 @@ export default function Eventos() {
   const [filter, setFilter] = useState<FilterType>('todos');
   const [search, setSearch] = useState('');
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
+  const [generosSeleccionados, setGenerosSeleccionados] = useState<Set<string>>(new Set());
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const generosDisponibles = useMemo(() => {
+    const all = (events as Event[]).flatMap((e) =>
+      e.genres?.map((g) => ({ name: g.genre?.name ?? '', emoji: g.genre?.emoji ?? '🎵' })) || []
+    );
+    const seen = new Set<string>();
+    return all.filter(({ name }) => {
+      if (!name || seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
+  }, [events]);
 
   // Cerrar panel al hacer click fuera
   useEffect(() => {
@@ -69,6 +82,12 @@ export default function Eventos() {
       result = result.filter((e) =>
         e.title.toLowerCase().includes(search.toLowerCase()) ||
         e.description?.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
+
+    if (generosSeleccionados.size > 0) {
+      result = result.filter((e) =>
+        e.genres?.some((g) => generosSeleccionados.has(g.genre?.name ?? ''))
       );
     }
 
@@ -133,7 +152,7 @@ export default function Eventos() {
     return start >= now && start <= endOfWeek;
   }).length;
 
-  const filtrosActivos = filter !== 'todos' ? 1 : 0;
+  const filtrosActivos = (filter !== 'todos' ? 1 : 0) + generosSeleccionados.size;
 
   const filterOptions = [
     { key: 'todos', label: 'Todos los eventos', icon: '📋', desc: 'Ver toda la agenda completa', count: events.length },
@@ -264,23 +283,76 @@ export default function Eventos() {
                     ))}
                   </div>
 
+                  {generosDisponibles.length > 0 && (
+                    <div className="px-3 pb-3 border-t border-gray-700/50 pt-3">
+                      <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2 block">Género musical</span>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setGenerosSeleccionados(new Set())}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                            generosSeleccionados.size === 0
+                              ? 'bg-ozio-purple border-ozio-purple/80 text-white'
+                              : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'
+                          }`}
+                        >
+                          Todos
+                        </button>
+                        {generosDisponibles.map(({ name, emoji }) => {
+                          const active = generosSeleccionados.has(name);
+                          return (
+                            <button
+                              key={name}
+                              type="button"
+                              onClick={() => {
+                                setGenerosSeleccionados((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(name)) next.delete(name);
+                                  else next.add(name);
+                                  return next;
+                                });
+                              }}
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                                active
+                                  ? 'bg-ozio-purple border-ozio-purple/80 text-white'
+                                  : 'border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'
+                              }`}
+                            >
+                              {emoji} {name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>
           </div>
 
-          {/* Chip del filtro activo */}
-          {filter !== 'todos' && (
-            <div className="flex items-center gap-2 mt-3">
-              <span className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-purple-300 text-xs font-medium px-3 py-1.5 rounded-full">
-                {currentFilter?.icon} {currentFilter?.label}
-                <button
-                  onClick={() => setFilter('todos')}
-                  className="ml-1 hover:text-white transition"
-                >
-                  ×
-                </button>
-              </span>
+          {/* Chips de filtros activos */}
+          {(filter !== 'todos' || generosSeleccionados.size > 0) && (
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              {filter !== 'todos' && (
+                <span className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-purple-300 text-xs font-medium px-3 py-1.5 rounded-full">
+                  {currentFilter?.icon} {currentFilter?.label}
+                  <button type="button" onClick={() => setFilter('todos')} className="ml-1 hover:text-white transition">×</button>
+                </span>
+              )}
+              {Array.from(generosSeleccionados).map((name) => {
+                const g = generosDisponibles.find((x) => x.name === name);
+                return (
+                  <span key={name} className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-purple-300 text-xs font-medium px-3 py-1.5 rounded-full">
+                    {g?.emoji} {name}
+                    <button
+                      type="button"
+                      onClick={() => setGenerosSeleccionados((prev) => { const next = new Set(prev); next.delete(name); return next; })}
+                      className="ml-1 hover:text-white transition"
+                    >×</button>
+                  </span>
+                );
+              })}
             </div>
           )}
 

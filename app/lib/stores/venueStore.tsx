@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
+
 interface Event {
   id: string;
   title: string;
@@ -9,12 +16,7 @@ interface Event {
   venue_id: string;
   image_path: string | null;
   description: string;
-}
-interface Genre {
-  id: number;
-  name: string;
-  slug: string;
-  emoji: string;
+  genres?: Genre[];
 }
 
 interface Venue {

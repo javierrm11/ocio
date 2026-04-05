@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("events")
-    .select("*, event_attendees(*)");
+    .select("*, event_attendees(*), genres: event_genres (genre_id, genre: genres (id, name, slug, emoji))");
 
   const filterableFields = [
     "venue_id",

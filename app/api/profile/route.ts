@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   if(user.user_metadata.type == "venue"){
     const { data, error } = await supabase
     .from("venues")
-    .select("*, events(*, event_attendees(count)), check_ins(*), genres:venue_genres (genre_id, genre:genres (id, name, slug, emoji))")
+    .select("*, events(*, event_attendees(count) genres: event_genres (genre_id, genre: genres (id, name, slug, emoji))), check_ins(*), genres:venue_genres (genre_id, genre:genres (id, name, slug, emoji))")
     .eq("id", user.id);
     if (error) {
       console.error("Error fetching venue profile:", error);

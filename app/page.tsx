@@ -15,7 +15,7 @@ export default function LandingPage() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-5 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E5CFF] to-[#8B5CF6] flex items-center justify-center shadow-lg shadow-[#2E5CFF]/30">
-            <span className="text-white font-black text-sm">O</span>
+            <img src="/logo.jpeg" alt="Ozio Logo" className="w-4 h-4" />
           </div>
           <span className="text-white font-black text-xl tracking-tight">Ozio</span>
         </div>
@@ -146,7 +146,7 @@ export default function LandingPage() {
       <footer className="relative z-10 border-t border-white/5 px-6 py-8 max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#2E5CFF] to-[#8B5CF6] flex items-center justify-center">
-            <span className="text-white font-black text-[10px]">O</span>
+            <img src="/logo.jpeg" alt="Ozio Logo" className="w-3 h-3" />
           </div>
           <span className="text-gray-500 text-sm">© {new Date().getFullYear()} Ozio</span>
         </div>

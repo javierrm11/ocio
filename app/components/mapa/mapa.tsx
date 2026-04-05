@@ -270,10 +270,10 @@ function MyMap() {
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [filters, setFilters] = useState({
     maxDistance: null as number | null,
-    minCheckins: 0,
   });
   const [showFilters, setShowFilters] = useState(false);
   const [generosSeleccionados, setGenerosSeleccionados] = useState<Set<string>>(new Set());
+  const [ambientesSeleccionados, setAmbientesSeleccionados] = useState<Set<string>>(new Set());
   const currentProfileId = currentUser?.id;
 
   const getGenreName = (g: Genre): string => g.genre?.name ?? g.name ?? "";
@@ -295,7 +295,7 @@ function MyMap() {
   }, [venues]);
 
   const hasActiveFilters =
-    filters.maxDistance !== null || filters.minCheckins > 0 || generosSeleccionados.size > 0;
+    filters.maxDistance !== null || ambientesSeleccionados.size > 0 || generosSeleccionados.size > 0;
 
   const venuesRef = useRef(venues);
   useEffect(() => {
@@ -478,8 +478,11 @@ function MyMap() {
     if (filters.maxDistance !== null && dist > filters.maxDistance)
       return false;
 
-    const checkins = v.check_ins?.length || 0;
-    if (checkins < filters.minCheckins) return false;
+    if (ambientesSeleccionados.size > 0) {
+      const checkins = v.check_ins?.length || 0;
+      const nivel = checkins === 0 ? "tranquilo" : checkins < 5 ? "animado" : "muy_animado";
+      if (!ambientesSeleccionados.has(nivel)) return false;
+    }
 
     if (generosSeleccionados.size > 0 && !v.genres?.some((g) => generosSeleccionados.has(getGenreName(g))))
       return false;
@@ -598,7 +601,7 @@ function MyMap() {
       </div>
 
       {/* ─── FILTROS RESPONSIVE ─── */}
-      <div className="absolute bottom-20 right-3 z-[992] pointer-events-none">
+      <div className="absolute bottom-20 right-3 z-[992] pointer-events-none max-w-xl">
         <button
           type="button"
           onClick={() => setShowFilters(true)}
@@ -652,7 +655,8 @@ function MyMap() {
                 <button
                   type="button"
                   onClick={() => {
-                    setFilters({ maxDistance: null, minCheckins: 0 });
+                    setFilters({ maxDistance: null });
+                    setAmbientesSeleccionados(new Set());
                     setGenerosSeleccionados(new Set());
                   }}
                   className="text-xs text-blue-400 hover:text-blue-300 transition"
@@ -721,29 +725,45 @@ function MyMap() {
 
             <div>
               <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
-                Ambiente mínimo
+                Ambiente
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAmbientesSeleccionados(new Set())}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                    ambientesSeleccionados.size === 0
+                      ? "bg-blue-600 border-blue-500 text-white"
+                      : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                  }`}
+                >
+                  Todos
+                </button>
                 {[
-                  { label: "Todos", value: 0 },
-                  { label: "🟡 Medio", value: 5 },
-                  { label: "🔴 Alto", value: 10 },
-                ].map((option) => {
-                  const active = filters.minCheckins === option.value;
+                  { key: "tranquilo",  label: "🌿 Tranquilo" },
+                  { key: "animado",    label: "✨ Animado" },
+                  { key: "muy_animado", label: "🔥 Muy animado" },
+                ].map(({ key, label }) => {
+                  const active = ambientesSeleccionados.has(key);
                   return (
                     <button
-                      key={option.value}
+                      key={key}
                       type="button"
-                      onClick={() =>
-                        setFilters((f) => ({ ...f, minCheckins: option.value }))
-                      }
-                      className={`text-xs py-2 rounded-xl border transition font-medium ${
+                      onClick={() => {
+                        setAmbientesSeleccionados((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(key)) next.delete(key);
+                          else next.add(key);
+                          return next;
+                        });
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                         active
                           ? "bg-blue-600 border-blue-500 text-white"
-                          : "border-gray-700 text-gray-300 hover:border-gray-500"
+                          : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
                       }`}
                     >
-                      {option.label}
+                      {label}
                     </button>
                   );
                 })}

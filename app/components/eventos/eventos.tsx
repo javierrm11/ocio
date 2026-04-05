@@ -137,16 +137,16 @@ export default function Eventos() {
     return result;
   })();
 
-  const activeCount = events.filter(
+  const activeCount = (events as Event[]).filter(
     (e: Event) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
   ).length;
 
-  const todayCount = events.filter((e: Event) => {
+  const todayCount = (events as Event[]).filter((e: Event) => {
     const start = new Date(e.starts_at);
     return start.toDateString() === now.toDateString();
   }).length;
 
-  const weekCount = events.filter((e: Event) => {
+  const weekCount = (events as Event[]).filter((e: Event) => {
     const start = new Date(e.starts_at);
     const endOfWeek = new Date(now); endOfWeek.setDate(now.getDate() + 7);
     return start >= now && start <= endOfWeek;

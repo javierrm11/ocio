@@ -4,6 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from "@/lib/stores/venueStore";
 import { useState, useMemo, useRef, useEffect } from 'react';
 
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  emoji: string;
+}
 interface Event {
   id: string;
   venue_id: string;
@@ -14,6 +20,7 @@ interface Event {
   featured: boolean;
   image_path: string | null;
   event_attendees?: any[];
+  genres?: { genre: Genre; genre_id: number }[];
 }
 
 interface Venue {
@@ -405,6 +412,19 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
 
         {event.description && (
           <p className="text-gray-500 text-sm mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
+        )}
+        {/* Géneros del evento */}
+        {event.genres && event.genres.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {event.genres.slice(0, 3).map((g) => (
+              <span
+                key={g.genre_id}
+                className="flex items-center gap-1 text-[11px] bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-2 py-0.5 rounded-full"
+              >
+                {g.genre?.emoji} {g.genre?.name}
+              </span>
+            ))}
+          </div>
         )}
 
         {venue && (

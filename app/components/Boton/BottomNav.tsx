@@ -21,6 +21,7 @@ function BottomNav() {
   const pathname = usePathname();
   const { role } = useUser();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const isBusiness = role === "business";
   const isAuthenticated = Boolean(getToken());
@@ -31,7 +32,7 @@ function BottomNav() {
 
     // 🔁 BOTÓN DINÁMICO
     isBusiness
-      ? { icon: <Plus size={30} />, label: 'Añadir', path: '/anadir', special: true, requiresAuth: true }
+      ? { icon: <Plus size={30} />, label: 'Añadir', path: '__add__', special: true, requiresAuth: true }
       : { icon: <Heart size={30} />, label: 'Guardados', path: '/profile?favorites', special: true },
 
     { icon: <Search size={25} />, label: 'Buscar', path: '/buscar' },
@@ -51,7 +52,10 @@ function BottomNav() {
                 setShowAuthModal(true);
                 return;
               }
-
+              if (path === '__add__') {
+                setShowAddModal(true);
+                return;
+              }
               router.push(path);
             }}
             special={special}
@@ -59,6 +63,66 @@ function BottomNav() {
         ))}
       </div>
 
+      {/* Modal: elegir qué añadir */}
+      {showAddModal && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 px-4 pb-6"
+          onClick={() => setShowAddModal(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-ozio-card p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold text-base">¿Qué quieres añadir?</h3>
+              <button
+                type="button"
+                aria-label="Cerrar"
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-white transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddModal(false);
+                  router.push('/anadir?tipo=historia');
+                }}
+                className="flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
+              >
+                <span className="text-4xl">📸</span>
+                <div className="text-center">
+                  <p className="text-white font-semibold text-sm group-hover:text-ozio-purple transition">Historia</p>
+                  <p className="text-gray-500 text-xs mt-0.5">Foto o vídeo del momento</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddModal(false);
+                  router.push('/anadir?tipo=evento');
+                }}
+                className="flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
+              >
+                <span className="text-4xl">🎉</span>
+                <div className="text-center">
+                  <p className="text-white font-semibold text-sm group-hover:text-ozio-blue transition">Evento</p>
+                  <p className="text-gray-500 text-xs mt-0.5">Crea un evento en tu local</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: requiere auth */}
       {showAuthModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-6">
           <div className="w-full max-w-sm rounded-2xl bg-ozio-card p-6 text-center shadow-2xl">

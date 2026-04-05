@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "react-leaflet";
 import L from "leaflet";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -273,10 +273,29 @@ function MyMap() {
     minCheckins: 0,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [generosSeleccionados, setGenerosSeleccionados] = useState<Set<string>>(new Set());
   const currentProfileId = currentUser?.id;
 
+  const getGenreName = (g: Genre): string => g.genre?.name ?? g.name ?? "";
+  const getGenreEmoji = (g: Genre): string => g.genre?.emoji ?? g.emoji ?? "🎵";
+
+  const generosDisponibles = useMemo(() => {
+    const all = venues.flatMap((v) =>
+      v.genres?.map((g) => ({
+        name: getGenreName(g),
+        emoji: getGenreEmoji(g),
+      })) || []
+    );
+    const seen = new Set<string>();
+    return all.filter(({ name }) => {
+      if (!name || seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
+  }, [venues]);
+
   const hasActiveFilters =
-    filters.maxDistance !== null || filters.minCheckins > 0;
+    filters.maxDistance !== null || filters.minCheckins > 0 || generosSeleccionados.size > 0;
 
   const venuesRef = useRef(venues);
   useEffect(() => {
@@ -462,6 +481,9 @@ function MyMap() {
     const checkins = v.check_ins?.length || 0;
     if (checkins < filters.minCheckins) return false;
 
+    if (generosSeleccionados.size > 0 && !v.genres?.some((g) => generosSeleccionados.has(getGenreName(g))))
+      return false;
+
     return true;
   });
 
@@ -629,12 +651,10 @@ function MyMap() {
               {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={() =>
-                    setFilters({
-                      maxDistance: null,
-                      minCheckins: 0,
-                    })
-                  }
+                  onClick={() => {
+                    setFilters({ maxDistance: null, minCheckins: 0 });
+                    setGenerosSeleccionados(new Set());
+                  }}
                   className="text-xs text-blue-400 hover:text-blue-300 transition"
                 >
                   Resetear
@@ -729,6 +749,51 @@ function MyMap() {
                 })}
               </div>
             </div>
+
+            {generosDisponibles.length > 0 && (
+              <div>
+                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+                  Género musical
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setGenerosSeleccionados(new Set())}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                      generosSeleccionados.size === 0
+                        ? "bg-blue-600 border-blue-500 text-white"
+                        : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  {generosDisponibles.map(({ name, emoji }) => {
+                    const active = generosSeleccionados.has(name);
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setGenerosSeleccionados((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(name)) next.delete(name);
+                            else next.add(name);
+                            return next;
+                          });
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                          active
+                            ? "bg-blue-600 border-blue-500 text-white"
+                            : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                        }`}
+                      >
+                        {emoji} {name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="px-5 py-4 border-t border-gray-700 bg-gray-900/95">

@@ -264,10 +264,10 @@ export default function VenueDetail() {
 
   return (
     <div className="bg-ozio-dark">
-    <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
       {/* Spacer for fixed header */}
       <Header/>
+      <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
       {/* ── Avatar + Stats (estilo Instagram) ── */}
       <div className="px-4 pt-4">

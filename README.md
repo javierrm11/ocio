@@ -146,7 +146,6 @@ npm run build
 
 ## 🛣️ Mejoras
 - Historias en las pestañas de las empresas
-- Landing Page
 - Fix filtros z-index
 - Circulo mas grande en funcion del plan del usuario
 - Filtros

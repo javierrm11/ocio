@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { isPremium } from "@/lib/hooks/plan";
+import { getToken } from "@/lib/hooks/getToken";
 
 const FREE_FEATURES = [
   { text: "Perfil del local", ok: true },
@@ -24,9 +26,30 @@ const PREMIUM_FEATURES = [
   { text: "Soporte prioritario 24h" },
 ];
 
+async function notifyPlanChange(plan: "premium" | "free") {
+  const token = getToken();
+  await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notify-plan`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ plan }),
+  });
+}
+
 export default function Premium() {
   const { currentUser } = useAppStore();
   const premium = isPremium(currentUser || {});
+  const [loading, setLoading] = useState<"premium" | "free" | null>(null);
+  const [sent, setSent] = useState<"premium" | "free" | null>(null);
+
+  async function handleSelect(plan: "premium" | "free") {
+    setLoading(plan);
+    await notifyPlanChange(plan);
+    setLoading(null);
+    setSent(plan);
+  }
 
   return (
     <div className="min-h-screen bg-[#070B15] pb-28 pt-14 overflow-x-hidden">
@@ -60,7 +83,7 @@ export default function Premium() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col md:flex-row  gap-4">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col md:flex-row gap-4">
 
         {/* ── Card PREMIUM ── */}
         <div className="relative rounded-3xl overflow-hidden premium-card flex-1">
@@ -105,13 +128,19 @@ export default function Premium() {
               <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-green-400 border border-green-500/30 bg-green-500/10">
                 ✨ Plan activo
               </div>
+            ) : sent === "premium" ? (
+              <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-amber-400 border border-amber-400/30 bg-amber-400/10">
+                ✅ Solicitud enviada — te contactamos en 24h
+              </div>
             ) : (
-              <a
-                href="mailto:hola@ozio.app?subject=Solicitud%20plan%20Premium&body=Hola%2C%20me%20interesa%20el%20plan%20Premium%20para%20mi%20local."
-                className="block w-full py-3.5 rounded-2xl text-center font-black text-sm hover:opacity-90 hover:scale-[1.02] transition active:scale-[0.98] premium-cta"
+              <button
+                type="button"
+                onClick={() => handleSelect("premium")}
+                disabled={loading === "premium"}
+                className="w-full py-3.5 rounded-2xl text-center font-black text-sm hover:opacity-90 hover:scale-[1.02] transition active:scale-[0.98] premium-cta disabled:opacity-60 disabled:scale-100"
               >
-                👑 Solicitar Premium
-              </a>
+                {loading === "premium" ? "Enviando..." : "👑 Solicitar Premium"}
+              </button>
             )}
           </div>
         </div>
@@ -150,13 +179,19 @@ export default function Premium() {
             <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-green-400 border border-green-500/30 bg-green-500/10">
               ✅ Plan activo
             </div>
+          ) : sent === "free" ? (
+            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5">
+              ✅ Solicitud enviada — te contactamos pronto
+            </div>
           ) : (
-            <a
-              href="mailto:hola@ozio.app?subject=Cancelar%20plan%20Premium&body=Hola%2C%20me%20gustar%C3%ADa%20cambiar%20al%20plan%20gratuito."
-              className="block w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5 hover:bg-white/10 hover:text-gray-300 transition active:scale-[0.98]"
+            <button
+              type="button"
+              onClick={() => handleSelect("free")}
+              disabled={loading === "free"}
+              className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5 hover:bg-white/10 hover:text-gray-300 transition active:scale-[0.98] disabled:opacity-60"
             >
-              Seleccionar plan
-            </a>
+              {loading === "free" ? "Enviando..." : "Seleccionar plan"}
+            </button>
           )}
         </div>
 

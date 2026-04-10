@@ -988,6 +988,7 @@ function MyMap() {
                         <span className="flex items-center gap-1">
                           📍 A {label}
                         </span>
+                        <span className="flex items-center gap-1">|</span>
                         {driveMin !== null && (
                           <span className="flex items-center gap-1">
                             <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">

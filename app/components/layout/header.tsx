@@ -14,7 +14,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
 
         {/* Logo + wordmark */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 p-2 cursor-pointer" onClick={() => router.push("/")}>
           <div className="w-8 h-8 rounded-lg bg-ozio-purple/10 border border-ozio-purple/40 flex items-center justify-center">
             <img src="/logo.jpeg" alt="Ozio" className="w-5 h-5 rounded" />
           </div>

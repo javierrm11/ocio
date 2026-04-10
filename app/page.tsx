@@ -33,19 +33,19 @@ export default function LandingPage() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#2E5CFF]/10 border border-[#2E5CFF]/30 text-[#2E5CFF] text-xs font-semibold mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2E5CFF] animate-pulse" />
-          Ambiente nocturno en tiempo real
+          Ambiente en tiempo real
         </div>
 
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
           Descubre dónde
           <br />
           <span className="bg-gradient-to-r from-[#2E5CFF] via-[#8B5CF6] to-[#FF8A00] bg-clip-text text-transparent">
-            está la noche
+            está el ambiente
           </span>
         </h1>
 
         <p className="text-gray-400 text-lg sm:text-xl max-w-xl leading-relaxed mb-10">
-          Consulta el ambiente de bares y discotecas en tiempo real, haz check-in y encuentra los mejores planes nocturnos cerca de ti.
+          Consulta el ambiente de bares, restaurantes y locales en tiempo real, haz check-in y encuentra los mejores planes cerca de ti.
         </p>
 
         {/* CTAs */}

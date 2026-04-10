@@ -1220,7 +1220,7 @@ function MyMap() {
                     className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                     onClick={() => router.push(`/venues/${selectedVenue.id}`)}
                   >
-                    Ver detalles
+                    Ir ahora 🔥
                   </button>
 
                   {isUserProfile && (

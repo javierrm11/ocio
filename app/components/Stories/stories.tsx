@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/hooks/getToken';
 
 interface Story {
@@ -79,6 +80,7 @@ export default function Stories() {
     }
   };
 
+  const router = useRouter();
   const canUploadStories = !userLoading && currentUser && !currentUser.username;
 
   // ── Navegación dentro del grupo activo ──────────────────────────────────
@@ -187,7 +189,7 @@ export default function Stories() {
         {canUploadStories && (
           <div
             className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
-            onClick={() => setShowUploadModal(true)}
+            onClick={() => router.push('/anadir?tipo=historia')}
           >
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

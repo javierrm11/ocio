@@ -509,7 +509,7 @@ function PremiumModal({ onClose }: { onClose: () => void }) {
         <button
           className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
           style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 16px rgba(251,191,36,0.3)" }}
-          onClick={router.push("/premium") /* Redirige a la página de compra, que aún no existe */}
+          onClick={() => router.push("/premium")}
         >
           Actualizar a Premium 👑
         </button>

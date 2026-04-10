@@ -116,3 +116,45 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* ── Premium page ─────────────────────────────────────────────────────────── */
+.premium-crown-icon {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24, #f97316);
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.45), 0 0 80px rgba(251, 191, 36, 0.15);
+}
+.premium-title-gradient {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.premium-card {
+  background: linear-gradient(160deg, rgba(139, 92, 246, 0.15) 0%, rgba(10, 14, 26, 0.95) 60%);
+  border: 1.5px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.08), 0 20px 60px rgba(139, 92, 246, 0.2);
+}
+.premium-card-badge {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #1a0800;
+}
+.premium-check-icon {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+.premium-cta {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
+  color: #1a0800;
+}
+.free-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.free-check-icon {
+  background: rgba(46, 92, 255, 0.15);
+  border: 1px solid rgba(46, 92, 255, 0.3);
+}
+.free-cross-icon {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

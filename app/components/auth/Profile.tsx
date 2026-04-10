@@ -476,6 +476,7 @@ function StatsTab() {
 
 // ── PremiumModal ──────────────────────────────────────────────────────────────
 function PremiumModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
       <div
@@ -508,7 +509,7 @@ function PremiumModal({ onClose }: { onClose: () => void }) {
         <button
           className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
           style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 16px rgba(251,191,36,0.3)" }}
-          onClick={onClose}
+          onClick={router.push("/premium") /* Redirige a la página de compra, que aún no existe */}
         >
           Actualizar a Premium 👑
         </button>

@@ -906,11 +906,10 @@ function MyMap() {
                 className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full"
                 style={{
                   backgroundColor:
-                    (selectedVenue.check_ins?.length || 0) === 0
-                      ? "#10b981"
-                      : (selectedVenue.check_ins?.length || 0) < 5
-                        ? "#f59e0b"
-                        : "#ef4444",
+                    heatState === "full"   ? "#b91c1c"
+                    : heatState === "hot"  ? "#ef4444"
+                    : heatState === "warm" ? "#f59e0b"
+                    :                       "#10b981",
                 }}
               >
                 {selectedHeatLabel}

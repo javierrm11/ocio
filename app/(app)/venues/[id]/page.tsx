@@ -310,15 +310,7 @@ export default function VenueDetail() {
               <p className="text-white text-xl font-black leading-none">{venue.events?.length || 0}</p>
               <p className="text-gray-400 text-xs mt-1">Eventos</p>
             </div>
-            <div className="w-px h-8 bg-gray-800" />
-            <div className="text-center">
-              <p className="text-white text-xl font-black leading-none">
-                {activeEvents.length > 0 ? (
-                  <span className="text-green-400">{activeEvents.length}</span>
-                ) : 0}
-              </p>
-              <p className="text-gray-400 text-xs mt-1">En curso</p>
-            </div>
+            
           </div>
         </div>
 

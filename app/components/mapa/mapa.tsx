@@ -930,45 +930,34 @@ function MyMap() {
                 </h2>
 
                 {/* 🌡️ Temperatura — Feature Principal */}
-                <div
-                  className={`mt-3 rounded-2xl p-4 border heat-card-${heatState}`}
-                >
-                  {/* Fila superior: icono + label + contador */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl leading-none">
-                        {selectedCheckins >= 5
-                          ? "🔥"
-                          : selectedCheckins > 0
-                            ? "✨"
-                            : "🌿"}
+                <div className={`mt-3 rounded-2xl p-3 border heat-card-${heatState}`}>
+                  {/* Segmentos */}
+                  <div className="flex gap-1.5 mb-3">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`flex-1 h-4 rounded-full transition-all duration-500 ${
+                          i < selectedHeatStep
+                            ? `heat-seg-${heatState} heat-seg-anim heat-seg-delay-${i}`
+                            : "bg-white/8"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Pie: emoji + label + conteo */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">
+                        {selectedCheckins >= 5 ? "🔥" : selectedCheckins > 0 ? "✨" : "🌿"}
                       </span>
-                      <div>
-                        <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold mb-0.5">
-                          Ambiente ahora
-                        </p>
-                        <p className="text-white text-xl font-black leading-tight">
-                          {selectedHeatLabel}
-                        </p>
-                      </div>
+                      <span className="text-white font-black text-base">
+                        {selectedHeatLabel}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Barra de temperatura protagonista */}
-                  <div className="relative h-5 w-full rounded-full bg-black/50 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full bg-gradient-to-r ${selectedHeatGradient} ${HEAT_BAR_WIDTH_CLASSES[selectedHeatStep]} transition-all duration-700 ease-out animate-heat-pulse heat-bar-glow-${heatState}`}
-                    />
-                    <div className="absolute inset-y-0 w-16 bg-white/10 blur-md animate-heat-shine" />
-                  </div>
-
-                  {/* Escala */}
-                  <div className="flex justify-between mt-2 px-0.5">
-                    <span className="text-[10px] text-white/25 font-medium">
-                      Tranquilo
-                    </span>
-                    <span className="text-[10px] text-white/25 font-medium">
-                      Llenazo
+                    <span className={`text-xs font-bold heat-count-${heatState}`}>
+                      {selectedCheckins}{" "}
+                      {selectedCheckins === 1 ? "persona" : "personas"}
                     </span>
                   </div>
                 </div>
@@ -1433,7 +1422,35 @@ function MyMap() {
         .heat-count-hot {
           color: #f87171;
         }
-        /* Heat bar glow */
+        /* Heat segments */
+        .heat-seg-cool {
+          background: linear-gradient(90deg, #34d399, #6ee7b7);
+          box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 18px rgba(52, 211, 153, 0.5);
+        }
+        .heat-seg-warm {
+          background: linear-gradient(90deg, #fb923c, #fbbf24);
+          box-shadow: 0 0 8px rgba(251, 146, 60, 0.9), 0 0 18px rgba(251, 146, 60, 0.5);
+        }
+        .heat-seg-hot {
+          background: linear-gradient(90deg, #ef4444, #fb923c);
+          box-shadow: 0 0 8px rgba(239, 68, 68, 0.95), 0 0 18px rgba(239, 68, 68, 0.55);
+        }
+        @keyframes seg-pulse {
+          0%, 100% { opacity: 1; transform: scaleY(1); }
+          50% { opacity: 0.65; transform: scaleY(0.75); }
+        }
+        .heat-seg-anim { animation: seg-pulse 1.6s ease-in-out infinite; }
+        .heat-seg-delay-0 { animation-delay: 0ms; }
+        .heat-seg-delay-1 { animation-delay: 100ms; }
+        .heat-seg-delay-2 { animation-delay: 200ms; }
+        .heat-seg-delay-3 { animation-delay: 300ms; }
+        .heat-seg-delay-4 { animation-delay: 400ms; }
+        .heat-seg-delay-5 { animation-delay: 500ms; }
+        .heat-seg-delay-6 { animation-delay: 600ms; }
+        .heat-seg-delay-7 { animation-delay: 700ms; }
+        .heat-seg-delay-8 { animation-delay: 800ms; }
+        .heat-seg-delay-9 { animation-delay: 900ms; }
+        /* Heat bar glow (legacy, kept for filter use) */
         .heat-bar-glow-cool {
           box-shadow:
             0 0 14px rgba(52, 211, 153, 0.9),

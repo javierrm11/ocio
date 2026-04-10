@@ -19,7 +19,7 @@ export async function GET() {
     .eq("id", user.id)
     .single();
 
-  if (!isPremium({ plan: accountData?.plan, plan_expires_at: accountData?.plan_expires_at })) {
+  if (!isPremium({ plan: accountData?.plan })) {
     return NextResponse.json({ error: "Plan premium requerido" }, { status: 403 });
   }
 

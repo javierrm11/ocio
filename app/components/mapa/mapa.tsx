@@ -46,8 +46,6 @@ interface Venue {
   is_favorite?: boolean;
   events?: Event[];
   plan?: string;
-  plan_expires_at?: string | null;
-  plan?: string;
 }
 
 function getEventStatus(venue: Venue): "active" | "soon" | "none" {

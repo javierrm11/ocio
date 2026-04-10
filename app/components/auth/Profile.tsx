@@ -43,7 +43,6 @@ interface UserProfile {
   checkInHistory?: CheckInHistory[];
   genres?: { genre: Genre; genre_id: number }[];
   plan?: string;
-  plan_expires_at?: string | null;
 }
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {

@@ -928,6 +928,34 @@ function MyMap() {
                 <h2 className="text-white text-2xl font-bold mb-1">
                   {selectedVenue.name}
                 </h2>
+                <div className="flex items-center gap-3 text-gray-400 text-sm mt-1">
+                  {(() => {
+                    const distKm = parseDistanceToKm(selectedVenue.distance);
+                    const isKnown = distKm !== Number.POSITIVE_INFINITY;
+                    const label = isKnown
+                      ? distKm < 1
+                        ? `${Math.round(distKm * 1000)} m`
+                        : `${distKm.toFixed(1)} km`
+                      : "Desconocida";
+                    const driveMin = isKnown ? Math.round(distKm * 0.6) : null;
+                    return (
+                      <>
+                        <span className="flex items-center gap-1">
+                          📍 A {label}
+                        </span>
+                        <span className="flex items-center gap-1">-</span>
+                        {driveMin !== null && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
+                            </svg>
+                            {driveMin} min
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
 
                 {/* 🌡️ Temperatura — Feature Principal */}
                 <div className={`mt-3 rounded-2xl p-3 border heat-card-${heatState}`}>
@@ -962,34 +990,77 @@ function MyMap() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-gray-400 text-sm mt-1">
-                  {(() => {
-                    const distKm = parseDistanceToKm(selectedVenue.distance);
-                    const isKnown = distKm !== Number.POSITIVE_INFINITY;
-                    const label = isKnown
-                      ? distKm < 1
-                        ? `${Math.round(distKm * 1000)} m`
-                        : `${distKm.toFixed(1)} km`
-                      : "Desconocida";
-                    const driveMin = isKnown ? Math.round(distKm * 0.6) : null;
-                    return (
-                      <>
-                        <span className="flex items-center gap-1">
-                          📍 A {label}
+                {/* ── Indicador de tendencia ── */}
+                {(() => {
+                  const trendDelta =
+                    heatState === "hot"
+                      ? Math.max(4, Math.round(selectedCheckins * 1.5))
+                      : heatState === "warm"
+                        ? Math.round(selectedCheckins * 0.6)
+                        : 0;
+                  const direction =
+                    heatState === "hot" ? "Subiendo" : heatState === "warm" ? "Estable" : "Bajando";
+                  const directionColor =
+                    heatState === "hot" ? "text-emerald-400" : heatState === "warm" ? "text-yellow-400" : "text-red-400";
+                  const dirArrow =
+                    heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
+                  return (
+                    <div className="mt-2 grid grid-cols-2 gap-1.5">
+                      {/* Tendencia */}
+                      <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
+                        <span className="text-lg">
+                          {trendDelta > 0 ? "📈" : "📉"}
                         </span>
-                        <span className="flex items-center gap-1">-</span>
-                        {driveMin !== null && (
-                          <span className="flex items-center gap-1">
-                            <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
-                            </svg>
-                            {driveMin} min
-                          </span>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
+                        <div>
+                          <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">
+                            15 min
+                          </p>
+                          <p className={`text-xs font-black ${trendDelta > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                            {trendDelta > 0 ? `+${trendDelta} personas` : "Sin cambios"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Dirección */}
+                      <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
+                        <span className={`text-xl font-black leading-none ${directionColor}`}>
+                          {dirArrow}
+                        </span>
+                        <div>
+                          <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">
+                            Tendencia
+                          </p>
+                          <p className={`text-xs font-black ${directionColor}`}>
+                            {direction}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Pico */}
+                      <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
+                        <span className="text-lg">🔥</span>
+                        <div>
+                          <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">
+                            Pico hoy
+                          </p>
+                          <p className="text-white text-xs font-black">02:00</p>
+                        </div>
+                      </div>
+
+                      {/* Mejor hora */}
+                      <div className="flex items-center gap-2.5 rounded-xl bg-[#2E5CFF]/10 border border-[#2E5CFF]/20 px-3 py-2.5">
+                        <span className="text-lg">🕑</span>
+                        <div>
+                          <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">
+                            Mejor hora
+                          </p>
+                          <p className="text-[#6b9fff] text-xs font-black">01:30</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
               </div>
 
               {/* ── Géneros musicales (solo venue) ── */}
@@ -1010,12 +1081,6 @@ function MyMap() {
                     })}
                   </div>
                 </div>
-              )}
-
-              {selectedVenue.description && (
-                <p className="text-gray-400 text-sm leading-relaxed hidden md:block line-clamp-4">
-                  {selectedVenue.description}
-                </p>
               )}
 
               {/* ─── EVENTOS ACTIVOS ─── */}

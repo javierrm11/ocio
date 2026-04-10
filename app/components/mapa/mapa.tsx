@@ -124,6 +124,7 @@ function parseDistanceToKm(distance?: string): number {
   const value = parseFloat(normalized);
 
   if (Number.isNaN(value)) return Number.POSITIVE_INFINITY;
+  if (normalized.endsWith("km")) return value;
   if (normalized.endsWith("m")) return value / 1000;
   return value;
 }
@@ -972,8 +973,36 @@ function MyMap() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
-                  <span>{selectedVenue.distance || "Desconocida"}</span>
+                <div className="flex items-center gap-3 text-gray-400 text-sm mt-1">
+                  {(() => {
+                    const distKm = parseDistanceToKm(selectedVenue.distance);
+                    const isKnown = distKm !== Number.POSITIVE_INFINITY;
+                    const label = isKnown
+                      ? distKm < 1
+                        ? `${Math.round(distKm * 1000)} m`
+                        : `${distKm.toFixed(1)} km`
+                      : "Desconocida";
+                    const driveMin = isKnown ? Math.round(distKm * 0.6) : null;
+                    return (
+                      <>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5 text-[#2E5CFF]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 13 6 13s6-7.75 6-13c0-3.314-2.686-6-6-6z" />
+                            <circle cx="12" cy="8" r="2" fill="#0A0E1A" />
+                          </svg>
+                          {label}
+                        </span>
+                        {driveMin !== null && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
+                            </svg>
+                            {driveMin} min
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

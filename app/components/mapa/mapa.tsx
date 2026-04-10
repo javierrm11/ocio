@@ -145,17 +145,22 @@ const HEAT_BAR_WIDTH_CLASSES = [
   "w-full",
 ];
 
-function getHeatStep(checkins: number, maxReference: number): number {
-  if (checkins <= 0) return 0;
-  const ratio = Math.min(checkins / maxReference, 1);
-  return Math.max(1, Math.min(10, Math.ceil(ratio * 10)));
+function getHeatStep(checkins: number): number {
+  return Math.min(checkins, 10);
 }
 
-function getHeatLabel(step: number): string {
-  if (step === 0) return "Tranquilo";
-  if (step <= 3) return "Tranquilo";
-  if (step <= 6) return "Animado";
-  if (step <= 8) return "Muy animado";
+function getHeatCategory(checkins: number): "tranquilo" | "animado" | "muy_animado" | "lleno" {
+  if (checkins <= 3) return "tranquilo";
+  if (checkins <= 6) return "animado";
+  if (checkins <= 9) return "muy_animado";
+  return "lleno";
+}
+
+function getHeatLabel(checkins: number): string {
+  const cat = getHeatCategory(getHeatStep(checkins));
+  if (cat === "tranquilo") return "Tranquilo";
+  if (cat === "animado") return "Animado";
+  if (cat === "muy_animado") return "Muy animado";
   return "Lleno";
 }
 
@@ -186,30 +191,33 @@ function createVenueIcon(
   eventStatus: "active" | "soon" | "none",
   premium = false,
 ): L.DivIcon {
-  const isHot = checkins >= 5;
-  const isWarm = checkins > 0 && checkins < 5;
+  const cat = getHeatCategory(getHeatStep(checkins));
 
   const bg =
     eventStatus === "active"
       ? "linear-gradient(135deg,#8B5CF6,#6d28d9)"
       : eventStatus === "soon"
         ? "linear-gradient(135deg,#FF8A00,#ea580c)"
-        : isHot
-          ? "linear-gradient(135deg,#ef4444,#dc2626)"
-          : isWarm
-            ? "linear-gradient(135deg,#f59e0b,#d97706)"
-            : "linear-gradient(135deg,#10b981,#059669)";
+        : cat === "lleno"
+          ? "linear-gradient(135deg,#dc2626,#b91c1c)"
+          : cat === "muy_animado"
+            ? "linear-gradient(135deg,#ef4444,#dc2626)"
+            : cat === "animado"
+              ? "linear-gradient(135deg,#f59e0b,#d97706)"
+              : "linear-gradient(135deg,#10b981,#059669)";
 
   const baseGlow =
     eventStatus === "active"
       ? "rgba(139,92,246,0.65)"
       : eventStatus === "soon"
         ? "rgba(255,138,0,0.65)"
-        : isHot
-          ? "rgba(239,68,68,0.65)"
-          : isWarm
-            ? "rgba(245,158,11,0.60)"
-            : "rgba(16,185,129,0.55)";
+        : cat === "lleno"
+          ? "rgba(185,28,28,0.75)"
+          : cat === "muy_animado"
+            ? "rgba(239,68,68,0.65)"
+            : cat === "animado"
+              ? "rgba(245,158,11,0.60)"
+              : "rgba(16,185,129,0.55)";
 
   const glow = premium ? "rgba(251,191,36,0.85)" : baseGlow;
 
@@ -218,10 +226,12 @@ function createVenueIcon(
       ? "#6d28d9"
       : eventStatus === "soon"
         ? "#ea580c"
-        : isHot
-          ? "#dc2626"
-          : isWarm
-            ? "#d97706"
+        : cat === "lleno"
+          ? "#b91c1c"
+          : cat === "muy_animado"
+            ? "#dc2626"
+            : cat === "animado"
+              ? "#d97706"
             : "#059669";
 
   // Premio: anillo dorado exterior + tamaño ligeramente mayor
@@ -494,7 +504,7 @@ function MyMap() {
 
     if (ambientesSeleccionados.size > 0) {
       const checkins = v.check_ins?.length || 0;
-      const nivel = checkins === 0 ? "tranquilo" : checkins < 5 ? "animado" : "muy_animado";
+      const nivel = getHeatCategory(getHeatStep(checkins));
       if (!ambientesSeleccionados.has(nivel)) return false;
     }
 
@@ -509,14 +519,14 @@ function MyMap() {
     10,
     ...venues.map((v) => v.check_ins?.length || 0),
   );
-  const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
+  const selectedHeatStep = getHeatStep(selectedCheckins);
+  const selectedHeatCategory = getHeatCategory(selectedHeatStep);
   const selectedHeatLabel = getHeatLabel(selectedHeatStep);
   const selectedHeatGradient = getHeatGradient(selectedCheckins);
   const heatState =
-    selectedHeatStep === 0 ? "cool"
-    : selectedHeatStep <= 3 ? "cool"
-    : selectedHeatStep <= 6 ? "warm"
-    : selectedHeatStep <= 8 ? "hot"
+    selectedHeatCategory === "tranquilo" ? "cool"
+    : selectedHeatCategory === "animado" ? "warm"
+    : selectedHeatCategory === "muy_animado" ? "hot"
     : "full";
   const hasUserActiveCheckIn = Boolean(
     selectedVenue?.check_ins?.some(
@@ -903,11 +913,7 @@ function MyMap() {
                         : "#ef4444",
                 }}
               >
-                {(selectedVenue.check_ins?.length || 0) === 0
-                  ? "Tranquilo"
-                  : (selectedVenue.check_ins?.length || 0) < 5
-                    ? "Animado"
-                    : "Muy Animado"}
+                {selectedHeatLabel}
               </div>
 
               {/* Banner evento activo/próximo en imagen */}

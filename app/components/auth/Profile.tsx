@@ -212,13 +212,6 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <button onClick={() => setActiveTab("historial")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Clock size={22} />
             </button>
-            <button
-              onClick={() => isPremium(user) ? setActiveTab("stats") : setShowPremiumModal(true)}
-              className={`flex-1 py-3 flex justify-center items-center gap-1 transition ${activeTab === "stats" ? "text-amber-400 border-b-2 border-amber-400" : "text-gray-600 hover:text-gray-400"}`}
-            >
-              <BarChart3 size={22} />
-              {!isPremium(user) && <Lock size={12} className="text-gray-600" />}
-            </button>
             <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
             </button>
@@ -316,6 +309,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
               <SettingsItem icon="ℹ️" title="Acerca de" />
               <SettingsItem icon="👤" title="Información de cuenta" />
+              {isVenue && <SettingsItem icon="👑" title="Cambiar plan" onClick={() => router.push("/premium")} />}
               <div className="pt-2 mt-2 border-t border-gray-800/80">
                 <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />
               </div>

@@ -60,10 +60,10 @@ export default function Premium() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto px-4 space-y-4">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col md:flex-row  gap-4">
 
         {/* ── Card PREMIUM ── */}
-        <div className="relative rounded-3xl overflow-hidden premium-card">
+        <div className="relative rounded-3xl overflow-hidden premium-card flex-1">
 
           {/* Shimmer */}
           <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-300/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
@@ -117,7 +117,7 @@ export default function Premium() {
         </div>
 
         {/* ── Card GRATIS ── */}
-        <div className="rounded-3xl p-6 free-card">
+        <div className="rounded-3xl p-6 free-card flex-1">
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
@@ -153,10 +153,11 @@ export default function Premium() {
           </div>
         </div>
 
-        <p className="text-gray-600 text-xs text-center pb-2 px-4 leading-relaxed">
-          Para activar el plan Premium contáctanos y activamos tu cuenta en menos de 24h.
-        </p>
       </div>
+
+      <p className="relative z-10 text-gray-600 text-xs text-center pb-2 px-4 leading-relaxed mt-2">
+        Para activar el plan Premium contáctanos y activamos tu cuenta en menos de 24h.
+      </p>
     </div>
   );
 }

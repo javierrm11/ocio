@@ -6,7 +6,8 @@ import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from "@/lib/hooks/getToken";
-import { Heart, Clock, Settings, CalendarDays, Plus } from "lucide-react";
+import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock } from "lucide-react";
+import { isPremium } from "@/lib/hooks/plan";
 
 interface CheckInHistory {
   id: string;
@@ -41,6 +42,8 @@ interface UserProfile {
   events?: any[];
   checkInHistory?: CheckInHistory[];
   genres?: { genre: Genre; genre_id: number }[];
+  plan?: string;
+  plan_expires_at?: string | null;
 }
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
@@ -51,6 +54,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [activeTab, setActiveTab] = useState<string>("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   useEffect(() => { fetchUserProfile(); }, []);
   useEffect(() => { if (user) setActiveTab(!user.username ? "events" : "favorites"); }, [user]);
@@ -190,6 +194,13 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <button onClick={() => setActiveTab("events")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <CalendarDays size={22} />
             </button>
+            <button
+              onClick={() => isPremium(user) ? setActiveTab("stats") : setShowPremiumModal(true)}
+              className={`flex-1 py-3 flex justify-center items-center gap-1 transition ${activeTab === "stats" ? "text-amber-400 border-b-2 border-amber-400" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <BarChart3 size={22} />
+              {!isPremium(user) && <Lock size={12} className="text-gray-600" />}
+            </button>
             <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
             </button>
@@ -201,6 +212,13 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             </button>
             <button onClick={() => setActiveTab("historial")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Clock size={22} />
+            </button>
+            <button
+              onClick={() => isPremium(user) ? setActiveTab("stats") : setShowPremiumModal(true)}
+              className={`flex-1 py-3 flex justify-center items-center gap-1 transition ${activeTab === "stats" ? "text-amber-400 border-b-2 border-amber-400" : "text-gray-600 hover:text-gray-400"}`}
+            >
+              <BarChart3 size={22} />
+              {!isPremium(user) && <Lock size={12} className="text-gray-600" />}
             </button>
             <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
@@ -290,6 +308,8 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
           {!isVenue && activeTab === "historial" && <CheckInHistoryTab userId={user.id} />}
 
+          {activeTab === "stats" && <StatsTab />}
+
           {activeTab === "settings" && (
             <div className="space-y-2">
               <SettingsItem icon="🔔" title="Notificaciones" />
@@ -311,6 +331,192 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       {editingEvent && (
         <EditEventModal event={editingEvent} onClose={() => setEditingEvent(null)} onEventUpdated={() => { setEditingEvent(null); fetchUserProfile(); }} onEventDeleted={() => { setEditingEvent(null); fetchUserProfile(); }} />
       )}
+      {showPremiumModal && <PremiumModal onClose={() => setShowPremiumModal(false)} />}
+    </div>
+  );
+}
+
+// ── StatsTab ──────────────────────────────────────────────────────────────────
+function StatsTab() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = getToken();
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => { setStats(data); setLoading(false); })
+      .catch(() => { setError("Error al cargar estadísticas"); setLoading(false); });
+  }, []);
+
+  if (loading) return (
+    <div className="flex justify-center py-12">
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-400" />
+    </div>
+  );
+
+  if (error || !stats) return (
+    <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-8 text-center">
+      <p className="text-gray-400 text-sm">{error ?? "Sin datos"}</p>
+    </div>
+  );
+
+  const isVenueStats = stats.type === "venue";
+
+  return (
+    <div className="space-y-4">
+      {/* KPIs principales */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-ozio-card border border-amber-400/20 rounded-2xl p-4 text-center">
+          <p className="text-amber-400 text-3xl font-black">{stats.total_checkins}</p>
+          <p className="text-gray-400 text-xs mt-1">{isVenueStats ? "Visitas totales" : "Check-ins totales"}</p>
+        </div>
+        {isVenueStats ? (
+          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4 text-center">
+            <p className="text-white text-3xl font-black">{stats.daily_avg}</p>
+            <p className="text-gray-400 text-xs mt-1">Media diaria</p>
+          </div>
+        ) : (
+          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4 text-center">
+            <p className="text-white text-3xl font-black">{stats.fav_day ?? "—"}</p>
+            <p className="text-gray-400 text-xs mt-1">Día favorito</p>
+          </div>
+        )}
+      </div>
+
+      {/* Hora pico / top local */}
+      {isVenueStats && stats.peak_hour && (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4 flex items-center gap-3">
+          <span className="text-2xl">🕐</span>
+          <div>
+            <p className="text-white font-bold text-lg">{stats.peak_hour}</p>
+            <p className="text-gray-400 text-xs">Hora pico de visitas</p>
+          </div>
+        </div>
+      )}
+
+      {/* Gráfico de barras simple — actividad */}
+      {isVenueStats && stats.daily_data?.length > 0 && (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+          <p className="text-white font-semibold text-sm mb-3">Visitas últimos 30 días</p>
+          <div className="flex items-end gap-1 h-20">
+            {stats.daily_data.slice(-20).map((d: any) => {
+              const max = Math.max(...stats.daily_data.map((x: any) => x.count), 1);
+              const pct = Math.round((d.count / max) * 100);
+              return (
+                <div key={d.date} className="flex-1 flex flex-col items-center gap-0.5">
+                  <div
+                    className="w-full rounded-t bg-amber-400/80"
+                    style={{ height: `${Math.max(pct, 4)}%` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!isVenueStats && stats.monthly_data?.length > 0 && (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+          <p className="text-white font-semibold text-sm mb-3">Check-ins por mes</p>
+          <div className="flex items-end gap-2 h-20">
+            {stats.monthly_data.map((d: any) => {
+              const max = Math.max(...stats.monthly_data.map((x: any) => x.count), 1);
+              const pct = Math.round((d.count / max) * 100);
+              const label = d.month.slice(5);
+              return (
+                <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full rounded-t bg-amber-400/80" style={{ height: `${Math.max(pct, 4)}%` }} />
+                  <span className="text-[9px] text-gray-500">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Top lista */}
+      {isVenueStats && stats.top_events?.length > 0 && (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+          <p className="text-white font-semibold text-sm mb-3">Top eventos</p>
+          <div className="space-y-2">
+            {stats.top_events.map((e: any, i: number) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400 font-black text-xs w-4">#{i + 1}</span>
+                  <p className="text-white text-sm truncate max-w-[180px]">{e.title}</p>
+                </div>
+                <span className="text-gray-400 text-xs">👥 {e.attendees}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!isVenueStats && stats.top_venues?.length > 0 && (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4">
+          <p className="text-white font-semibold text-sm mb-3">Locales más visitados</p>
+          <div className="space-y-2">
+            {stats.top_venues.map((v: any, i: number) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-amber-400 font-black text-xs w-4">#{i + 1}</span>
+                {v.avatar_path && <img src={v.avatar_path} alt={v.name} className="w-8 h-8 rounded-full object-cover" />}
+                <p className="text-white text-sm flex-1 truncate">{v.name}</p>
+                <span className="text-gray-400 text-xs">{v.count}x</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── PremiumModal ──────────────────────────────────────────────────────────────
+function PremiumModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Drag handle */}
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
+
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 24px rgba(251,191,36,0.4)" }}>
+            <span className="text-3xl">👑</span>
+          </div>
+          <h2 className="text-white text-xl font-black mb-2">Estadísticas Premium</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Accede a estadísticas detalladas de tu local o actividad: visitas, hora pico, tendencias y mucho más.
+          </p>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {["📊 Gráficos de actividad en tiempo real", "🕐 Hora pico de visitas", "🏆 Top eventos y locales", "📅 Análisis mensual y tendencias"].map((feat) => (
+            <div key={feat} className="flex items-center gap-3 text-sm">
+              <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
+              <span className="text-gray-300">{feat.slice(3)}</span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
+          style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 16px rgba(251,191,36,0.3)" }}
+          onClick={onClose}
+        >
+          Actualizar a Premium 👑
+        </button>
+        <button onClick={onClose} className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-300 transition">
+          Ahora no
+        </button>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
-import { ArrowLeft, Upload, X, ImageIcon, Video, Calendar, Star } from "lucide-react";
+import { ArrowLeft, Upload, X, ImageIcon, Video, Calendar, Star, Lock } from "lucide-react";
+import { isPremium } from "@/lib/hooks/plan";
 
 type Tipo = "historia" | "evento" | null;
 
@@ -203,6 +204,8 @@ function FormHistoria() {
 function FormEvento() {
   const router = useRouter();
   const { currentUser } = useAppStore();
+  const userIsPremium = isPremium(currentUser || {});
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -415,24 +418,41 @@ function FormEvento() {
       </div>
 
       {/* Destacado */}
-      <button
-        type="button"
-        onClick={() => set("featured", !form.featured)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm ${
-          form.featured
-            ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-400"
-            : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
-        }`}
-      >
-        <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-yellow-400" : ""}`} />
-        <div className="text-left">
-          <p className="font-medium">Evento destacado</p>
-          <p className="text-xs opacity-70 mt-0.5">Aparecerá primero en el listado</p>
-        </div>
-        {form.featured && (
-          <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">Activo</span>
-        )}
-      </button>
+      {userIsPremium ? (
+        <button
+          type="button"
+          onClick={() => set("featured", !form.featured)}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm ${
+            form.featured
+              ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-400"
+              : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+          }`}
+        >
+          <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-yellow-400" : ""}`} />
+          <div className="text-left">
+            <p className="font-medium">Evento destacado</p>
+            <p className="text-xs opacity-70 mt-0.5">Aparecerá primero en el listado</p>
+          </div>
+          {form.featured && (
+            <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">Activo</span>
+          )}
+        </button>
+      ) : (
+        <>
+          <div
+            onClick={() => setShowPremiumModal(true)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-700/50 bg-ozio-card cursor-pointer transition"
+          >
+            <Star className="w-4 h-4 flex-shrink-0 text-gray-600" />
+            <div className="text-left">
+              <p className="font-medium text-gray-500 text-sm">Evento destacado</p>
+              <p className="text-xs text-gray-600 mt-0.5">Solo disponible en el plan Premium</p>
+            </div>
+            <Lock className="w-4 h-4 ml-auto text-gray-600" />
+          </div>
+          {showPremiumModal && <PremiumFeaturedModal onClose={() => setShowPremiumModal(false)} />}
+        </>
+      )}
 
       {error && (
         <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">{error}</p>
@@ -446,6 +466,56 @@ function FormEvento() {
       >
         {loading ? "Creando evento..." : "Crear evento"}
       </button>
+    </div>
+  );
+}
+
+
+/* ─── Modal premium destacado ─── */
+function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
+
+        <div className="text-center mb-6">
+          <div
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 24px rgba(251,191,36,0.4)" }}
+          >
+            <span className="text-3xl">⭐</span>
+          </div>
+          <h2 className="text-white text-xl font-black mb-2">Eventos destacados</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Con Premium tus eventos aparecen primero en el listado y consiguen más visibilidad.
+          </p>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {["🔝 Posición destacada en el listado", "👁️ Mayor visibilidad para tu evento", "🚀 Más asistentes potenciales", "👑 Badge exclusivo en el mapa"].map((feat) => (
+            <div key={feat} className="flex items-center gap-3 text-sm">
+              <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
+              <span className="text-gray-300">{feat.slice(3)}</span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
+          style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 16px rgba(251,191,36,0.3)" }}
+          onClick={() => router.push("/premium")}
+        >
+          Actualizar a Premium 👑
+        </button>
+        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-300 transition">
+          Ahora no
+        </button>
+      </div>
     </div>
   );
 }

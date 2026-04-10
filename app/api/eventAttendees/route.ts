@@ -51,6 +51,18 @@ export async function POST(request: Request) {
     );
   }
   const supabase = await createClient();
+
+  // Solo usuarios con username pueden apuntarse (no venues)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", userId)
+    .single();
+
+  if (!profile?.username) {
+    return NextResponse.json({ error: "Solo los usuarios pueden confirmar asistencia" }, { status: 403 });
+  }
+
   const body = await request.json();
 
   const {

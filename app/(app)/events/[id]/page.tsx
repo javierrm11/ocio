@@ -59,7 +59,7 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(isComplete ? partialEvent : null);
   const [loading, setLoading] = useState(!isComplete);
 
-  const isUserLoggedIn = !!currentUser;
+  const isRegularUser = !!currentUser?.username;
   const isAttendingInitial = event?.event_attendees?.some(
     (att) => att.profile_id === currentUser?.id,
   ) ?? false;
@@ -370,7 +370,7 @@ export default function EventDetailPage() {
             </div>
 
             {/* Botón asistir */}
-            {isUserLoggedIn && !isPastEvent && (
+            {isRegularUser && !isPastEvent && (
               <div>
                 {isAttending ? (
                   <button

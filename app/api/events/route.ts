@@ -1,6 +1,9 @@
-import { getUserId } from "@/lib/auth/get-user";
+import { getUserId, getUser } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
+import { isPremium } from "@/lib/hooks/plan";
 import { NextResponse } from "next/server";
+
+const FREE_EVENTS_PER_MONTH = 2;
 
 // obtener todas las companies, con filtro opcional por cualquier campo
 export async function GET(request: Request) {
@@ -11,20 +14,17 @@ export async function GET(request: Request) {
     .from("events")
     .select("*, event_attendees(*), genres: event_genres (genre_id, genre: genres (id, name, slug, emoji))");
 
-  const filterableFields = [
-    "venue_id",
-    "title",
-    "description",
-    "starts_date",
-    "ends_date",
-    "featured",
-  ];
+  const exactFields = ["venue_id", "featured"];
+  const ilikeFields = ["title", "description"];
 
-  filterableFields.forEach((field) => {
+  exactFields.forEach((field) => {
     const value = searchParams.get(field);
-    if (value) {
-      query = query.or(`${field}.ilike.%${value}%`);
-    }
+    if (value) query = query.eq(field, value);
+  });
+
+  ilikeFields.forEach((field) => {
+    const value = searchParams.get(field);
+    if (value) query = query.ilike(field, `%${value}%`);
   });
 
   const { data, error } = await query;
@@ -78,6 +78,33 @@ export async function POST(request: Request) {
   const formData = await request.formData();
 
   const venue_id = formData.get("venue_id") as string;
+
+  // Comprobar límite mensual para cuentas gratuitas
+  const user = await getUser();
+  const { data: venueData } = await supabase
+    .from("venues")
+    .select("plan")
+    .eq("id", venue_id)
+    .single();
+
+  if (!isPremium({ plan: venueData?.plan })) {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const { count } = await supabase
+      .from("events")
+      .select("id", { count: "exact", head: true })
+      .eq("venue_id", venue_id)
+      .gte("created_at", startOfMonth.toISOString());
+
+    if ((count ?? 0) >= FREE_EVENTS_PER_MONTH) {
+      return NextResponse.json(
+        { error: `Los locales con plan gratuito solo pueden crear ${FREE_EVENTS_PER_MONTH} eventos al mes. Actualiza a Premium para crear eventos ilimitados.`, limit_reached: true },
+        { status: 403 }
+      );
+    }
+  }
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const starts_at = formData.get("starts_at") as string;

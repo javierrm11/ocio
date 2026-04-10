@@ -226,6 +226,9 @@ function FormEvento() {
 
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
 
+  const [monthlyCount, setMonthlyCount] = useState<number | null>(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
   // Cargar catálogo de géneros
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/genres`)
@@ -233,6 +236,26 @@ function FormEvento() {
       .then(setGenres)
       .catch(() => {});
   }, []);
+
+  // Comprobar eventos del mes actual (solo cuentas gratuitas)
+  useEffect(() => {
+    if (userIsPremium || !currentUser?.id) return;
+    const token = typeof window !== "undefined" ? (document.cookie.match(/(?:^|; )token=([^;]*)/) ?? [])[1] : "";
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events?venue_id=${currentUser.id}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((r) => r.json())
+      .then((events: any[]) => {
+        if (!Array.isArray(events)) return;
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        const count = events.filter((e) => e.created_at && new Date(e.created_at) >= startOfMonth).length;
+        setMonthlyCount(count);
+        if (count >= 2) setShowLimitModal(true);
+      })
+      .catch(() => {});
+  }, [userIsPremium, currentUser?.id]);
 
   const toggleGenre = (id: number) => {
     setSelectedGenres((prev) =>
@@ -288,8 +311,21 @@ function FormEvento() {
     "w-full bg-ozio-card border border-gray-700/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
   const labelClass = "text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1.5 block";
 
+  const limitReached = !userIsPremium && monthlyCount !== null && monthlyCount >= 2;
+
   return (
     <div className="flex flex-col gap-5">
+      {showLimitModal && <PremiumLimitModal onClose={() => setShowLimitModal(false)} />}
+
+      {limitReached && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
+          <span className="text-xl">🔒</span>
+          <div>
+            <p className="text-amber-400 text-sm font-semibold">Límite mensual alcanzado</p>
+            <p className="text-gray-400 text-xs mt-0.5">Has creado 2 eventos este mes. Actualiza a Premium para crear eventos ilimitados.</p>
+          </div>
+        </div>
+      )}
 
       {/* Título */}
       <div>
@@ -460,7 +496,7 @@ function FormEvento() {
 
       <button
         type="button"
-        onClick={submit}
+        onClick={limitReached ? () => setShowLimitModal(true) : submit}
         disabled={loading}
         className="w-full bg-ozio-blue hover:bg-ozio-blue/90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition text-sm"
       >
@@ -470,6 +506,56 @@ function FormEvento() {
   );
 }
 
+
+
+/* ─── Modal límite mensual ─── */
+function PremiumLimitModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
+
+        <div className="text-center mb-6">
+          <div
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 24px rgba(251,191,36,0.4)" }}
+          >
+            <span className="text-3xl">🎉</span>
+          </div>
+          <h2 className="text-white text-xl font-black mb-2">Límite de eventos alcanzado</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Con el plan gratuito puedes crear <span className="text-white font-semibold">2 eventos al mes</span>. Actualiza a Premium para crear eventos ilimitados.
+          </p>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          {["🚀 Eventos ilimitados cada mes", "⭐ Eventos destacados en el listado", "📊 Estadísticas avanzadas de asistencia", "👑 Badge exclusivo en el mapa"].map((feat) => (
+            <div key={feat} className="flex items-center gap-3 text-sm">
+              <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
+              <span className="text-gray-300">{feat.slice(3)}</span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
+          style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 16px rgba(251,191,36,0.3)" }}
+          onClick={() => router.push("/premium")}
+        >
+          Actualizar a Premium 👑
+        </button>
+        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-300 transition">
+          Ahora no
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Modal premium destacado ─── */
 function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {

@@ -149,10 +149,12 @@ function getHeatStep(checkins: number, maxReference: number): number {
   return Math.max(1, Math.min(10, Math.ceil(ratio * 10)));
 }
 
-function getHeatLabel(checkins: number): string {
-  if (checkins === 0) return "Tranquilo";
-  if (checkins < 5) return "Animado";
-  return "Muy animado";
+function getHeatLabel(step: number): string {
+  if (step === 0) return "Tranquilo";
+  if (step <= 3) return "Tranquilo";
+  if (step <= 6) return "Animado";
+  if (step <= 8) return "Muy animado";
+  return "Lleno";
 }
 
 function getHeatGradient(checkins: number): string {
@@ -497,10 +499,14 @@ function MyMap() {
     ...venues.map((v) => v.check_ins?.length || 0),
   );
   const selectedHeatStep = getHeatStep(selectedCheckins, maxCheckinsReference);
-  const selectedHeatLabel = getHeatLabel(selectedCheckins);
+  const selectedHeatLabel = getHeatLabel(selectedHeatStep);
   const selectedHeatGradient = getHeatGradient(selectedCheckins);
   const heatState =
-    selectedCheckins === 0 ? "cool" : selectedCheckins < 5 ? "warm" : "hot";
+    selectedHeatStep === 0 ? "cool"
+    : selectedHeatStep <= 3 ? "cool"
+    : selectedHeatStep <= 6 ? "warm"
+    : selectedHeatStep <= 8 ? "hot"
+    : "full";
   const hasUserActiveCheckIn = Boolean(
     selectedVenue?.check_ins?.some(
       (c: any) =>
@@ -966,7 +972,7 @@ function MyMap() {
                         key={i}
                         className={`flex-1 h-4 rounded-full transition-all duration-500 ${
                           i < selectedHeatStep
-                            ? `heat-seg-${heatState} heat-seg-anim heat-seg-delay-${i}`
+                            ? `heat-seg-pos-${i} heat-seg-anim heat-seg-delay-${i}`
                             : "bg-white/8"
                         }`}
                       />
@@ -977,7 +983,7 @@ function MyMap() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-xl">
-                        {selectedCheckins >= 5 ? "🔥" : selectedCheckins > 0 ? "✨" : "🌿"}
+                        {heatState === "full" ? "🔴" : heatState === "hot" ? "🟠" : heatState === "warm" ? "🟡" : "🟢"}
                       </span>
                       <span className="text-white font-black text-base">
                         {selectedHeatLabel}
@@ -993,17 +999,25 @@ function MyMap() {
                 {/* ── Indicador de tendencia ── */}
                 {(() => {
                   const trendDelta =
-                    heatState === "hot"
-                      ? Math.max(4, Math.round(selectedCheckins * 1.5))
-                      : heatState === "warm"
-                        ? Math.round(selectedCheckins * 0.6)
-                        : 0;
+                    heatState === "full"
+                      ? Math.max(6, Math.round(selectedCheckins * 2))
+                      : heatState === "hot"
+                        ? Math.max(3, Math.round(selectedCheckins * 1.5))
+                        : heatState === "warm"
+                          ? Math.round(selectedCheckins * 0.6)
+                          : 0;
                   const direction =
-                    heatState === "hot" ? "Subiendo" : heatState === "warm" ? "Estable" : "Bajando";
+                    heatState === "full" ? "Llenazo"
+                    : heatState === "hot" ? "Subiendo"
+                    : heatState === "warm" ? "Estable"
+                    : "Bajando";
                   const directionColor =
-                    heatState === "hot" ? "text-emerald-400" : heatState === "warm" ? "text-yellow-400" : "text-red-400";
+                    heatState === "full" ? "text-red-400"
+                    : heatState === "hot" ? "text-orange-400"
+                    : heatState === "warm" ? "text-yellow-400"
+                    : "text-emerald-400";
                   const dirArrow =
-                    heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
+                    heatState === "full" ? "↑↑" : heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
                   return (
                     <div className="mt-2 grid grid-cols-2 gap-1.5">
                       {/* Tendencia */}
@@ -1435,70 +1449,46 @@ function MyMap() {
         }
         /* Heat card states */
         .heat-card-cool {
-          background: linear-gradient(
-            135deg,
-            rgba(16, 185, 129, 0.08) 0%,
-            rgba(10, 10, 20, 0.85) 100%
-          );
-          border-color: rgba(52, 211, 153, 0.35);
-          box-shadow:
-            0 0 28px rgba(52, 211, 153, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(10, 10, 20, 0.85) 100%);
+          border-color: rgba(74, 222, 128, 0.3);
+          box-shadow: 0 0 28px rgba(74, 222, 128, 0.1), inset 0 1px 0 rgba(255,255,255,0.04);
         }
         .heat-card-warm {
-          background: linear-gradient(
-            135deg,
-            rgba(251, 146, 60, 0.1) 0%,
-            rgba(10, 10, 20, 0.85) 100%
-          );
-          border-color: rgba(251, 146, 60, 0.35);
-          box-shadow:
-            0 0 28px rgba(251, 146, 60, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(10, 10, 20, 0.85) 100%);
+          border-color: rgba(234, 179, 8, 0.35);
+          box-shadow: 0 0 28px rgba(234, 179, 8, 0.15), inset 0 1px 0 rgba(255,255,255,0.04);
         }
         .heat-card-hot {
-          background: linear-gradient(
-            135deg,
-            rgba(239, 68, 68, 0.14) 0%,
-            rgba(10, 10, 20, 0.85) 100%
-          );
-          border-color: rgba(239, 68, 68, 0.4);
-          box-shadow:
-            0 0 32px rgba(239, 68, 68, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(10, 10, 20, 0.85) 100%);
+          border-color: rgba(249, 115, 22, 0.38);
+          box-shadow: 0 0 30px rgba(249, 115, 22, 0.18), inset 0 1px 0 rgba(255,255,255,0.04);
         }
-        /* Heat badge backgrounds */
-        .heat-badge-cool {
-          background: rgba(52, 211, 153, 0.13);
-        }
-        .heat-badge-warm {
-          background: rgba(251, 146, 60, 0.13);
-        }
-        .heat-badge-hot {
-          background: rgba(239, 68, 68, 0.16);
+        .heat-card-full {
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(10, 10, 20, 0.85) 100%);
+          border-color: rgba(239, 68, 68, 0.45);
+          box-shadow: 0 0 34px rgba(239, 68, 68, 0.25), inset 0 1px 0 rgba(255,255,255,0.04);
         }
         /* Heat count colors */
-        .heat-count-cool {
-          color: #34d399;
+        .heat-count-cool  { color: #4ade80; }
+        .heat-count-warm  { color: #fde047; }
+        .heat-count-hot   { color: #fb923c; }
+        .heat-count-full  { color: #f87171; }
+        /* Heat segments por posición — termómetro verde→amarillo→naranja→rojo */
+        .heat-seg-pos-0, .heat-seg-pos-1, .heat-seg-pos-2 {
+          background: linear-gradient(90deg, #22c55e, #4ade80);
+          box-shadow: 0 0 8px rgba(74, 222, 128, 0.9), 0 0 18px rgba(74, 222, 128, 0.45);
         }
-        .heat-count-warm {
-          color: #fb923c;
+        .heat-seg-pos-3, .heat-seg-pos-4, .heat-seg-pos-5 {
+          background: linear-gradient(90deg, #ca8a04, #fde047);
+          box-shadow: 0 0 8px rgba(253, 224, 71, 0.85), 0 0 18px rgba(253, 224, 71, 0.4);
         }
-        .heat-count-hot {
-          color: #f87171;
-        }
-        /* Heat segments */
-        .heat-seg-cool {
-          background: linear-gradient(90deg, #34d399, #6ee7b7);
-          box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 18px rgba(52, 211, 153, 0.5);
-        }
-        .heat-seg-warm {
-          background: linear-gradient(90deg, #fb923c, #fbbf24);
+        .heat-seg-pos-6, .heat-seg-pos-7 {
+          background: linear-gradient(90deg, #ea580c, #fb923c);
           box-shadow: 0 0 8px rgba(251, 146, 60, 0.9), 0 0 18px rgba(251, 146, 60, 0.5);
         }
-        .heat-seg-hot {
-          background: linear-gradient(90deg, #ef4444, #fb923c);
-          box-shadow: 0 0 8px rgba(239, 68, 68, 0.95), 0 0 18px rgba(239, 68, 68, 0.55);
+        .heat-seg-pos-8, .heat-seg-pos-9 {
+          background: linear-gradient(90deg, #dc2626, #f87171);
+          box-shadow: 0 0 10px rgba(239, 68, 68, 1), 0 0 22px rgba(239, 68, 68, 0.6);
         }
         @keyframes seg-pulse {
           0%, 100% { opacity: 1; transform: scaleY(1); }

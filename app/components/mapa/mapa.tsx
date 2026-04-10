@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
 import { getToken } from "@/lib/hooks/getToken";
+import { isPremium } from "@/lib/hooks/plan";
 
 interface Event {
   id: string;
@@ -44,6 +45,9 @@ interface Venue {
   check_ins?: any[];
   is_favorite?: boolean;
   events?: Event[];
+  plan?: string;
+  plan_expires_at?: string | null;
+  plan?: string;
 }
 
 function getEventStatus(venue: Venue): "active" | "soon" | "none" {
@@ -182,11 +186,11 @@ function createVenueIcon(
   avatarPath: string | null,
   checkins: number,
   eventStatus: "active" | "soon" | "none",
+  premium = false,
 ): L.DivIcon {
   const isHot = checkins >= 5;
   const isWarm = checkins > 0 && checkins < 5;
 
-  // Gradiente igual que el heat-card del panel lateral
   const bg =
     eventStatus === "active"
       ? "linear-gradient(135deg,#8B5CF6,#6d28d9)"
@@ -198,7 +202,7 @@ function createVenueIcon(
             ? "linear-gradient(135deg,#f59e0b,#d97706)"
             : "linear-gradient(135deg,#10b981,#059669)";
 
-  const glow =
+  const baseGlow =
     eventStatus === "active"
       ? "rgba(139,92,246,0.65)"
       : eventStatus === "soon"
@@ -208,6 +212,8 @@ function createVenueIcon(
           : isWarm
             ? "rgba(245,158,11,0.60)"
             : "rgba(16,185,129,0.55)";
+
+  const glow = premium ? "rgba(251,191,36,0.85)" : baseGlow;
 
   const tip =
     eventStatus === "active"
@@ -220,32 +226,39 @@ function createVenueIcon(
             ? "#d97706"
             : "#059669";
 
-  const label =
-    eventStatus === "active"
-      ? "🎉"
-      : eventStatus === "soon"
-        ? "🕐"
-        : isHot
-          ? "🔥"
-          : isWarm
-            ? "✨"
-            : "💤";
+  // Premio: anillo dorado exterior + tamaño ligeramente mayor
+  const size = Math.max(38, Math.min(54, 38 + checkins * 2)) + (premium ? 14 : 0);
+  const border = premium
+    ? "5px solid #fbbf24; outline: 2px solid rgba(251,191,36,0.4); outline-offset: 2px;"
+    : "4.5px solid rgba(255,255,255,0.22)";
 
-  // Tamaño crece con la actividad (mín 38px, máx 54px)
-  const size = Math.max(38, Math.min(54, 38 + checkins * 2));
-  const countSize = checkins > 9 ? 13 : 16;
+  const crownBadge = premium
+    ? `<div style="
+        position:absolute;top:-6px;right:-4px;
+        width:18px;height:18px;border-radius:50%;
+        background:linear-gradient(135deg,#f59e0b,#fbbf24);
+        border:1.5px solid #fff;
+        display:flex;align-items:center;justify-content:center;
+        font-size:10px;line-height:1;
+        box-shadow:0 2px 6px rgba(251,191,36,0.7);
+      ">👑</div>`
+    : "";
 
   const html = `
-    <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 6px 18px ${glow});">
-      <div style="
-        width:${size}px;height:${size}px;border-radius:50%;
-        background:${bg};
-        border:4.5px solid rgba(255,255,255,0.22);
-        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-      ">
-        <img src="${avatarPath || "https://via.placeholder.com/40?text=?"}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:brightness(0.9);" />
+    <div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 6px 20px ${glow});">
+      <div style="position:relative;">
+        <div style="
+          width:${size}px;height:${size}px;border-radius:50%;
+          background:${bg};
+          border:${border};
+          display:flex;align-items:center;justify-content:center;
+          ${premium ? "box-shadow:0 0 0 3px rgba(251,191,36,0.25);" : ""}
+        ">
+          <img src="${avatarPath || "https://via.placeholder.com/40?text=?"}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:brightness(0.9);" />
+        </div>
+        ${crownBadge}
       </div>
-      <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid ${tip};"></div>
+      <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid ${premium ? "#fbbf24" : tip};"></div>
     </div>
   `;
 
@@ -585,6 +598,7 @@ function MyMap() {
                   venue.avatar_path || null,
                   checkinsCount,
                   eventStatus,
+                  isPremium(venue),
                 )}
                 eventHandlers={{ click: () => handleVenueClick(venue) }}
               >
@@ -931,9 +945,16 @@ function MyMap() {
             {/* Contenido */}
             <div className="p-6 flex flex-col gap-4">
               <div>
-                <h2 className="text-white text-2xl font-bold mb-1">
-                  {selectedVenue.name}
-                </h2>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-white text-2xl font-bold">
+                    {selectedVenue.name}
+                  </h2>
+                  {isPremium(selectedVenue) && (
+                    <span className="premium-badge">
+                      👑 PREMIUM
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-3 text-gray-400 text-sm mt-1">
                   {(() => {
                     const distKm = parseDistanceToKm(selectedVenue.distance);
@@ -989,9 +1010,8 @@ function MyMap() {
                         {selectedHeatLabel}
                       </span>
                     </div>
-                    <span className={`text-xs font-bold heat-count-${heatState}`}>
-                      {selectedCheckins}{" "}
-                      {selectedCheckins === 1 ? "persona" : "personas"}
+                    <span className={`text-sm font-black heat-count-${heatState}`}>
+                      {selectedHeatStep * 10}%
                     </span>
                   </div>
                 </div>
@@ -1520,6 +1540,20 @@ function MyMap() {
           box-shadow:
             0 0 16px rgba(239, 68, 68, 1),
             0 0 32px rgba(239, 68, 68, 0.55);
+        }
+        /* Premium badge */
+        .premium-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          background: linear-gradient(135deg, #f59e0b, #fbbf24);
+          color: #1a0a00;
+          box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
         }
         /* Venue tooltip */
         .venue-tooltip {

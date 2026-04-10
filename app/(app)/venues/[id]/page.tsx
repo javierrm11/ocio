@@ -46,6 +46,7 @@ interface Venue {
   events?: Event[];
   is_favorite?: boolean;
   genres?: Genre[];
+  plan?: string;
 }
 
 export default function VenueDetail() {

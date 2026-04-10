@@ -33,6 +33,7 @@ interface Venue {
   is_favorite?: boolean;
   events?: Event[];
   genres?: Genre[];
+  plan?: string;
 }
 
 

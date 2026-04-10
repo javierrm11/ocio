@@ -27,6 +27,7 @@ interface Venue {
   id: string;
   name: string;
   avatar_path?: string;
+  plan?: string;
 }
 
 type FilterType = 'todos' | 'hoy' | 'semana' | 'activos';

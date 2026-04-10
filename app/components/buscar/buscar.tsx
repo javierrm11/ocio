@@ -30,6 +30,7 @@ interface Venue {
   is_favorite?: boolean;
   distance?: number | string;
   genres?: Genre[];
+  plan?: string;
 }
 
 interface Event {

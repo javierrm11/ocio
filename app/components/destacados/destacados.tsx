@@ -13,6 +13,7 @@ interface Venue {
   longitude: number;
   avatar_path?: string;
   check_ins?: any[];
+  plan?: string;
 }
 
 interface Event {

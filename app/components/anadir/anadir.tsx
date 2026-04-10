@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
-import { ArrowLeft, Upload, X, ImageIcon, Video, Calendar, Star, Lock } from "lucide-react";
+import { ArrowLeft, X, ImageIcon, Calendar, Star, Lock } from "lucide-react";
 import { isPremium } from "@/lib/hooks/plan";
 
 type Tipo = "historia" | "evento" | null;
@@ -22,25 +22,30 @@ export default function AnadirPage() {
   const tipoParam = searchParams.get("tipo") as Tipo;
   const [tipo, setTipo] = useState<Tipo>(tipoParam);
 
+  if (tipo === "historia") {
+    return (
+      <FormHistoria onBack={() => (tipoParam ? router.back() : setTipo(null))} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
       <div className="sticky top-0 z-20 bg-ozio-darker border-b border-gray-800/50 px-4 py-3 flex items-center gap-3">
         <button
           type="button"
-          onClick={() => (tipo && tipoParam ? router.back() : tipo ? setTipo(null) : router.back())}
+          onClick={() => (tipo ? setTipo(null) : router.back())}
           className="text-gray-400 hover:text-white transition"
           aria-label="Volver"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-white font-semibold text-base">
-          {tipo === "historia" ? "Nueva historia" : tipo === "evento" ? "Nuevo evento" : "¿Qué quieres añadir?"}
+          {tipo === "evento" ? "Nuevo evento" : "¿Qué quieres añadir?"}
         </h1>
       </div>
 
       <div className="px-4 pt-6 max-w-lg mx-auto">
         {!tipo && <Selector onSelect={setTipo} />}
-        {tipo === "historia" && <FormHistoria />}
         {tipo === "evento" && <FormEvento />}
       </div>
     </div>
@@ -78,14 +83,18 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
   );
 }
 
-/* ─── Formulario Historia ─── */
-function FormHistoria() {
+/* ─── Formulario Historia (estilo Instagram) ─── */
+function FormHistoria({ onBack }: { onBack: () => void }) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const handleFile = (f: File) => {
     setFile(f);
@@ -93,14 +102,59 @@ function FormHistoria() {
     setError(null);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
+  const openCamera = async (mode: "user" | "environment" = facingMode) => {
+    setShowCamera(true);
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: mode },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch {
+      setShowCamera(false);
+      galleryRef.current?.click();
+    }
   };
 
+  const closeCamera = () => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setShowCamera(false);
+  };
+
+  const flipCamera = () => {
+    const next = facingMode === "user" ? "environment" : "user";
+    setFacingMode(next);
+    openCamera(next);
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const f = new File([blob], "captura.jpg", { type: "image/jpeg" });
+      handleFile(f);
+      closeCamera();
+    }, "image/jpeg", 0.92);
+  };
+
+  // Parar stream al desmontar
+  useEffect(() => {
+    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); };
+  }, []);
+
   const submit = async () => {
-    if (!file) { setError("Selecciona un archivo"); return; }
+    if (!file) return;
     setLoading(true);
     setError(null);
     try {
@@ -108,7 +162,6 @@ function FormHistoria() {
       const fd = new FormData();
       fd.append("media", file);
       fd.append("media_type", file.type.startsWith("video/") ? "video" : "image");
-
       const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -127,75 +180,173 @@ function FormHistoria() {
   const isVideo = file?.type.startsWith("video/");
 
   return (
-    <div className="flex flex-col gap-6">
-      <div
-        className={`relative rounded-2xl border-2 border-dashed transition cursor-pointer overflow-hidden min-h-[280px] ${
-          file ? "border-ozio-purple/50" : "border-gray-700 hover:border-gray-500"
-        }`}
-        onClick={() => inputRef.current?.click()}
-        onDrop={handleDrop}
-        onDragOver={(e) => e.preventDefault()}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          title="Seleccionar archivo de media"
-          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-          className="hidden"
-          onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }}
-        />
-        {preview ? (
-          <>
-            {isVideo ? (
-              <video src={preview} className="w-full h-full object-cover max-h-[400px]" controls />
-            ) : (
-              <img src={preview} alt="Preview" className="w-full h-full object-cover max-h-[400px]" />
-            )}
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setFile(null); setPreview(null); }}
-              className="absolute top-3 right-3 bg-black/60 rounded-full p-1.5 text-white hover:bg-black/80 transition"
-              aria-label="Eliminar archivo"
-            >
-              <X className="w-4 h-4" />
+    <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
+      {/* Input galería oculto */}
+      <input ref={galleryRef} type="file" title="Seleccionar de galería" accept="image/*,video/*" className="hidden"
+        onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
+
+      {/* Overlay cámara */}
+      {showCamera && (
+        <div className="absolute inset-0 z-30 bg-black flex flex-col">
+          <video ref={videoRef} autoPlay playsInline muted
+            className={`flex-1 w-full object-cover ${facingMode === "user" ? "[transform:scaleX(-1)]" : ""}`}
+          />
+          {/* Controles cámara */}
+          <div className="flex items-center justify-between px-10 py-8 bg-black">
+            <button type="button" aria-label="Cerrar cámara" onClick={closeCamera}
+              className="w-12 h-12 flex items-center justify-center">
+              <X className="w-7 h-7 text-white" />
             </button>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center gap-3 p-10 text-center min-h-[280px]">
-            <div className="flex gap-3 text-gray-600">
-              <ImageIcon className="w-8 h-8" />
-              <Video className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-white font-medium">Arrastra o pulsa para subir</p>
-              <p className="text-gray-500 text-sm mt-1">JPG, PNG, GIF, WebP · MP4, WebM, MOV</p>
-              <p className="text-gray-600 text-xs mt-0.5">Máx. 10 MB (imagen) · 50 MB (vídeo)</p>
-            </div>
-            <div className="mt-2 flex items-center gap-2 bg-ozio-purple/10 border border-ozio-purple/30 text-ozio-purple text-sm px-4 py-2 rounded-full">
-              <Upload className="w-4 h-4" />
-              Seleccionar archivo
-            </div>
+            <button type="button" aria-label="Tomar foto" onClick={capturePhoto}
+              className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition">
+              <div className="w-16 h-16 rounded-full bg-white" />
+            </button>
+            <button type="button" aria-label="Girar cámara" onClick={flipCamera}
+              className="w-12 h-12 flex items-center justify-center opacity-80">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
-        )}
-      </div>
-
-      <div className="bg-ozio-card border border-gray-700/50 rounded-xl p-4 text-sm text-gray-400">
-        <p className="font-medium text-gray-300 mb-1">💡 Las historias duran 24 horas</p>
-        <p>Se publicarán asociadas a tu local y desaparecerán automáticamente.</p>
-      </div>
-
-      {error && (
-        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">{error}</p>
+        </div>
       )}
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={!file || loading}
-        className="w-full bg-ozio-purple hover:bg-ozio-purple/90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition text-sm"
-      >
-        {loading ? "Publicando..." : "Publicar historia"}
-      </button>
+      {/* Barra superior */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-11 pb-3 z-20">
+        <button type="button" aria-label="Cerrar" onClick={onBack} className="w-10 h-10 flex items-center justify-center">
+          <X className="w-7 h-7 text-white drop-shadow-lg" />
+        </button>
+        <div className="flex items-center gap-3">
+          {/* Flash tachado */}
+          <button type="button" aria-label="Flash" className="w-10 h-10 flex items-center justify-center opacity-80">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none" opacity={0.5}/>
+              <line x1="2" y1="2" x2="22" y2="22" />
+            </svg>
+          </button>
+          {/* Ajustes */}
+          <button type="button" aria-label="Ajustes" className="w-10 h-10 flex items-center justify-center opacity-80">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Área principal */}
+      {preview ? (
+        /* ── Vista previa ── */
+        <div className="flex-1 relative">
+          {isVideo ? (
+            <video src={preview} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted playsInline />
+          ) : (
+            <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70 pointer-events-none" />
+
+          {/* Botón eliminar */}
+          <button type="button" aria-label="Eliminar media" onClick={() => { setFile(null); setPreview(null); }}
+            className="absolute top-20 right-4 bg-black/50 backdrop-blur-sm rounded-full p-2 z-10">
+            <X className="w-5 h-5 text-white" />
+          </button>
+
+          {/* Error */}
+          {error && (
+            <div className="absolute bottom-32 left-4 right-4 z-10">
+              <p className="text-red-400 text-sm text-center bg-black/70 backdrop-blur-sm rounded-2xl px-4 py-3">{error}</p>
+            </div>
+          )}
+
+          {/* Botón publicar */}
+          <div className="absolute bottom-10 left-0 right-0 flex items-center justify-center gap-4 px-6 z-10">
+            <button type="button" aria-label="Cambiar media" onClick={() => { setFile(null); setPreview(null); }}
+              className="w-14 h-14 rounded-full border-2 border-white/60 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button type="button" aria-label="Publicar historia" onClick={submit} disabled={loading}
+              className="flex items-center gap-2 bg-white text-black font-bold py-3.5 px-10 rounded-full text-base disabled:opacity-60 active:scale-95 transition shadow-xl">
+              {loading && (
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              )}
+              {loading ? "Publicando..." : "Tu historia →"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ── Sin media ── */
+        <>
+          {/* Menú lateral izquierdo */}
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-7 z-10">
+            {[
+              { icon: "Aa", label: "Crear" },
+              { icon: "∞", label: "Boomerang" },
+              { icon: "⊞", label: "Diseño" },
+            ].map((item) => (
+              <button key={item.label} type="button"
+                onClick={() => galleryRef.current?.click()}
+                className="flex items-center gap-3 group">
+                <div className="w-10 h-10 rounded-full border-2 border-white/70 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">{item.icon}</span>
+                </div>
+                <span className="text-white font-semibold text-sm drop-shadow-md">{item.label}</span>
+              </button>
+            ))}
+            <button type="button" aria-label="Ver más opciones" className="pl-2 opacity-60">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Canvas vacío con gradiente */}
+          <div className="flex-1 bg-gradient-to-b from-gray-900 via-[#0d0d0d] to-black" />
+        </>
+      )}
+
+      {/* Controles inferiores (solo sin preview) */}
+      {!preview && (
+        <div className="flex flex-col items-center gap-5 pb-10 pt-4 bg-black">
+          {/* Fila: galería · disparador · girar cámara */}
+          <div className="flex items-center justify-center gap-10 w-full px-10">
+            {/* Galería */}
+            <button type="button" aria-label="Abrir galería" onClick={() => galleryRef.current?.click()}
+              className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white/50 bg-gray-800 flex items-center justify-center active:scale-95 transition">
+              <ImageIcon className="w-7 h-7 text-white/70" />
+            </button>
+
+            {/* Botón captura */}
+            <button type="button" aria-label="Abrir cámara" onClick={() => openCamera()}
+              className="w-[72px] h-[72px] rounded-full border-[3px] border-white flex items-center justify-center active:scale-95 transition">
+              <div className="w-[58px] h-[58px] rounded-full bg-white" />
+            </button>
+
+            {/* Girar cámara */}
+            <button type="button" aria-label="Girar cámara" onClick={flipCamera} className="w-14 h-14 flex items-center justify-center opacity-70">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Tabs de modo */}
+          <div className="flex items-center gap-8">
+            {["Publicar", "Historia", "Reel"].map((mode) => (
+              <button key={mode} type="button"
+                className={`text-xs font-bold tracking-widest uppercase transition ${
+                  mode === "Historia" ? "text-white" : "text-white/35"
+                }`}>
+                {mode}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

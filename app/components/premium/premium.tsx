@@ -118,22 +118,15 @@ export default function Premium() {
 
         {/* ── Card GRATIS ── */}
         <div className="rounded-3xl p-6 free-card flex-1">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
-              <div className="flex items-end gap-1">
-                <span className="text-white text-4xl font-black leading-none">0€</span>
-                <span className="text-gray-600 text-sm mb-0.5">/mes</span>
-              </div>
+          <div className="mb-5">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
+            <div className="flex items-end gap-1">
+              <span className="text-white text-4xl font-black leading-none">0€</span>
+              <span className="text-gray-600 text-sm mb-0.5">/mes</span>
             </div>
-            {!premium && (
-              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-400">
-                Plan actual
-              </span>
-            )}
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 mb-6">
             {FREE_FEATURES.map((f) => (
               <div key={f.text} className="flex items-center gap-3">
                 <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${f.ok ? "free-check-icon" : "free-cross-icon"}`}>
@@ -151,6 +144,20 @@ export default function Premium() {
               </div>
             ))}
           </div>
+
+          {/* CTA */}
+          {!premium ? (
+            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-green-400 border border-green-500/30 bg-green-500/10">
+              ✅ Plan activo
+            </div>
+          ) : (
+            <a
+              href="mailto:hola@ozio.app?subject=Cancelar%20plan%20Premium&body=Hola%2C%20me%20gustar%C3%ADa%20cambiar%20al%20plan%20gratuito."
+              className="block w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5 hover:bg-white/10 hover:text-gray-300 transition active:scale-[0.98]"
+            >
+              Seleccionar plan
+            </a>
+          )}
         </div>
 
       </div>

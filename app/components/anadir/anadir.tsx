@@ -148,10 +148,11 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
     }, "image/jpeg", 0.92);
   };
 
-  // Parar stream al desmontar
+  // Abrir cámara al montar y pararla al desmontar
   useEffect(() => {
+    openCamera();
     return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); };
-  }, []);
+  }, []); // solo al montar
 
   const submit = async () => {
     if (!file) return;

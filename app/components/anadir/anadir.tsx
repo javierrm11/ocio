@@ -125,16 +125,15 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
     const v = videoRef.current;
     if (!v) return;
     const canvas = document.createElement("canvas");
-    // Recorte 9:16
-    const vw = v.videoWidth, vh = v.videoHeight;
-    const ratio = 9 / 16;
-    let sw = vw, sh = vh, sx = 0, sy = 0;
-    if (vw / vh > ratio) { sw = vh * ratio; sx = (vw - sw) / 2; }
-    else { sh = vw / ratio; sy = (vh - sh) / 2; }
-    canvas.width = sw; canvas.height = sh;
+    canvas.width = v.videoWidth;
+    canvas.height = v.videoHeight;
     const ctx = canvas.getContext("2d");
-    if (facingMode === "user") { ctx?.scale(-1, 1); ctx?.drawImage(v, -sw, 0, sw, sh); }
-    else ctx?.drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
+    if (facingMode === "user") {
+      // Espejo para selfie, igual que el preview
+      ctx?.translate(canvas.width, 0);
+      ctx?.scale(-1, 1);
+    }
+    ctx?.drawImage(v, 0, 0);
     canvas.toBlob((blob) => {
       if (!blob) return;
       const f = new File([blob], "captura.jpg", { type: "image/jpeg" });

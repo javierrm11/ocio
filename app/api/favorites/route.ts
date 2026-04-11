@@ -6,8 +6,7 @@ export async function GET() {
   const userId = await getUserId();
   if (!userId) {
     return NextResponse.json(
-      { error: 'No autenticado' },
-      { status: 401 }
+      {}
     );
   }
   const supabase = await createClient();

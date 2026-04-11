@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const user = await getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return {};
   }
   const supabase = await createClient();
   if (user.user_metadata.type == "venue") {

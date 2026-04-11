@@ -1,8 +1,9 @@
 import { getUserId } from "@/lib/auth/get-user";
 import { createClient } from "@/lib/supabase/server";
-import { profile } from "console";
+import { haversineKm } from "@/lib/utils/distance";
 import { NextResponse } from "next/server";
-import { use } from "react";
+
+const PRESENCE_RADIUS_KM = 0.3; // 300 metros
 
 // obtener todas las companies, con filtro opcional por cualquier campo
 export async function GET(request: Request) {
@@ -53,16 +54,32 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const body = await request.json();
 
-  const {
-    venue_id,
-  } = body;
+  const { venue_id, user_lat, user_lng } = body;
 
+  // Validar ubicación del usuario respecto al venue
+  let location_valid = false;
+
+  if (user_lat != null && user_lng != null) {
+    const { data: venue } = await supabase
+      .from("venues")
+      .select("latitude, longitude")
+      .eq("id", venue_id)
+      .single();
+
+    if (venue) {
+      const distKm = haversineKm(user_lat, user_lng, venue.latitude, venue.longitude);
+      location_valid = distKm <= PRESENCE_RADIUS_KM;
+    }
+  }
 
   const { data, error } = await supabase
     .from("check_ins")
     .insert({
-      profile_id : userId,
+      profile_id: userId,
       venue_id,
+      user_lat: user_lat ?? null,
+      user_lng: user_lng ?? null,
+      location_valid,
     })
     .select();
 

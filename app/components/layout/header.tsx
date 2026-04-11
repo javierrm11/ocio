@@ -1,12 +1,16 @@
 'use client';
 
-import { Bell, User } from 'lucide-react';
+import { Bell, User, Gem } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/stores/venueStore';
 
 function Header() {
   const router = useRouter();
   const { currentUser } = useAppStore();
+
+  // venues tienen latitude, profiles no
+  const isUserProfile = currentUser && !('latitude' in currentUser);
+  const points: number = isUserProfile ? (currentUser as any).points ?? 0 : 0;
 
   return (
     <header className="w-full bg-ozio-darker text-white z-50">
@@ -25,6 +29,31 @@ function Header() {
 
         {/* Iconos */}
         <div className="flex items-center gap-1">
+
+          {/* Puntos — solo para usuarios */}
+          {isUserProfile && (
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-2.5 h-9 rounded-[10px] hover:bg-white/[0.06] transition-all"
+              onClick={() => router.push('/profile')}
+              aria-label="Mis puntos"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="flex-shrink-0">
+                <path d="M2 9l4-5h12l4 5-10 11L2 9z" fill="url(#hg)" />
+                <path d="M2 9h20M8 4l4 5 4-5M12 14l-10-5M12 14l10-5" stroke="#b45309" strokeWidth="0.6" strokeLinejoin="round" />
+                <defs>
+                  <linearGradient id="hg" x1="2" y1="4" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#fde68a" />
+                    <stop offset="50%" stopColor="#f59e0b" />
+                    <stop offset="100%" stopColor="#d97706" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-white text-sm font-black">{points}</span>
+              </div>
+            </button>
+          )}
 
           {/* Notificaciones */}
           <button

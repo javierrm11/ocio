@@ -299,6 +299,7 @@ function MyMap() {
     userFavorites,
     setUserFavorites,
     currentUser,
+    setCurrentUser,
     loaded,
     userLocation,
     setUserLocation,
@@ -394,6 +395,13 @@ function MyMap() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, [setUserLocation, setVenues]);
 
+  const [pointsToast, setPointsToast] = useState<number | null>(null);
+
+  const showPointsToast = (points: number) => {
+    setPointsToast(points);
+    setTimeout(() => setPointsToast(null), 4000);
+  };
+
   const onCheckIn = (venueId: any) => {
     const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
@@ -402,7 +410,11 @@ function MyMap() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ venue_id: venueId }),
+      body: JSON.stringify({
+        venue_id: venueId,
+        user_lat: userLocation?.latitude ?? null,
+        user_lng: userLocation?.longitude ?? null,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -454,7 +466,14 @@ function MyMap() {
       body: JSON.stringify({ active: false }),
     })
       .then((res) => res.json())
-      .then(() => {
+      .then((result) => {
+        if (result.points_earned > 0) {
+          showPointsToast(result.points_earned);
+          if (result.total_points !== null && currentUser) {
+            setCurrentUser({ ...currentUser, points: result.total_points });
+          }
+        }
+
         // Elimina del estado local (la API lo guarda como histórico con active:false)
         const removeCheckIn = (list: any[]) =>
           list.filter((c: any) => c.id !== myCheckIn.id);
@@ -594,6 +613,13 @@ function MyMap() {
 
   return (
     <>
+      {/* ─── TOAST PUNTOS ─── */}
+      {pointsToast !== null && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-yellow-400 text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
+          <span>+{pointsToast} puntos ganados</span>
+        </div>
+      )}
+
       {/* ─── MAPA ─── */}
       <div className="fixed inset-0 md:right-0 md:left-0">
         <MapContainer

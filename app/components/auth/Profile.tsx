@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from "@/lib/hooks/getToken";
-import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock } from "lucide-react";
+import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock, Gem } from "lucide-react";
 import { isPremium } from "@/lib/hooks/plan";
 
 interface CheckInHistory {
@@ -43,6 +43,23 @@ interface UserProfile {
   checkInHistory?: CheckInHistory[];
   genres?: { genre: Genre; genre_id: number }[];
   plan?: string;
+  points?: number;
+}
+
+function DiamondIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M2 9l4-5h12l4 5-10 11L2 9z" fill="url(#dg)" />
+      <path d="M2 9h20M8 4l4 5 4-5M12 14l-10-5M12 14l10-5" stroke="#b45309" strokeWidth="0.6" strokeLinejoin="round" />
+      <defs>
+        <linearGradient id="dg" x1="2" y1="4" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#fde68a" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#d97706" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
 }
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
@@ -143,6 +160,18 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               <p className="text-white text-xl font-black leading-none">{isVenue ? user.check_ins?.length || 0 : user.favorites?.length || 0}</p>
               <p className="text-gray-400 text-xs mt-1">{isVenue ? "Visitas" : "Favoritos"}</p>
             </div>
+            {!isVenue && (
+              <>
+                <div className="w-px h-8 bg-gray-800" />
+                <div className="text-center">
+                  <p className="text-yellow-400 text-xl font-black leading-none flex items-center justify-center gap-1">
+                    <DiamondIcon size={14} />
+                    {user.points ?? 0}
+                  </p>
+                  <p className="text-gray-400 text-xs mt-1">Puntos</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -211,6 +240,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             </button>
             <button onClick={() => setActiveTab("historial")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Clock size={22} />
+            </button>
+            <button onClick={() => setActiveTab("puntos")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "puntos" ? "border-b-2 border-yellow-500" : "opacity-30 hover:opacity-60"}`}>
+              <DiamondIcon size={22} />
             </button>
             <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
@@ -299,6 +331,8 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           )}
 
           {!isVenue && activeTab === "historial" && <CheckInHistoryTab userId={user.id} />}
+
+          {!isVenue && activeTab === "puntos" && <PointsTab totalPoints={user.points ?? 0} />}
 
           {activeTab === "stats" && <StatsTab />}
 
@@ -999,6 +1033,131 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
         <button onClick={() => setPage(page + 1)} className="w-full py-3 bg-ozio-card border border-gray-700/50 hover:border-ozio-blue/50 text-gray-400 hover:text-white font-medium rounded-2xl transition text-sm">
           Ver más ({history.length - page * PER_PAGE} restantes)
         </button>
+      )}
+    </div>
+  );
+}
+
+interface PointTransaction {
+  id: string;
+  type: "checkin_validated" | "checkout_confirmed" | "extended_stay";
+  points: number;
+  created_at: string;
+  check_in_id: string | null;
+}
+
+const POINT_TYPE_LABEL: Record<PointTransaction["type"], string> = {
+  checkin_validated: "Check-in validado",
+  checkout_confirmed: "Check-out confirmado",
+  extended_stay: "Permanencia +1h",
+};
+
+const POINT_TYPE_ICON: Record<PointTransaction["type"], string> = {
+  checkin_validated: "📍",
+  checkout_confirmed: "✅",
+  extended_stay: "⏱️",
+};
+
+function PointsTab({ totalPoints }: { totalPoints: number }) {
+  const [transactions, setTransactions] = useState<PointTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPoints = async () => {
+      try {
+        const token = getToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/points`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        setTransactions(data.transactions ?? []);
+      } catch {
+        // silently fail
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPoints();
+  }, []);
+
+  const grouped = transactions.reduce((acc, t) => {
+    const date = new Date(t.created_at);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const isYesterday = date.toDateString() === new Date(now.getTime() - 86400000).toDateString();
+    const label = isToday ? "Hoy" : isYesterday ? "Ayer" : date.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+    if (!acc[label]) acc[label] = [];
+    acc[label].push(t);
+    return acc;
+  }, {} as Record<string, PointTransaction[]>);
+
+  return (
+    <div className="space-y-5">
+      {/* Resumen total */}
+      <div className="bg-gradient-to-br from-yellow-500/10 to-amber-500/5 border border-yellow-500/25 rounded-2xl p-5 flex items-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-yellow-400/15 flex items-center justify-center flex-shrink-0">
+          <DiamondIcon size={28} />
+        </div>
+        <div>
+          <p className="text-yellow-400 text-3xl font-black leading-none">{totalPoints}</p>
+          <p className="text-gray-400 text-sm mt-1">puntos acumulados</p>
+        </div>
+        <div className="ml-auto text-right">
+          <p className="text-white font-bold text-lg">{transactions.length}</p>
+          <p className="text-gray-500 text-xs">movimientos</p>
+        </div>
+      </div>
+
+      {/* Cómo ganar puntos */}
+      <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-4 space-y-2.5">
+        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-3">Cómo ganar puntos</p>
+        {[
+          { icon: "📍", label: "Check-in validado (≥ 20 min dentro)", pts: "+5" },
+          { icon: "✅", label: "Check-out confirmado", pts: "+5" },
+          { icon: "⏱️", label: "Permanencia superior a 1h", pts: "+10" },
+        ].map(({ icon, label, pts }) => (
+          <div key={label} className="flex items-center gap-3">
+            <span className="text-lg w-6 text-center">{icon}</span>
+            <span className="text-gray-300 text-sm flex-1">{label}</span>
+            <span className="text-yellow-400 font-bold text-sm">{pts}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Historial */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400" />
+        </div>
+      ) : transactions.length === 0 ? (
+        <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
+          <div className="text-5xl mb-3">⭐</div>
+          <p className="text-white font-semibold mb-1">Sin puntos aún</p>
+          <p className="text-gray-400 text-sm">Haz check-in en un local para empezar a ganar</p>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {Object.entries(grouped).map(([dateLabel, items]) => (
+            <div key={dateLabel}>
+              <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3 px-1">{dateLabel}</p>
+              <div className="space-y-2">
+                {items.map((t) => (
+                  <div key={t.id} className="bg-ozio-card border border-gray-700/50 rounded-2xl px-4 py-3 flex items-center gap-3">
+                    <span className="text-xl w-7 text-center flex-shrink-0">{POINT_TYPE_ICON[t.type]}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-medium">{POINT_TYPE_LABEL[t.type]}</p>
+                      <p className="text-gray-500 text-xs mt-0.5">
+                        {new Date(t.created_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    <span className="text-yellow-400 font-black text-base flex-shrink-0">+{t.points}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

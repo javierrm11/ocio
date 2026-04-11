@@ -234,14 +234,14 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
 
         {/* Preview imagen con drag/zoom */}
         {preview && !isVideo && (
-          <div className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none bg-black"
             onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
             onWheel={onWheel} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Historia"
               draggable={false}
               style={{ transform: `translate(${imgPos.x}px,${imgPos.y}px) scale(${imgPos.scale})`, transformOrigin: "center", transition: dragRef.current ? "none" : "transform 0.1s" }}
-              className="absolute inset-0 w-full h-full object-cover" />
+              className="max-w-full max-h-full object-contain" />
           </div>
         )}
 

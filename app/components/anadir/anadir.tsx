@@ -216,10 +216,13 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
   const isVideo = file?.type.startsWith("video/");
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
       {/* Input galería */}
       <input ref={galleryRef} type="file" title="Seleccionar de galería" accept="image/*,video/*" className="hidden"
         onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
+
+      {/* Contenedor 9:16 centrado */}
+      <div className="relative flex flex-col w-full max-w-md h-full">
 
       {/* ── Canvas 9:16 ── */}
       <div className="flex-1 relative overflow-hidden bg-black">
@@ -328,6 +331,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       )}
+      </div>{/* fin contenedor 9:16 */}
     </div>
   );
 }

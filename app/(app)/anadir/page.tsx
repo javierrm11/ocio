@@ -9,7 +9,6 @@ export default function AnadirPage() {
       <Suspense fallback={<div className="min-h-screen bg-ozio-dark" />}>
         <Anadir />
       </Suspense>
-      <BottomNav />
     </div>
   );
 }

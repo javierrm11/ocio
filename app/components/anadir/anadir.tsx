@@ -90,185 +90,233 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showCamera, setShowCamera] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  // Transform para imagen arrastrable/zoomable
+  const [imgPos, setImgPos] = useState({ x: 0, y: 0, scale: 1 });
+  const dragRef = useRef<{ startX: number; startY: number; ox: number; oy: number } | null>(null);
+  const pinchRef = useRef<number | null>(null);
+
   const galleryRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const handleFile = (f: File) => {
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-    setError(null);
-  };
-
-  const openCamera = async (mode: "user" | "environment" = facingMode) => {
-    setShowCamera(true);
+  /* ── Cámara ── */
+  const startCamera = async (mode: "user" | "environment" = facingMode) => {
     try {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: mode },
-        audio: false,
-      });
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: false });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch {
-      setShowCamera(false);
-      galleryRef.current?.click();
-    }
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch { /* sin cámara disponible */ }
   };
 
-  const closeCamera = () => {
+  const stopCamera = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    setShowCamera(false);
   };
 
   const flipCamera = () => {
     const next = facingMode === "user" ? "environment" : "user";
     setFacingMode(next);
-    openCamera(next);
+    startCamera(next);
   };
 
   const capturePhoto = () => {
-    if (!videoRef.current) return;
+    const v = videoRef.current;
+    if (!v) return;
     const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
+    // Recorte 9:16
+    const vw = v.videoWidth, vh = v.videoHeight;
+    const ratio = 9 / 16;
+    let sw = vw, sh = vh, sx = 0, sy = 0;
+    if (vw / vh > ratio) { sw = vh * ratio; sx = (vw - sw) / 2; }
+    else { sh = vw / ratio; sy = (vh - sh) / 2; }
+    canvas.width = sw; canvas.height = sh;
+    const ctx = canvas.getContext("2d");
+    if (facingMode === "user") { ctx?.scale(-1, 1); ctx?.drawImage(v, -sw, 0, sw, sh); }
+    else ctx?.drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
     canvas.toBlob((blob) => {
       if (!blob) return;
       const f = new File([blob], "captura.jpg", { type: "image/jpeg" });
-      handleFile(f);
-      closeCamera();
+      setFile(f); setPreview(URL.createObjectURL(f)); setImgPos({ x: 0, y: 0, scale: 1 });
+      stopCamera();
     }, "image/jpeg", 0.92);
   };
 
-  // Abrir cámara al montar y pararla al desmontar
-  useEffect(() => {
-    openCamera();
-    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); };
-  }, []); // solo al montar
+  // Arrancar cámara al entrar, parar al salir
+  useEffect(() => { startCamera(); return stopCamera; }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── Galería ── */
+  const handleFile = (f: File) => {
+    setFile(f); setPreview(URL.createObjectURL(f));
+    setImgPos({ x: 0, y: 0, scale: 1 }); setError(null);
+    stopCamera();
+  };
+
+  /* ── Drag (mouse) ── */
+  const onMouseDown = (e: React.MouseEvent) => {
+    dragRef.current = { startX: e.clientX, startY: e.clientY, ox: imgPos.x, oy: imgPos.y };
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragRef.current) return;
+    setImgPos((p) => ({ ...p, x: dragRef.current!.ox + e.clientX - dragRef.current!.startX, y: dragRef.current!.oy + e.clientY - dragRef.current!.startY }));
+  };
+  const onMouseUp = () => { dragRef.current = null; };
+
+  /* ── Zoom rueda ── */
+  const onWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    setImgPos((p) => ({ ...p, scale: Math.min(5, Math.max(0.5, p.scale - e.deltaY * 0.001)) }));
+  };
+
+  /* ── Touch drag + pinch ── */
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      dragRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, ox: imgPos.x, oy: imgPos.y };
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchRef.current = Math.hypot(dx, dy);
+    }
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 1 && dragRef.current) {
+      setImgPos((p) => ({ ...p, x: dragRef.current!.ox + e.touches[0].clientX - dragRef.current!.startX, y: dragRef.current!.oy + e.touches[0].clientY - dragRef.current!.startY }));
+    } else if (e.touches.length === 2 && pinchRef.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const ratio = dist / pinchRef.current;
+      pinchRef.current = dist;
+      setImgPos((p) => ({ ...p, scale: Math.min(5, Math.max(0.5, p.scale * ratio)) }));
+    }
+  };
+  const onTouchEnd = () => { dragRef.current = null; pinchRef.current = null; };
+
+  /* ── Submit ── */
   const submit = async () => {
     if (!file) return;
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const token = getToken();
       const fd = new FormData();
       fd.append("media", file);
       fd.append("media_type", file.type.startsWith("video/") ? "video" : "image");
       const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
+        method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd,
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error al publicar");
       router.push("/mapa");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Error desconocido");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const isVideo = file?.type.startsWith("video/");
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
-      {/* Input galería oculto */}
+      {/* Input galería */}
       <input ref={galleryRef} type="file" title="Seleccionar de galería" accept="image/*,video/*" className="hidden"
         onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
 
-      {/* Overlay cámara */}
-      {showCamera && (
-        <div className="absolute inset-0 z-30 bg-black flex flex-col">
-          <video ref={videoRef} autoPlay playsInline muted
-            className={`flex-1 w-full object-cover ${facingMode === "user" ? "[transform:scaleX(-1)]" : ""}`}
-          />
-          {/* Controles cámara */}
-          <div className="flex items-center justify-between px-10 py-8 bg-black">
-            <button type="button" aria-label="Cerrar cámara" onClick={closeCamera}
-              className="w-12 h-12 flex items-center justify-center">
-              <X className="w-7 h-7 text-white" />
+      {/* ── Canvas 9:16 ── */}
+      <div className="flex-1 relative overflow-hidden bg-black">
+
+        {/* Cámara en vivo (fondo, siempre montada) */}
+        <video ref={videoRef} autoPlay playsInline muted
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${preview ? "opacity-0 pointer-events-none" : "opacity-100"} ${facingMode === "user" ? "[transform:scaleX(-1)]" : ""}`}
+        />
+
+        {/* Preview imagen con drag/zoom */}
+        {preview && !isVideo && (
+          <div className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+            onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
+            onWheel={onWheel} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview} alt="Historia"
+              draggable={false}
+              style={{ transform: `translate(${imgPos.x}px,${imgPos.y}px) scale(${imgPos.scale})`, transformOrigin: "center", transition: dragRef.current ? "none" : "transform 0.1s" }}
+              className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+        )}
+
+        {/* Preview vídeo */}
+        {preview && isVideo && (
+          <video src={preview} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
+        )}
+
+        {/* Barra superior (siempre encima) */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-10 pb-3 z-20">
+          <button type="button" aria-label="Cerrar" onClick={onBack} className="w-10 h-10 flex items-center justify-center">
+            <X className="w-7 h-7 text-white drop-shadow-lg" />
+          </button>
+          {!preview && (
+            <div className="flex items-center gap-3">
+              <button type="button" aria-label="Flash" className="w-10 h-10 flex items-center justify-center opacity-80">
+                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none" opacity={0.5}/>
+                  <line x1="2" y1="2" x2="22" y2="22" />
+                </svg>
+              </button>
+              <button type="button" aria-label="Ajustes" className="w-10 h-10 flex items-center justify-center opacity-80">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+
+
+        {/* Hint reposicionar imagen */}
+        {preview && !isVideo && (
+          <p className="absolute bottom-4 left-0 right-0 text-center text-white/50 text-xs pointer-events-none">
+            Arrastra o pellizca para reencuadrar
+          </p>
+        )}
+      </div>
+
+      {/* ── Controles inferiores ── */}
+      {!preview ? (
+        <div className="flex flex-col items-center gap-5 pb-10 pt-4 bg-black">
+          <div className="flex items-center justify-center gap-10 w-full px-10">
+            {/* Galería */}
+            <button type="button" aria-label="Abrir galería" onClick={() => galleryRef.current?.click()}
+              className="w-14 h-14 rounded-xl border-2 border-white/50 bg-gray-800 flex items-center justify-center active:scale-95 transition">
+              <ImageIcon className="w-7 h-7 text-white/70" />
             </button>
+            {/* Capturar */}
             <button type="button" aria-label="Tomar foto" onClick={capturePhoto}
-              className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition">
-              <div className="w-16 h-16 rounded-full bg-white" />
+              className="w-[72px] h-[72px] rounded-full border-[3px] border-white flex items-center justify-center active:scale-95 transition">
+              <div className="w-[58px] h-[58px] rounded-full bg-white" />
             </button>
-            <button type="button" aria-label="Girar cámara" onClick={flipCamera}
-              className="w-12 h-12 flex items-center justify-center opacity-80">
+            {/* Girar */}
+            <button type="button" aria-label="Girar cámara" onClick={flipCamera} className="w-14 h-14 flex items-center justify-center opacity-70">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
           </div>
+
+          {/* Modo activo */}
+          <p className="text-white text-xs font-bold tracking-widest uppercase">Historia</p>
         </div>
-      )}
-
-      {/* Barra superior */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-11 pb-3 z-20">
-        <button type="button" aria-label="Cerrar" onClick={onBack} className="w-10 h-10 flex items-center justify-center">
-          <X className="w-7 h-7 text-white drop-shadow-lg" />
-        </button>
-        <div className="flex items-center gap-3">
-          {/* Flash tachado */}
-          <button type="button" aria-label="Flash" className="w-10 h-10 flex items-center justify-center opacity-80">
-            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none" opacity={0.5}/>
-              <line x1="2" y1="2" x2="22" y2="22" />
-            </svg>
-          </button>
-          {/* Ajustes */}
-          <button type="button" aria-label="Ajustes" className="w-10 h-10 flex items-center justify-center opacity-80">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Área principal */}
-      {preview ? (
-        /* ── Vista previa ── */
-        <div className="flex-1 relative">
-          {isVideo ? (
-            <video src={preview} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted playsInline />
-          ) : (
-            <img src={preview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70 pointer-events-none" />
-
-          {/* Botón eliminar */}
-          <button type="button" aria-label="Eliminar media" onClick={() => { setFile(null); setPreview(null); }}
-            className="absolute top-20 right-4 bg-black/50 backdrop-blur-sm rounded-full p-2 z-10">
-            <X className="w-5 h-5 text-white" />
-          </button>
-
-          {/* Error */}
+      ) : (
+        /* ── Controles con preview ── */
+        <div className="flex flex-col items-center gap-4 pb-10 pt-5 px-6 bg-black">
           {error && (
-            <div className="absolute bottom-32 left-4 right-4 z-10">
-              <p className="text-red-400 text-sm text-center bg-black/70 backdrop-blur-sm rounded-2xl px-4 py-3">{error}</p>
-            </div>
+            <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2 w-full">{error}</p>
           )}
-
-          {/* Botón publicar */}
-          <div className="absolute bottom-10 left-0 right-0 flex items-center justify-center gap-4 px-6 z-10">
-            <button type="button" aria-label="Cambiar media" onClick={() => { setFile(null); setPreview(null); }}
-              className="w-14 h-14 rounded-full border-2 border-white/60 bg-black/30 backdrop-blur-sm flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+          <div className="flex items-center justify-center gap-4 w-full">
+            <button type="button" aria-label="Descartar" onClick={() => { setFile(null); setPreview(null); startCamera(); }}
+              className="w-14 h-14 rounded-full border-2 border-white/50 bg-white/10 flex items-center justify-center active:scale-95 transition">
+              <X className="w-6 h-6 text-white" />
             </button>
             <button type="button" aria-label="Publicar historia" onClick={submit} disabled={loading}
-              className="flex items-center gap-2 bg-white text-black font-bold py-3.5 px-10 rounded-full text-base disabled:opacity-60 active:scale-95 transition shadow-xl">
+              className="flex-1 flex items-center justify-center gap-2 bg-white text-black font-bold py-4 rounded-full text-base disabled:opacity-60 active:scale-95 transition shadow-xl">
               {loading && (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
@@ -277,74 +325,6 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
               )}
               {loading ? "Publicando..." : "Tu historia →"}
             </button>
-          </div>
-        </div>
-      ) : (
-        /* ── Sin media ── */
-        <>
-          {/* Menú lateral izquierdo */}
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-7 z-10">
-            {[
-              { icon: "Aa", label: "Crear" },
-              { icon: "∞", label: "Boomerang" },
-              { icon: "⊞", label: "Diseño" },
-            ].map((item) => (
-              <button key={item.label} type="button"
-                onClick={() => galleryRef.current?.click()}
-                className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-full border-2 border-white/70 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">{item.icon}</span>
-                </div>
-                <span className="text-white font-semibold text-sm drop-shadow-md">{item.label}</span>
-              </button>
-            ))}
-            <button type="button" aria-label="Ver más opciones" className="pl-2 opacity-60">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Canvas vacío con gradiente */}
-          <div className="flex-1 bg-gradient-to-b from-gray-900 via-[#0d0d0d] to-black" />
-        </>
-      )}
-
-      {/* Controles inferiores (solo sin preview) */}
-      {!preview && (
-        <div className="flex flex-col items-center gap-5 pb-10 pt-4 bg-black">
-          {/* Fila: galería · disparador · girar cámara */}
-          <div className="flex items-center justify-center gap-10 w-full px-10">
-            {/* Galería */}
-            <button type="button" aria-label="Abrir galería" onClick={() => galleryRef.current?.click()}
-              className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white/50 bg-gray-800 flex items-center justify-center active:scale-95 transition">
-              <ImageIcon className="w-7 h-7 text-white/70" />
-            </button>
-
-            {/* Botón captura */}
-            <button type="button" aria-label="Abrir cámara" onClick={() => openCamera()}
-              className="w-[72px] h-[72px] rounded-full border-[3px] border-white flex items-center justify-center active:scale-95 transition">
-              <div className="w-[58px] h-[58px] rounded-full bg-white" />
-            </button>
-
-            {/* Girar cámara */}
-            <button type="button" aria-label="Girar cámara" onClick={flipCamera} className="w-14 h-14 flex items-center justify-center opacity-70">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Tabs de modo */}
-          <div className="flex items-center gap-8">
-            {["Publicar", "Historia", "Reel"].map((mode) => (
-              <button key={mode} type="button"
-                className={`text-xs font-bold tracking-widest uppercase transition ${
-                  mode === "Historia" ? "text-white" : "text-white/35"
-                }`}>
-                {mode}
-              </button>
-            ))}
           </div>
         </div>
       )}
@@ -376,7 +356,7 @@ function FormEvento() {
     featured: false,
   });
 
-  const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: string, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
   const [monthlyCount, setMonthlyCount] = useState<number | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -397,7 +377,7 @@ function FormEvento() {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((r) => r.json())
-      .then((events: any[]) => {
+      .then((events: { created_at?: string }[]) => {
         if (!Array.isArray(events)) return;
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
@@ -452,8 +432,8 @@ function FormEvento() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error al crear el evento");
       router.push("/events");
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error desconocido");
     } finally {
       setLoading(false);
     }

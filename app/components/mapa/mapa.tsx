@@ -5,6 +5,8 @@ import {
   CircleMarker,
   Marker,
   Tooltip,
+  Polyline,
+  useMap,
 } from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -279,6 +281,16 @@ function createVenueIcon(
   });
 }
 
+function MapFlyToBounds({ points }: { points: [number, number][] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length > 0) {
+      map.fitBounds(L.latLngBounds(points), { padding: [60, 60] });
+    }
+  }, [points, map]);
+  return null;
+}
+
 function MyMap() {
   const router = useRouter();
   const {
@@ -325,6 +337,35 @@ function MyMap() {
   useEffect(() => {
     venuesRef.current = venues;
   }, [venues]);
+
+  const [routePoints, setRoutePoints] = useState<[number, number][]>([]);
+  const [loadingRoute, setLoadingRoute] = useState(false);
+
+  const fetchRoute = async (destLat: number, destLng: number) => {
+    if (!userLocation) {
+      alert("Activa tu ubicación para calcular la ruta");
+      return;
+    }
+    setLoadingRoute(true);
+    try {
+      const { latitude: oLat, longitude: oLng } = userLocation;
+      const res = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${oLng},${oLat};${destLng},${destLat}?overview=full&geometries=geojson`
+      );
+      const data = await res.json();
+      if (data.routes?.[0]) {
+        const points: [number, number][] = data.routes[0].geometry.coordinates.map(
+          ([lng, lat]: [number, number]) => [lat, lng]
+        );
+        setRoutePoints(points);
+        closeModal();
+      }
+    } catch (e) {
+      console.error("Error calculando ruta", e);
+    } finally {
+      setLoadingRoute(false);
+    }
+  };
 
   const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
   const closeModal = () => setSelectedVenue(null);
@@ -626,8 +667,34 @@ function MyMap() {
               </Marker>
             );
           })}
+          {routePoints.length > 0 && (
+            <>
+              <Polyline
+                positions={routePoints}
+                pathOptions={{ color: "#3b82f6", weight: 5, opacity: 0.85, lineCap: "round", lineJoin: "round" }}
+              />
+              <MapFlyToBounds points={routePoints} />
+            </>
+          )}
         </MapContainer>
       </div>
+
+      {/* Banner ruta activa */}
+      {routePoints.length > 0 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
+          <span>🗺️ Ruta activa</span>
+          <button
+            type="button"
+            aria-label="Cancelar ruta"
+            onClick={() => setRoutePoints([])}
+            className="bg-white/20 hover:bg-white/30 rounded-full p-0.5 transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* ─── FILTROS RESPONSIVE ─── */}
       <div className="absolute bottom-20 right-3 z-[992] pointer-events-none max-w-xl">
@@ -1312,6 +1379,20 @@ function MyMap() {
                     onClick={() => router.push(`/venues/${selectedVenue.id}`)}
                   >
                     Ir ahora 🔥
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loadingRoute}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                    onClick={() => fetchRoute(selectedVenue.latitude, selectedVenue.longitude)}
+                  >
+                    {loadingRoute ? (
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                    ) : "🗺️"}
+                    {loadingRoute ? "Calculando..." : "Cómo llegar"}
                   </button>
 
                   {isUserProfile && (

@@ -234,7 +234,7 @@ npm run lint
 ### Rendimiento
 - [✅] **`next.config.ts` vacío** — Configurar `images.remotePatterns` para que Next.js optimice las imágenes de avatares y portadas servidas desde Supabase Storage.
 - [✅ ] **Sin `useMemo` / `useCallback` en el mapa** — El componente recalcula filtros y marcadores en cada render. Memoizar los valores derivados reduciría renders innecesarios.
-- [ ] **Carga inicial bloqueante** — `AppInitializer` espera venues y events en serie antes de marcar `loaded = true`. Separar las cargas y mostrar contenido progresivamente mejoraría el tiempo de primera interacción.
+- [✅] **Carga inicial bloqueante** — `AppInitializer` espera venues y events en serie antes de marcar `loaded = true`. Separar las cargas y mostrar contenido progresivamente mejoraría el tiempo de primera interacción.
 
 ### Funcionalidad
 - [ ] **Fallback de ubicación hardcodeado a Córdoba** — Si el usuario deniega la geolocalización, el mapa centra en Córdoba sin aviso. Mostrar un modal o banner explicativo con opción de introducir ciudad manualmente.

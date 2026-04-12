@@ -226,10 +226,7 @@ npm run lint
 - [✅] **Cookies sin flags de seguridad** — El token de sesión se guarda en una cookie accesible desde JavaScript. Añadir `httpOnly`, `Secure` y `SameSite=Strict` para proteger contra XSS y CSRF. Actualmente cualquier script en la página puede leer el token.
 
 ### Calidad de código
-- [ ] **Tipos `any` en el store y componentes** — `check_ins?: any[]`, `currentUser: any | null` en [venueStore.tsx](app/lib/stores/venueStore.tsx). Definir interfaces concretas mejora la seguridad de tipos y el autocompletado.
 - [✅] **Componente mapa de 1.700+ líneas** — [mapa.tsx](app/components/mapa/mapa.tsx) agrupa mapa, marcadores, filtros, panel lateral y lógica de check-in en un solo fichero. Dividirlo en sub-componentes (e.g. `MapMarkers`, `VenuePanel`, `MapFilters`) facilitaría el mantenimiento y los tests.
-- [ ] **Inconsistencia en la estructura de géneros** — En algunos endpoints los géneros llegan como `Genre[]` y en otros como `{ genre: Genre }[]`. Unificar la serialización en las rutas API.
-- [ ] **`distance` tipado como `string | number`** — En la interfaz `Venue` del store debería ser siempre `number` (o `number | null`), no `string`.
 
 ### Rendimiento
 - [✅] **`next.config.ts` vacío** — Configurar `images.remotePatterns` para que Next.js optimice las imágenes de avatares y portadas servidas desde Supabase Storage.

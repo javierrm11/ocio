@@ -17,6 +17,8 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.91.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "@vercel/analytics": "^2.0.1",
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",

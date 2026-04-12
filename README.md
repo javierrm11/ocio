@@ -232,8 +232,8 @@ npm run lint
 - [ ] **`distance` tipado como `string | number`** — En la interfaz `Venue` del store debería ser siempre `number` (o `number | null`), no `string`.
 
 ### Rendimiento
-- [ ] **`next.config.ts` vacío** — Configurar `images.remotePatterns` para que Next.js optimice las imágenes de avatares y portadas servidas desde Supabase Storage.
-- [ ] **Sin `useMemo` / `useCallback` en el mapa** — El componente recalcula filtros y marcadores en cada render. Memoizar los valores derivados reduciría renders innecesarios.
+- [✅] **`next.config.ts` vacío** — Configurar `images.remotePatterns` para que Next.js optimice las imágenes de avatares y portadas servidas desde Supabase Storage.
+- [✅ ] **Sin `useMemo` / `useCallback` en el mapa** — El componente recalcula filtros y marcadores en cada render. Memoizar los valores derivados reduciría renders innecesarios.
 - [ ] **Carga inicial bloqueante** — `AppInitializer` espera venues y events en serie antes de marcar `loaded = true`. Separar las cargas y mostrar contenido progresivamente mejoraría el tiempo de primera interacción.
 
 ### Funcionalidad

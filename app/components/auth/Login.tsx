@@ -38,8 +38,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       }
 
       if (typeof window !== 'undefined') {
-        const maxAge =  60 * 60 * 24 * 30; // 30 días o sesión
-        document.cookie = `token=${data.session.access_token}; path=/; ${maxAge ? `max-age=${maxAge};` : ''} SameSite=Lax`;
+        const maxAge = 60 * 60 * 24 * 30; // 30 días
+        const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `session=1; path=/; max-age=${maxAge}; SameSite=Strict${secure}`;
       }
 
       // ✅ Forzar recarga del store con el nuevo token

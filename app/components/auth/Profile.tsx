@@ -110,7 +110,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+    document.cookie = "session=; path=/; max-age=0; SameSite=Strict";
     setCurrentUser(null);
     setUserFavorites([]);
     setVenues([]);

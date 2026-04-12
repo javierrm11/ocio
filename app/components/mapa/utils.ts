@@ -211,7 +211,7 @@ export function createVenueIcon(
           display:flex;align-items:center;justify-content:center;
           ${premium ? "box-shadow:0 0 0 3px rgba(251,191,36,0.25);" : ""}
         ">
-          <img src="${avatarPath || "https://via.placeholder.com/40?text=?"}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:brightness(0.9);" />
+          <img src="${avatarPath || null}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:brightness(0.9);" />
         </div>
         ${crownBadge}
       </div>

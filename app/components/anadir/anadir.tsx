@@ -375,7 +375,7 @@ function FormEvento() {
   // Comprobar eventos del mes actual (solo cuentas gratuitas)
   useEffect(() => {
     if (userIsPremium || !currentUser?.id) return;
-    const token = typeof window !== "undefined" ? (document.cookie.match(/(?:^|; )token=([^;]*)/) ?? [])[1] : "";
+    const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events?venue_id=${currentUser.id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })

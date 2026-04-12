@@ -9,7 +9,7 @@ import {
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -281,6 +281,20 @@ function createVenueIcon(
   });
 }
 
+function getGenreName(g: Genre): string { return g.genre?.name ?? g.name ?? ""; }
+function getGenreEmoji(g: Genre): string { return g.genre?.emoji ?? g.emoji ?? "🎵"; }
+
+function getMadridHour(): number {
+  return parseInt(
+    new Intl.DateTimeFormat("es-ES", {
+      timeZone: "Europe/Madrid",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date()),
+    10,
+  );
+}
+
 function MapFlyToBounds({ points }: { points: [number, number][] }) {
   const map = useMap();
   useEffect(() => {
@@ -313,9 +327,6 @@ function MyMap() {
   const [ambientesSeleccionados, setAmbientesSeleccionados] = useState<Set<string>>(new Set());
   const currentProfileId = currentUser?.id;
 
-  const getGenreName = (g: Genre): string => g.genre?.name ?? g.name ?? "";
-  const getGenreEmoji = (g: Genre): string => g.genre?.emoji ?? g.emoji ?? "🎵";
-
   const generosDisponibles = useMemo(() => {
     const all = venues.flatMap((v) =>
       v.genres?.map((g) => ({
@@ -331,8 +342,10 @@ function MyMap() {
     });
   }, [venues]);
 
-  const hasActiveFilters =
-    filters.maxDistance !== null || ambientesSeleccionados.size > 0 || generosSeleccionados.size > 0;
+  const hasActiveFilters = useMemo(
+    () => filters.maxDistance !== null || ambientesSeleccionados.size > 0 || generosSeleccionados.size > 0,
+    [filters.maxDistance, ambientesSeleccionados, generosSeleccionados],
+  );
 
   const venuesRef = useRef(venues);
   useEffect(() => {
@@ -342,7 +355,10 @@ function MyMap() {
   const [routePoints, setRoutePoints] = useState<[number, number][]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
 
-  const fetchRoute = async (destLat: number, destLng: number) => {
+  const handleVenueClick = useCallback((venue: Venue) => setSelectedVenue(venue), []);
+  const closeModal = useCallback(() => setSelectedVenue(null), []);
+
+  const fetchRoute = useCallback(async (destLat: number, destLng: number) => {
     if (!userLocation) {
       alert("Activa tu ubicación para calcular la ruta");
       return;
@@ -366,10 +382,7 @@ function MyMap() {
     } finally {
       setLoadingRoute(false);
     }
-  };
-
-  const handleVenueClick = (venue: Venue) => setSelectedVenue(venue);
-  const closeModal = () => setSelectedVenue(null);
+  }, [userLocation, closeModal]);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -397,12 +410,12 @@ function MyMap() {
 
   const [pointsToast, setPointsToast] = useState<number | null>(null);
 
-  const showPointsToast = (points: number) => {
+  const showPointsToast = useCallback((points: number) => {
     setPointsToast(points);
     setTimeout(() => setPointsToast(null), 4000);
-  };
+  }, []);
 
-  const onCheckIn = (venueId: any) => {
+  const onCheckIn = useCallback((venueId: any) => {
     const token = getToken();
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/checkins`, {
       method: "POST",
@@ -446,9 +459,9 @@ function MyMap() {
             : prev,
         );
       });
-  };
+  }, [userLocation, currentProfileId, setVenues]);
 
-  const onCheckOut = (venueId: any) => {
+  const onCheckOut = useCallback((venueId: any) => {
     // Busca el check-in activo del usuario actual en este venue
     const myCheckIn = venuesRef.current
       .find((v) => v.id === venueId)
@@ -491,9 +504,9 @@ function MyMap() {
             : prev,
         );
       });
-  };
+  }, [currentProfileId, currentUser, setCurrentUser, setVenues, showPointsToast]);
 
-  const toggleFavorite = (venueId: any, isFavorite: boolean) => {
+  const toggleFavorite = useCallback((venueId: any, isFavorite: boolean) => {
     const token = getToken();
     if (isFavorite) {
       fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/favorites/${venueId}`, {
@@ -528,20 +541,10 @@ function MyMap() {
         setUserFavorites([...userFavorites, venueId]);
       });
     }
-  };
+  }, [venues, userFavorites, selectedVenue, setVenues, setUserFavorites]);
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
-
-  const getMadridHour = () =>
-    parseInt(
-      new Intl.DateTimeFormat("es-ES", {
-        timeZone: "Europe/Madrid",
-        hour: "numeric",
-        hour12: false,
-      }).format(new Date()),
-      10,
-    );
 
   const [isNight, setIsNight] = useState(() => {
     const h = getMadridHour();
@@ -557,7 +560,7 @@ function MyMap() {
     return () => clearInterval(interval);
   }, []);
 
-  const filteredVenues = venues.filter((v) => {
+  const filteredVenues = useMemo(() => venues.filter((v) => {
     const dist = parseDistanceToKm(v.distance);
     if (filters.maxDistance !== null && dist > filters.maxDistance)
       return false;
@@ -572,28 +575,40 @@ function MyMap() {
       return false;
 
     return true;
-  });
+  }), [venues, filters.maxDistance, ambientesSeleccionados, generosSeleccionados]);
 
-  const selectedCheckins = selectedVenue?.check_ins?.length || 0;
-  const maxCheckinsReference = Math.max(
-    10,
-    ...venues.map((v) => v.check_ins?.length || 0),
+  const maxCheckinsReference = useMemo(
+    () => Math.max(10, ...venues.map((v) => v.check_ins?.length || 0)),
+    [venues],
   );
-  const selectedHeatStep = getHeatStep(selectedCheckins);
-  const selectedHeatCategory = getHeatCategory(selectedHeatStep);
-  const selectedHeatLabel = getHeatLabel(selectedHeatStep);
-  const selectedHeatGradient = getHeatGradient(selectedCheckins);
-  const heatState =
-    selectedHeatCategory === "tranquilo" ? "cool"
-    : selectedHeatCategory === "animado" ? "warm"
-    : selectedHeatCategory === "muy_animado" ? "hot"
-    : "full";
-  const hasUserActiveCheckIn = Boolean(
-    selectedVenue?.check_ins?.some(
-      (c: any) =>
-        c.active && (!currentProfileId || c.profile_id === currentProfileId),
-    ),
-  );
+
+  const {
+    selectedCheckins,
+    selectedHeatStep,
+    selectedHeatCategory,
+    selectedHeatLabel,
+    selectedHeatGradient,
+    heatState,
+    hasUserActiveCheckIn,
+  } = useMemo(() => {
+    const selectedCheckins = selectedVenue?.check_ins?.length || 0;
+    const selectedHeatStep = getHeatStep(selectedCheckins);
+    const selectedHeatCategory = getHeatCategory(selectedHeatStep);
+    const selectedHeatLabel = getHeatLabel(selectedHeatStep);
+    const selectedHeatGradient = getHeatGradient(selectedCheckins);
+    const heatState =
+      selectedHeatCategory === "tranquilo" ? "cool"
+      : selectedHeatCategory === "animado" ? "warm"
+      : selectedHeatCategory === "muy_animado" ? "hot"
+      : "full";
+    const hasUserActiveCheckIn = Boolean(
+      selectedVenue?.check_ins?.some(
+        (c: any) =>
+          c.active && (!currentProfileId || c.profile_id === currentProfileId),
+      ),
+    );
+    return { selectedCheckins, selectedHeatStep, selectedHeatCategory, selectedHeatLabel, selectedHeatGradient, heatState, hasUserActiveCheckIn };
+  }, [selectedVenue, currentProfileId]);
 
   if (!loaded) {
     return (

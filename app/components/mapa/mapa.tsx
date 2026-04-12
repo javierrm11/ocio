@@ -1,5 +1,5 @@
 "use client";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
@@ -9,6 +9,94 @@ import { getDistanceKm, getGenreEmoji, getGenreName, getHeatCategory, getHeatSte
 import { MapMarkers } from "./MapMarkers";
 import { MapFilters } from "./MapFilters";
 import { VenuePanel } from "./VenuePanel";
+
+// Re-centra el mapa cuando cambia la ubicación
+function MapViewSetter({ location }: { location: { latitude: number; longitude: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (location) map.setView([location.latitude, location.longitude], map.getZoom());
+  }, [location, map]);
+  return null;
+}
+
+// Banner de ubicación denegada con búsqueda de ciudad
+function LocationBanner({
+  onLocationFound,
+}: {
+  onLocationFound: (lat: number, lng: number) => void;
+}) {
+  const [city, setCity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
+
+  const handleSearch = async () => {
+    const q = city.trim();
+    if (!q) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+        { headers: { "Accept-Language": "es" } },
+      );
+      const data = await res.json();
+      if (!data.length) { setError("Ciudad no encontrada"); return; }
+      onLocationFound(parseFloat(data[0].lat), parseFloat(data[0].lon));
+      setDismissed(true);
+    } catch {
+      setError("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm">
+      <div className="bg-ozio-dark/95 backdrop-blur border border-white/10 rounded-2xl shadow-xl px-4 py-3">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <p className="text-white text-sm font-semibold leading-snug">
+            Ubicación no disponible
+          </p>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={() => setDismissed(true)}
+            className="text-white/40 hover:text-white/80 transition shrink-0 mt-0.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <p className="text-white/50 text-xs mb-3">
+          El mapa usa una ubicación por defecto. Introduce tu ciudad para centrarlo correctamente.
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            placeholder="Ej: Sevilla, Madrid…"
+            className="flex-1 bg-white/10 text-white placeholder-white/30 text-sm rounded-xl px-3 py-2 outline-none border border-white/10 focus:border-ozio-blue transition"
+          />
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={loading || !city.trim()}
+            className="bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-40 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
+          >
+            {loading ? "…" : "Ir"}
+          </button>
+        </div>
+        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+      </div>
+    </div>
+  );
+}
 
 function MyMap() {
   const {
@@ -21,6 +109,8 @@ function MyMap() {
     loaded,
     userLocation,
     setUserLocation,
+    locationDenied,
+    setLocationDenied,
   } = useAppStore();
 
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
@@ -59,6 +149,7 @@ function MyMap() {
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
+        setLocationDenied(false);
         setVenues(
           venuesRef.current.map((v) => ({
             ...v,
@@ -66,11 +157,11 @@ function MyMap() {
           })),
         );
       },
-      (error) => console.error("Geolocation error:", error),
+      () => setLocationDenied(true),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [setUserLocation, setVenues]);
+  }, [setUserLocation, setLocationDenied, setVenues]);
 
   const generosDisponibles = useMemo(() => {
     const all = venues.flatMap((v) =>
@@ -269,6 +360,7 @@ function MyMap() {
                 : "© OpenStreetMap contributors"
             }
           />
+          <MapViewSetter location={userLocation} />
           <MapMarkers
             filteredVenues={filteredVenues}
             userLocation={userLocation}
@@ -293,6 +385,16 @@ function MyMap() {
             </svg>
           </button>
         </div>
+      )}
+
+      {/* Location denied banner */}
+      {locationDenied && !userLocation && (
+        <LocationBanner
+          onLocationFound={(lat, lng) => {
+            setUserLocation({ latitude: lat, longitude: lng });
+            setLocationDenied(false);
+          }}
+        />
       )}
 
       {/* Filters */}

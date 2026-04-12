@@ -13,6 +13,7 @@ export function AppInitializer() {
     setLoaded,
     setEvents,
     setUserLocation,
+    setLocationDenied,
   } = useAppStore();
 
   useEffect(() => {
@@ -27,18 +28,11 @@ export function AppInitializer() {
           });
         },
         () => {
-          // fallback Córdoba
-          setUserLocation({
-            latitude: 37.8787857,
-            longitude: -4.766206,
-          });
+          setLocationDenied(true);
         },
       );
     } else {
-      setUserLocation({
-        latitude: 37.8787857,
-        longitude: -4.766206,
-      });
+      setLocationDenied(true);
     }
 
     const token = getToken();

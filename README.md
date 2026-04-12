@@ -237,10 +237,9 @@ npm run lint
 - [✅] **Carga inicial bloqueante** — `AppInitializer` espera venues y events en serie antes de marcar `loaded = true`. Separar las cargas y mostrar contenido progresivamente mejoraría el tiempo de primera interacción.
 
 ### Funcionalidad
-- [ ] **Fallback de ubicación hardcodeado a Córdoba** — Si el usuario deniega la geolocalización, el mapa centra en Córdoba sin aviso. Mostrar un modal o banner explicativo con opción de introducir ciudad manualmente.
+- [✅] **Fallback de ubicación hardcodeado a Córdoba** — Si el usuario deniega la geolocalización, el mapa centra en Córdoba sin aviso. Mostrar un modal o banner explicativo con opción de introducir ciudad manualmente.
 - [✅] **Sin suite de tests** — No existe ningún fichero `.test.ts` / `.spec.ts`. Al menos la validación de radio de check-in (300 m), la autenticación y el cálculo de distancia deberían cubrirse con tests unitarios.
 - [✅] **Sin rate limiting en las rutas API** — Endpoints como `/api/auth/login` o `/api/checkins` son susceptibles a abuso. Añadir rate limiting (e.g. con `upstash/ratelimit` o middleware de Vercel).
-- [ ] **Zod instalado pero no usado en las API** — `zod` aparece en las dependencias. Validar los cuerpos de las peticiones en las rutas API evitaría errores inesperados y mejoraría los mensajes de error.
 
 ### Pendientes de producto
 - [ ] Historias en la vista de los establecimientos

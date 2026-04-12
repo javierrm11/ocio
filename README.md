@@ -223,7 +223,7 @@ npm run lint
 ## Mejoras pendientes y errores conocidos
 
 ### Seguridad
-- [ ] **Cookies sin flags de seguridad** — El token de sesión se guarda en una cookie accesible desde JavaScript. Añadir `httpOnly`, `Secure` y `SameSite=Strict` para proteger contra XSS y CSRF. Actualmente cualquier script en la página puede leer el token.
+- [✅] **Cookies sin flags de seguridad** — El token de sesión se guarda en una cookie accesible desde JavaScript. Añadir `httpOnly`, `Secure` y `SameSite=Strict` para proteger contra XSS y CSRF. Actualmente cualquier script en la página puede leer el token.
 
 ### Calidad de código
 - [ ] **Tipos `any` en el store y componentes** — `check_ins?: any[]`, `currentUser: any | null` en [venueStore.tsx](app/lib/stores/venueStore.tsx). Definir interfaces concretas mejora la seguridad de tipos y el autocompletado.
@@ -238,7 +238,7 @@ npm run lint
 
 ### Funcionalidad
 - [ ] **Fallback de ubicación hardcodeado a Córdoba** — Si el usuario deniega la geolocalización, el mapa centra en Córdoba sin aviso. Mostrar un modal o banner explicativo con opción de introducir ciudad manualmente.
-- [ ] **Sin suite de tests** — No existe ningún fichero `.test.ts` / `.spec.ts`. Al menos la validación de radio de check-in (300 m), la autenticación y el cálculo de distancia deberían cubrirse con tests unitarios.
+- [✅] **Sin suite de tests** — No existe ningún fichero `.test.ts` / `.spec.ts`. Al menos la validación de radio de check-in (300 m), la autenticación y el cálculo de distancia deberían cubrirse con tests unitarios.
 - [ ] **Sin rate limiting en las rutas API** — Endpoints como `/api/auth/login` o `/api/checkins` son susceptibles a abuso. Añadir rate limiting (e.g. con `upstash/ratelimit` o middleware de Vercel).
 - [ ] **Zod instalado pero no usado en las API** — `zod` aparece en las dependencias. Validar los cuerpos de las peticiones en las rutas API evitaría errores inesperados y mejoraría los mensajes de error.
 

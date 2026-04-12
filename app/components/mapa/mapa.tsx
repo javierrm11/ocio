@@ -205,7 +205,7 @@ function MyMap() {
         headers: { Authorization: `Bearer ${token}` },
       }).then(() => {
         setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: false } : v));
-        if (selectedVenue?.id === venueId) setSelectedVenue({ ...selectedVenue, is_favorite: false });
+        if (selectedVenue && selectedVenue.id === venueId) setSelectedVenue({ ...selectedVenue, is_favorite: false });
         setUserFavorites(userFavorites.filter((id) => id !== venueId));
       });
     } else {
@@ -215,7 +215,7 @@ function MyMap() {
         body: JSON.stringify({ venue_id: venueId }),
       }).then(() => {
         setVenues(venues.map((v) => v.id === venueId ? { ...v, is_favorite: true } : v));
-        if (selectedVenue?.id === venueId) setSelectedVenue({ ...selectedVenue, is_favorite: true });
+        if (selectedVenue && selectedVenue.id === venueId) setSelectedVenue({ ...selectedVenue, is_favorite: true });
         setUserFavorites([...userFavorites, venueId]);
       });
     }

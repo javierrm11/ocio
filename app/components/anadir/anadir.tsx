@@ -218,7 +218,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
   const isVideo = file?.type.startsWith("video/");
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Nueva historia">
       {/* Input galería */}
       <input ref={galleryRef} type="file" title="Seleccionar de galería" accept="image/*,video/*" className="hidden"
         onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
@@ -253,7 +253,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
         )}
 
         {/* Barra superior (siempre encima) */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-10 pb-3 z-20">
+        <header className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-10 pb-3 z-20">
           <button type="button" aria-label="Cerrar" onClick={onBack} className="w-10 h-10 flex items-center justify-center">
             <X className="w-7 h-7 text-white drop-shadow-lg" />
           </button>
@@ -273,7 +273,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
               </button>
             </div>
           )}
-        </div>
+        </header>
 
 
         {/* Hint reposicionar imagen */}
@@ -526,26 +526,27 @@ function FormEvento() {
       {genres.length > 0 && (
         <div>
           <label className={labelClass}>Géneros musicales</label>
-          <div className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
             {genres.map((genre) => {
               const selected = selectedGenres.includes(genre.id);
               return (
-                <button
-                  key={genre.id}
-                  type="button"
-                  onClick={() => toggleGenre(genre.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
-                    selected
-                      ? "bg-ozio-blue border-ozio-blue text-white scale-105"
-                      : "bg-ozio-card border-gray-700/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
-                  }`}
-                >
-                  <span>{genre.emoji}</span>
-                  <span>{genre.name}</span>
-                </button>
+                <li key={genre.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggleGenre(genre.id)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
+                      selected
+                        ? "bg-ozio-blue border-ozio-blue text-white scale-105"
+                        : "bg-ozio-card border-gray-700/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
+                    }`}
+                  >
+                    <span>{genre.emoji}</span>
+                    <span>{genre.name}</span>
+                  </button>
+                </li>
               );
             })}
-          </div>
+          </ul>
           {selectedGenres.length > 0 && (
             <p className="text-xs text-ozio-blue mt-2">
               {selectedGenres.length} género{selectedGenres.length > 1 ? "s" : ""} seleccionado{selectedGenres.length > 1 ? "s" : ""}
@@ -613,9 +614,10 @@ function FormEvento() {
         </button>
       ) : (
         <>
-          <div
+          <button
+            type="button"
             onClick={() => setShowPremiumModal(true)}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-700/50 bg-ozio-card cursor-pointer transition"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-700/50 bg-ozio-card cursor-pointer transition text-left"
           >
             <Star className="w-4 h-4 flex-shrink-0 text-gray-600" />
             <div className="text-left">
@@ -623,7 +625,7 @@ function FormEvento() {
               <p className="text-xs text-gray-600 mt-0.5">Solo disponible en el plan Premium</p>
             </div>
             <Lock className="w-4 h-4 ml-auto text-gray-600" />
-          </div>
+          </button>
           {showPremiumModal && <PremiumFeaturedModal onClose={() => setShowPremiumModal(false)} />}
         </>
       )}
@@ -650,7 +652,7 @@ function FormEvento() {
 function PremiumLimitModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title" onClick={onClose}>
       <div
         className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
         onClick={(e) => e.stopPropagation()}
@@ -664,20 +666,20 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
           >
             <span className="text-3xl">🎉</span>
           </div>
-          <h2 className="text-white text-xl font-black mb-2">Límite de eventos alcanzado</h2>
+          <h2 id="limit-modal-title" className="text-white text-xl font-black mb-2">Límite de eventos alcanzado</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Con el plan gratuito puedes crear <span className="text-white font-semibold">2 eventos al mes</span>. Actualiza a Premium para crear eventos ilimitados.
           </p>
         </div>
 
-        <div className="space-y-3 mb-6">
+        <ul className="space-y-3 mb-6 list-none p-0 m-0">
           {["🚀 Eventos ilimitados cada mes", "⭐ Eventos destacados en el listado", "📊 Estadísticas avanzadas de asistencia", "👑 Badge exclusivo en el mapa"].map((feat) => (
-            <div key={feat} className="flex items-center gap-3 text-sm">
+            <li key={feat} className="flex items-center gap-3 text-sm">
               <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
               <span className="text-gray-300">{feat.slice(3)}</span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <button
           type="button"
@@ -699,7 +701,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
 function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="featured-modal-title" onClick={onClose}>
       <div
         className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
         onClick={(e) => e.stopPropagation()}
@@ -713,20 +715,20 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
           >
             <span className="text-3xl">⭐</span>
           </div>
-          <h2 className="text-white text-xl font-black mb-2">Eventos destacados</h2>
+          <h2 id="featured-modal-title" className="text-white text-xl font-black mb-2">Eventos destacados</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Con Premium tus eventos aparecen primero en el listado y consiguen más visibilidad.
           </p>
         </div>
 
-        <div className="space-y-3 mb-6">
+        <ul className="space-y-3 mb-6 list-none p-0 m-0">
           {["🔝 Posición destacada en el listado", "👁️ Mayor visibilidad para tu evento", "🚀 Más asistentes potenciales", "👑 Badge exclusivo en el mapa"].map((feat) => (
-            <div key={feat} className="flex items-center gap-3 text-sm">
+            <li key={feat} className="flex items-center gap-3 text-sm">
               <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
               <span className="text-gray-300">{feat.slice(3)}</span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <button
           type="button"

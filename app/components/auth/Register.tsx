@@ -176,12 +176,12 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
   return (
     <div className="bg-ozio-dark flex items-center justify-center min-h-[600px]">
       <div className="w-full max-w-md">
-        <div className="bg-ozio-card rounded-3xl p-8 shadow-xl">
+        <section className="bg-ozio-card rounded-3xl p-8 shadow-xl" aria-labelledby="register-title">
 
           {/* Progress indicator */}
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <ol className="flex items-center justify-center gap-2 mb-6 list-none p-0 m-0" aria-label="Pasos del registro">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num, idx) => (
-              <div key={num} className="flex items-center">
+              <li key={num} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition ${
                   step >= num ? 'bg-ozio-blue text-white' : 'bg-gray-700 text-gray-400'
                 }`}>
@@ -190,11 +190,11 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 {idx < totalSteps - 1 && (
                   <div className={`w-8 h-1 rounded transition ${step > num ? 'bg-ozio-blue' : 'bg-gray-700'}`} />
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
 
-          <h2 className="text-2xl font-bold text-white mb-2">{stepTitle()}</h2>
+          <h2 id="register-title" className="text-2xl font-bold text-white mb-2">{stepTitle()}</h2>
           <p className="text-gray-400 text-sm mb-6">Paso {step} de {totalSteps}</p>
 
           {error && (
@@ -221,8 +221,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   placeholder="tu@email.com" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Tipo de cuenta</label>
-                <select name="profileType" value={formData.profileType} onChange={handleChange}
+                <label htmlFor="profileType" className="block text-sm font-medium text-gray-300 mb-2">Tipo de cuenta</label>
+                <select id="profileType" name="profileType" value={formData.profileType} onChange={handleChange}
                   className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
                   <option value="user">👤 Usuario</option>
                   <option value="venue">🏢 Establecimiento</option>
@@ -298,26 +298,27 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 <p className="text-sm text-gray-400 mb-4">
                   Selecciona los géneros que suenan en tu local. Ayuda a los usuarios a encontrarte.
                 </p>
-                <div className="flex flex-wrap gap-2 max-h-72 overflow-y-auto pr-1">
+                <ul className="flex flex-wrap gap-2 max-h-72 overflow-y-auto pr-1 list-none p-0 m-0">
                   {genres.map(genre => {
                     const selected = formData.selectedGenres.includes(genre.id);
                     return (
-                      <button
-                        key={genre.id}
-                        type="button"
-                        onClick={() => toggleGenre(genre.id)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all border ${
-                          selected
-                            ? 'bg-ozio-blue border-ozio-blue text-white scale-105'
-                            : 'bg-ozio-dark border-gray-700 text-gray-300 hover:border-ozio-blue/50 hover:text-white'
-                        }`}
-                      >
-                        <span>{genre.emoji}</span>
-                        <span>{genre.name}</span>
-                      </button>
+                      <li key={genre.id}>
+                        <button
+                          type="button"
+                          onClick={() => toggleGenre(genre.id)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all border ${
+                            selected
+                              ? 'bg-ozio-blue border-ozio-blue text-white scale-105'
+                              : 'bg-ozio-dark border-gray-700 text-gray-300 hover:border-ozio-blue/50 hover:text-white'
+                          }`}
+                        >
+                          <span>{genre.emoji}</span>
+                          <span>{genre.name}</span>
+                        </button>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
                 {formData.selectedGenres.length > 0 && (
                   <p className="text-xs text-ozio-blue mt-3">
                     {formData.selectedGenres.length} género{formData.selectedGenres.length > 1 ? 's' : ''} seleccionado{formData.selectedGenres.length > 1 ? 's' : ''}
@@ -374,7 +375,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {((step === 4 && formData.profileType === 'user') || (step === 5 && formData.profileType === 'venue')) && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex flex-col items-center">
-                <div className="relative mb-4">
+                <figure className="relative mb-4 m-0">
                   {formData.profileImagePreview ? (
                     <img src={formData.profileImagePreview} alt="Preview"
                       className="w-32 h-32 rounded-full object-cover border-4 border-ozio-blue" />
@@ -385,15 +386,15 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                       </svg>
                     </div>
                   )}
-                  <button type="button" onClick={() => fileInputRef.current?.click()}
+                  <button type="button" aria-label="Cambiar foto de perfil" onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-0 right-0 bg-ozio-blue p-2 rounded-full border-2 border-ozio-dark hover:bg-ozio-purple transition">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </button>
-                </div>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                </figure>
+                <input ref={fileInputRef} type="file" accept="image/*" aria-label="Seleccionar imagen de perfil" onChange={handleImageChange} className="hidden" />
                 <p className="text-sm text-gray-300 mb-2">
                   {formData.profileType === 'user' ? 'Foto de perfil' : 'Logo del establecimiento'}
                 </p>
@@ -438,7 +439,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
               Inicia sesión
             </Link>
           </p>
-        </div>
+        </section>
       </div>
     </div>
   );

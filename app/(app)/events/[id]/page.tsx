@@ -184,17 +184,17 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
+      <main className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ozio-blue"></div>
-      </div>
+      </main>
     );
   }
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
+      <main className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-white text-2xl font-bold mb-4">Evento no encontrado</h2>
+          <h1 className="text-white text-2xl font-bold mb-4">Evento no encontrado</h1>
           <button
             onClick={() => router.back()}
             className="px-6 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-full transition"
@@ -202,25 +202,25 @@ export default function EventDetailPage() {
             Volver
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-ozio-dark pb-20">
+    <main className="min-h-screen bg-ozio-dark pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-gray-800">
+      <header className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-gray-800">
         <div className="px-4 md:px-8 py-4 flex items-center gap-3 max-w-6xl mx-auto">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-800 rounded-full transition">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-white text-xl font-bold">Detalles del Evento</h1>
+          <span className="text-white text-xl font-bold">Detalles del Evento</span>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto">
+      <article className="max-w-6xl mx-auto">
         {/* Imagen */}
         {event.image_path && (
           <div className="relative h-72 md:h-96 lg:h-[480px] overflow-hidden lg:rounded-b-3xl">
@@ -251,9 +251,9 @@ export default function EventDetailPage() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Título y estado */}
-            <div>
+            <section>
               <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
-                <h2 className="text-white text-3xl font-bold flex-1">{event.title}</h2>
+                <h1 className="text-white text-3xl font-bold flex-1">{event.title}</h1>
                 {getEventStatusBadge()}
               </div>
               <p className={`font-semibold text-sm mb-2 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>
@@ -277,11 +277,11 @@ export default function EventDetailPage() {
                   ))}
                 </div>
               )}
-            </div>
+            </section>
 
             {/* Venue */}
             {event.venues && (
-              <div className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+              <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -309,12 +309,12 @@ export default function EventDetailPage() {
                     Ver local
                   </button>
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Mapa */}
             {event.venues?.latitude && event.venues?.longitude && (
-              <div className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+              <section className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
                 <h3 className="text-white font-semibold p-4">🗺️ Mapa</h3>
                 <div className="h-64 md:h-80 relative overflow-hidden">
                   <iframe
@@ -326,15 +326,15 @@ export default function EventDetailPage() {
                     loading="lazy"
                   />
                 </div>
-              </div>
+              </section>
             )}
           </div>
 
           {/* Columna derecha — 1/3 */}
-          <div className="space-y-6 mt-6 lg:mt-0">
+          <aside className="space-y-6 mt-6 lg:mt-0">
 
             {/* Fechas */}
-            <div className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+            <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -367,7 +367,7 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Botón asistir */}
             {isRegularUser && !isPastEvent && (
@@ -411,9 +411,9 @@ export default function EventDetailPage() {
                 </p>
               </div>
             )}
-          </div>
+          </aside>
         </div>
-      </div>
-    </div>
+      </article>
+    </main>
   );
 }

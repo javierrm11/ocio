@@ -218,20 +218,20 @@ export default function VenueDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
+      <main className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-ozio-blue"></div>
-      </div>
+      </main>
     );
   }
 
   if (!venue) {
     return (
-      <div className="min-h-screen bg-ozio-dark flex items-center justify-center">
+      <main className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-white text-xl font-bold mb-2">
+          <h1 className="text-white text-xl font-bold mb-2">
             Local no encontrado
-          </h2>
+          </h1>
           <p className="text-gray-400 mb-6">
             El local que buscas no existe o ha sido eliminado
           </p>
@@ -242,7 +242,7 @@ export default function VenueDetail() {
             Volver
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -268,10 +268,10 @@ export default function VenueDetail() {
 
       {/* Spacer for fixed header */}
       <Header/>
-      <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
+      <main className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
 
       {/* ── Avatar + Stats (estilo Instagram) ── */}
-      <div className="px-4 pt-4">
+      <header className="px-4 pt-4">
         <div className="flex items-center gap-5">
 
           {/* Avatar con anillo degradado + botón volver */}
@@ -317,7 +317,7 @@ export default function VenueDetail() {
         {/* ── Nombre + badge + dirección ── */}
         <div className="mt-3 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-white font-black text-base leading-tight">{venue.name}</h2>
+            <h1 className="text-white font-black text-base leading-tight">{venue.name}</h1>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25">
               Local
             </span>
@@ -404,10 +404,10 @@ export default function VenueDetail() {
             </button>
           )}
         </div>
-      </div>
+      </header>
 
       {/* ── Tabs solo iconos ── */}
-      <div className="flex border-t border-b border-gray-800">
+      <nav className="flex border-t border-b border-gray-800" aria-label="Navegación del local">
         <button
           onClick={() => setActiveTab("events")}
           className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
@@ -420,10 +420,10 @@ export default function VenueDetail() {
         >
           <MapPin size={22} />
         </button>
-      </div>
+      </nav>
 
       {/* ── Tab content ── */}
-      <div className="px-4 pt-4 space-y-3">
+      <section className="px-4 pt-4 space-y-3">
 
         {/* Eventos */}
         {activeTab === "events" && (
@@ -439,20 +439,26 @@ export default function VenueDetail() {
                     {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
                   </span>
                 </div>
-                <div className="space-y-3">
+                <ul className="space-y-3">
                   {activeEvents.map((event) => (
-                    <EventMiniCard key={event.id} event={event} />
+                    <li key={event.id}>
+                      <EventMiniCard event={event} />
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             )}
 
             {upcomingEvents.length > 0 ? (
               <div className="space-y-3">
                 <p className="text-gray-500 text-xs uppercase tracking-widest font-semibold px-1">Próximos</p>
-                {upcomingEvents.map((event) => (
-                  <EventMiniCard key={event.id} event={event} />
-                ))}
+                <ul className="space-y-3">
+                  {upcomingEvents.map((event) => (
+                    <li key={event.id}>
+                      <EventMiniCard event={event} />
+                    </li>
+                  ))}
+                </ul>
               </div>
             ) : activeEvents.length === 0 && (
               <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
@@ -489,8 +495,8 @@ export default function VenueDetail() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
     </div>
   );
 }
@@ -503,7 +509,7 @@ function EventMiniCard({ event }: { event: Event }) {
   const isActive = startDate <= now && endDate >= now;
 
   return (
-    <div
+    <article
       className="bg-ozio-dark border border-gray-700/50 rounded-2xl p-4 hover:border-ozio-blue/50 transition cursor-pointer"
       onClick={() => {
         const eventData = encodeURIComponent(JSON.stringify(event));
@@ -564,6 +570,6 @@ function EventMiniCard({ event }: { event: Event }) {
           </span>
         </div>
       )}
-    </div>
+    </article>
   );
 }

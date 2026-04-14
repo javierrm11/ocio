@@ -10,12 +10,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                 <WelcomeEngagementModal />
 
-                {/* 3. Contenido principal */}
-                <main className="flex-1">
-                    <div className="">
-                        {children}
-                    </div>
-                </main>
+                {/* Contenido principal */}
+                <div className="flex-1">
+                    {children}
+                </div>
         </div>
     );
 }

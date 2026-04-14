@@ -145,10 +145,10 @@ export default function Premium() {
               </button>
             )}
           </div>
-        </div>
+        </article>
 
         {/* ── Card GRATIS ── */}
-        <div className="rounded-3xl p-6 free-card flex-1">
+        <article className="rounded-3xl p-6 free-card flex-1">
           <div className="mb-5">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
             <div className="flex items-end gap-1">
@@ -195,9 +195,9 @@ export default function Premium() {
               {loading === "free" ? "Enviando..." : "Seleccionar plan"}
             </button>
           )}
-        </div>
+        </article>
 
-      </div>
+      </section>
 
       <p className="relative z-10 text-gray-600 text-xs text-center pb-2 px-4 leading-relaxed mt-2">
         Para activar el plan Premium contáctanos y activamos tu cuenta en menos de 24h.

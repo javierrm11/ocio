@@ -170,7 +170,8 @@ export default function Buscar() {
     <div className="min-h-screen bg-ozio-dark pb-24">
 
       {/* Header sticky */}
-      <div className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-gray-800/50 backdrop-blur-sm">
+      <header className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-gray-800/50 backdrop-blur-sm">
+        <h1 className="sr-only">Buscar</h1>
         <div className="max-w-4xl mx-auto">
           <div className="relative flex items-center gap-2">
 
@@ -335,7 +336,7 @@ export default function Buscar() {
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="px-4 md:px-8 pt-4">
         <div className="max-w-4xl mx-auto">
@@ -368,38 +369,39 @@ export default function Buscar() {
 
           {/* Pantalla inicio sin búsqueda */}
           {!hasQuery && (
-            <div className="py-4">
+            <section className="py-4" aria-label="Descubrir">
               <div className="mb-6">
-                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">🔥 Más visitados ahora</p>
-                <div className="space-y-3">
+                <h2 className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">🔥 Más visitados ahora</h2>
+                <ul className="space-y-3 list-none p-0 m-0">
                   {[...venues]
                     .sort((a: Venue, b: Venue) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
                     .slice(0, 3)
                     .map((venue: Venue, i) => (
-                      <MiniVenueCard key={venue.id} venue={venue} rank={i + 1} events={events} />
+                      <li key={venue.id}><MiniVenueCard venue={venue} rank={i + 1} events={events} /></li>
                     ))}
-                </div>
+                </ul>
               </div>
               <div>
-                <p className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">Búsquedas populares</p>
-                <div className="flex flex-wrap gap-2">
+                <h2 className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">Búsquedas populares</h2>
+                <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
                   {["Reggaeton", "House", "Techno", "Bar", "Discoteca", "Rooftop", "Salsa", "Pop"].map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setQuery(s)}
-                      className="bg-ozio-card border border-gray-700/50 text-gray-300 text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-white transition"
-                    >
-                      {s}
-                    </button>
+                    <li key={s}>
+                      <button
+                        onClick={() => setQuery(s)}
+                        className="bg-ozio-card border border-gray-700/50 text-gray-300 text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-white transition"
+                      >
+                        {s}
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
-            </div>
+            </section>
           )}
 
           {/* Resultados */}
           {hasQuery && (
-            <>
+            <section aria-label="Resultados de búsqueda">
               <p className="text-gray-500 text-sm mb-4">
                 {filteredVenues.length} local{filteredVenues.length !== 1 ? "es" : ""}
                 {query && <> para <span className="text-white">"{query}"</span></>}
@@ -420,13 +422,13 @@ export default function Buscar() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 m-0">
                   {filteredVenues.map((venue) => (
-                    <VenueCard key={venue.id} venue={venue} events={events} getGenreName={getGenreName} getGenreEmoji={getGenreEmoji} />
+                    <li key={venue.id}><VenueCard venue={venue} events={events} getGenreName={getGenreName} getGenreEmoji={getGenreEmoji} /></li>
                   ))}
-                </div>
+                </ul>
               )}
-            </>
+            </section>
           )}
         </div>
       </div>
@@ -446,7 +448,7 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
   const rankEmoji = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
 
   return (
-    <div
+    <article
       className="bg-ozio-card border border-gray-700/50 rounded-md p-3 flex items-center gap-3 hover:border-ozio-blue/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
@@ -468,7 +470,7 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
       <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
-    </div>
+    </article>
   );
 }
 
@@ -506,11 +508,11 @@ function VenueCard({
       : parseFloat(venue.distance || "0");
 
   return (
-    <div
+    <article
       className="bg-ozio-card border border-gray-700/50 rounded-md overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
-      <div className="relative h-44 overflow-hidden">
+      <figure className="relative h-44 overflow-hidden m-0">
         <img
           src={venue.avatar_path || "https://via.placeholder.com/400x200"}
           alt={venue.name}
@@ -533,31 +535,30 @@ function VenueCard({
         >
           {ambience.label}
         </div>
-      </div>
+      </figure>
 
       <div className="p-4">
         <h3 className="text-white font-bold text-base mb-1 truncate">{venue.name}</h3>
         {venue.address && (
-          <p className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1">
+          <address className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1 not-italic">
             <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
             {venue.address}
-          </p>
+          </address>
         )}
 
         <div className="flex items-center justify-between">
           {/* Géneros */}
-          <div className="flex gap-1.5 flex-wrap">
+          <ul className="flex gap-1.5 flex-wrap list-none p-0 m-0">
             {venue.genres?.slice(0, 2).map((g) => (
-              <span
-                key={getGenreName(g)}
-                className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
-              >
-                {getGenreEmoji(g)} {getGenreName(g)}
-              </span>
+              <li key={getGenreName(g)}>
+                <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
+                  {getGenreEmoji(g)} {getGenreName(g)}
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <div className="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
             {dist > 0 && (
@@ -577,6 +578,6 @@ function VenueCard({
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -168,7 +168,7 @@ export default function Eventos() {
     <div className="min-h-screen bg-ozio-dark pb-24">
 
       {/* Header */}
-      <div className="bg-gradient-to-b from-ozio-purple/80 to-ozio-dark px-4 md:px-8 pt-4 pb-2">
+      <header className="bg-gradient-to-b from-ozio-purple/80 to-ozio-dark px-4 md:px-8 pt-4 pb-2">
         <div className="max-w-4xl mx-auto">
 
           {/* Título + badge activos */}
@@ -358,10 +358,10 @@ export default function Eventos() {
           )}
 
         </div>
-      </div>
+      </header>
 
       {/* Lista */}
-      <div className="px-4 md:px-8 mt-4">
+      <section className="px-4 md:px-8 mt-4" aria-label="Lista de eventos">
         <div className="max-w-4xl mx-auto">
           {filteredEvents.length === 0 ? (
             <div className="bg-ozio-card border border-gray-700/50 rounded-md p-12 text-center mt-4">
@@ -387,16 +387,16 @@ export default function Eventos() {
                   <span className="text-gray-600"> · {currentFilter?.label}</span>
                 )}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 m-0">
                 {filteredEvents.map((event) => {
                   const venue = venues.find((v: Venue) => String(v.id) === String(event.venue_id));
-                  return <EventCard key={event.id} event={event} venue={venue} />;
+                  return <li key={event.id}><EventCard event={event} venue={venue} /></li>;
                 })}
-              </div>
+              </ul>
             </>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
@@ -448,7 +448,7 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
       : startDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <div
+    <article
       className={`bg-ozio-card border rounded-md overflow-hidden transition cursor-pointer group ${
         isPast
           ? 'border-gray-800/50 opacity-60 hover:opacity-80'
@@ -462,7 +462,7 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
       }}
     >
       {/* Imagen */}
-      <div className="relative h-44 overflow-hidden">
+      <figure className="relative h-44 overflow-hidden m-0">
         <img
           src={event.image_path || venue?.avatar_path || 'https://via.placeholder.com/400x200'}
           alt={event.title}
@@ -475,7 +475,7 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
         <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-xl border border-white/10 font-medium">
           {dayLabel}
         </div>
-      </div>
+      </figure>
 
       {/* Contenido */}
       <div className="p-4">
@@ -488,16 +488,15 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
         )}
         {/* Géneros del evento */}
         {event.genres && event.genres.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
+          <ul className="flex flex-wrap gap-1 mb-3 list-none p-0 m-0">
             {event.genres.slice(0, 3).map((g) => (
-              <span
-                key={g.genre_id}
-                className="flex items-center gap-1 text-[11px] bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-2 py-0.5 rounded-full"
-              >
-                {g.genre?.emoji} {g.genre?.name}
-              </span>
+              <li key={g.genre_id}>
+                <span className="flex items-center gap-1 text-[11px] bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-2 py-0.5 rounded-full">
+                  {g.genre?.emoji} {g.genre?.name}
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {venue && (
@@ -515,9 +514,9 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>
-              {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              <time dateTime={event.starts_at}>{startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</time>
               {' – '}
-              {endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              <time dateTime={event.ends_at}>{endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</time>
             </span>
           </div>
 
@@ -533,6 +532,6 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

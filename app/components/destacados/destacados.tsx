@@ -50,7 +50,7 @@ export default function Destacados() {
   return (
     <div className="min-h-screen bg-ozio-dark pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-b from-ozio-purple to-ozio-card px-4 md:px-8 lg:px-12 py-6 pt-16">
+      <header className="bg-gradient-to-b from-ozio-purple to-ozio-card px-4 md:px-8 lg:px-12 py-6 pt-16">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <button
@@ -89,7 +89,7 @@ export default function Destacados() {
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Content */}
       <div className="px-4 md:px-8 lg:px-12 mt-6">
@@ -99,16 +99,16 @@ export default function Destacados() {
               {featuredEvents.length > 0 ? (
                 <>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-white font-semibold">Eventos destacados</span>
+                    <h2 className="text-white font-semibold">Eventos destacados</h2>
                     <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full">
                       {featuredEvents.length}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 m-0">
                     {featuredEvents.map((event) => (
-                      <EventCard key={event.id} event={event} />
+                      <li key={event.id}><EventCard event={event} /></li>
                     ))}
-                  </div>
+                  </ul>
                 </>
               ) : (
                 <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-8 text-center">
@@ -122,16 +122,16 @@ export default function Destacados() {
           {activeTab === 'locales' && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-white font-semibold">Locales más populares</span>
+                <h2 className="text-white font-semibold">Locales más populares</h2>
                 <span className="bg-ozio-orange/20 text-ozio-orange text-xs px-2 py-1 rounded-full">
                   Top {topVenues.length}
                 </span>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 list-none p-0 m-0">
                 {topVenues.map((venue, index) => (
-                  <VenueCard key={venue.id} venue={venue} rank={index + 1} />
+                  <li key={venue.id}><VenueCard venue={venue} rank={index + 1} /></li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
         </div>
@@ -175,7 +175,7 @@ function EventCard({ event }: { event: Event }) {
   };
 
   return (
-    <div
+    <article
       className={`bg-ozio-card border rounded-2xl overflow-hidden transition cursor-pointer ${
         isPastEvent
           ? 'border-gray-800/50 opacity-70 hover:opacity-90'
@@ -186,7 +186,7 @@ function EventCard({ event }: { event: Event }) {
         router.push(`/events/${event.id}?data=${eventData}`);
       }}
     >
-      <div className="relative h-48">
+      <figure className="relative h-48 m-0">
         <img
           src={event.image_path || 'https://via.placeholder.com/400x200'}
           alt={event.title}
@@ -202,7 +202,7 @@ function EventCard({ event }: { event: Event }) {
         <div className="absolute top-3 right-3">
           {getStatusBadge()}
         </div>
-      </div>
+      </figure>
 
       <div className="p-4">
         <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-gray-400' : 'text-white'}`}>
@@ -217,9 +217,9 @@ function EventCard({ event }: { event: Event }) {
           <svg className={`w-4 h-4 ${isPastEvent ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span>
+          <time dateTime={event.starts_at}>
             {startDate.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
-          </span>
+          </time>
         </div>
 
         <div className="flex items-center gap-2 text-gray-400 text-sm">
@@ -227,8 +227,9 @@ function EventCard({ event }: { event: Event }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>
-            {startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} -
-            {endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+            <time dateTime={event.starts_at}>{startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</time>
+            {' - '}
+            <time dateTime={event.ends_at}>{endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</time>
           </span>
         </div>
 
@@ -245,7 +246,7 @@ function EventCard({ event }: { event: Event }) {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -271,7 +272,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
   };
 
   return (
-    <div
+    <article
       className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-orange/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
@@ -317,6 +318,6 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
           </svg>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

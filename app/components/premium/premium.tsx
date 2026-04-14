@@ -62,7 +62,7 @@ export default function Premium() {
       </div>
 
       {/* ── Hero ── */}
-      <div className="relative z-10 pt-14 pb-10 px-4 text-center">
+      <section className="relative z-10 pt-14 pb-10 px-4 text-center" aria-label="Información Premium">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-5 mx-auto premium-crown-icon">
           <span className="text-4xl">👑</span>
         </div>
@@ -74,19 +74,21 @@ export default function Premium() {
           Destaca tu local, consigue más visibilidad y accede a estadísticas exclusivas.
         </p>
 
-        <div className="flex flex-wrap justify-center gap-2 mt-5">
+        <ul className="flex flex-wrap justify-center gap-2 mt-5 list-none p-0 m-0">
           {["📊 Estadísticas", "🔥 Más visibilidad", "🚀 Sin límites"].map((b) => (
-            <span key={b} className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300">
-              {b}
-            </span>
+            <li key={b}>
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                {b}
+              </span>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col md:flex-row gap-4">
+      <section className="relative z-10 max-w-4xl mx-auto px-4 flex flex-col md:flex-row gap-4" aria-label="Planes de suscripción">
 
         {/* ── Card PREMIUM ── */}
-        <div className="relative rounded-3xl overflow-hidden premium-card flex-1">
+        <article className="relative rounded-3xl overflow-hidden premium-card flex-1" aria-label="Plan Premium">
 
           {/* Shimmer */}
           <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-300/10 rounded-full blur-2xl animate-pulse pointer-events-none" />

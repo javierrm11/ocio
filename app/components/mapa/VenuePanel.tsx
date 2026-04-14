@@ -100,12 +100,13 @@ export function VenuePanel({
       <div className="fixed inset-0 bg-black/40 z-[989] md:hidden" onClick={onClose} />
 
       {/* Panel */}
-      <div
+      <aside
         className="fixed z-[1002] bg-gray-900 overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
+        aria-label={`Detalles de ${venue.name}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header image */}
-        <div className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none flex-shrink-0">
+        <figure className="relative h-56 md:h-64 lg:h-72 overflow-hidden rounded-t-3xl md:rounded-none flex-shrink-0 m-0">
           <img
             src={venue.avatar_path}
             alt={venue.name}
@@ -156,7 +157,7 @@ export function VenuePanel({
               </div>
             </div>
           )}
-        </div>
+        </figure>
 
         {/* Content */}
         <div className="p-6 flex flex-col gap-4">
@@ -249,26 +250,25 @@ export function VenuePanel({
           {/* Genres */}
           {venue.genres && venue.genres.length > 0 && (
             <div className="mt-3">
-              <div className="flex flex-wrap gap-1.5">
+              <ul className="flex flex-wrap gap-1.5 list-none p-0 m-0">
                 {venue.genres.map((item) => {
                   const genre = item.genre || item;
                   return (
-                    <span
-                      key={genre.slug}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
-                    >
-                      <span>{genre.emoji}</span>
-                      <span>{genre.name}</span>
-                    </span>
+                    <li key={genre.slug}>
+                      <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25">
+                        <span>{genre.emoji}</span>
+                        <span>{genre.name}</span>
+                      </span>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
           )}
 
           {/* Active events */}
           {activeEvents.length > 0 && (
-            <div className="bg-gray-800 border border-green-500/40 rounded-2xl p-4">
+            <section className="bg-gray-800 border border-green-500/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <h3 className="text-white font-semibold text-sm">Evento en curso</h3>
@@ -300,12 +300,12 @@ export function VenuePanel({
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Upcoming events */}
           {soonEvents.length > 0 && (
-            <div className="bg-gray-800 border border-orange-500/40 rounded-2xl p-4">
+            <section className="bg-gray-800 border border-orange-500/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-orange-400 text-sm">🕐</span>
                 <h3 className="text-white font-semibold text-sm">Próximamente hoy</h3>
@@ -337,11 +337,11 @@ export function VenuePanel({
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2">
+          <section className="flex flex-wrap items-center gap-2" aria-label="Acciones">
             {isUserProfile &&
               (hasUserActiveCheckIn ? (
                 <button
@@ -418,9 +418,9 @@ export function VenuePanel({
                 </button>
               )}
             </div>
-          </div>
+          </section>
         </div>
-      </div>
+      </aside>
 
       {/* Desktop backdrop */}
       <div className="hidden md:block fixed inset-0 z-[988]" onClick={onClose} />

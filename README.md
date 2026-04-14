@@ -244,4 +244,4 @@ npm run lint
 - [ ] Radio de visualización en el mapa variable según el plan del usuario
 - [ ] Filtros adicionales en la búsqueda (aforo, precio, horario)
 - [ ] Notificaciones push (Web Push API / service worker)
-- [ ] SEO Html5
+- [✅] SEO Html5

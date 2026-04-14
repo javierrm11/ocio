@@ -67,12 +67,13 @@ export function MapFilters({
         className={`fixed top-0 right-0 z-[1002] h-full w-full md:w-80 lg:w-96 bg-gray-900 border-l border-gray-700 shadow-2xl transform transition-transform duration-300 ${
           showFilters ? "translate-x-0" : "translate-x-full"
         }`}
+        aria-labelledby="filters-title"
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
+          <header className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
             <div>
-              <h3 className="text-white font-semibold">Filtros</h3>
+              <h3 id="filters-title" className="text-white font-semibold">Filtros</h3>
               <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
             </div>
             <div className="flex items-center gap-2">
@@ -96,7 +97,7 @@ export function MapFilters({
                 </svg>
               </button>
             </div>
-          </div>
+          </header>
 
           {/* Body */}
           <div className="p-5 overflow-y-auto flex-1 space-y-6">
@@ -139,18 +140,20 @@ export function MapFilters({
               <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
                 Ambiente
               </label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAmbientesSeleccionados(new Set())}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                    ambientesSeleccionados.size === 0
-                      ? "bg-blue-600 border-blue-500 text-white"
-                      : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
-                  }`}
-                >
-                  Todos
-                </button>
+              <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setAmbientesSeleccionados(new Set())}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                      ambientesSeleccionados.size === 0
+                        ? "bg-blue-600 border-blue-500 text-white"
+                        : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                    }`}
+                  >
+                    Todos
+                  </button>
+                </li>
                 {[
                   { key: "tranquilo",   label: "🌿 Tranquilo" },
                   { key: "animado",     label: "✨ Animado" },
@@ -158,59 +161,14 @@ export function MapFilters({
                 ].map(({ key, label }) => {
                   const active = ambientesSeleccionados.has(key);
                   return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() =>
-                        setAmbientesSeleccionados((prev) => {
-                          const next = new Set(prev);
-                          if (next.has(key)) next.delete(key);
-                          else next.add(key);
-                          return next;
-                        })
-                      }
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                        active
-                          ? "bg-blue-600 border-blue-500 text-white"
-                          : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Géneros */}
-            {generosDisponibles.length > 0 && (
-              <div>
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
-                  Género musical
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setGenerosSeleccionados(new Set())}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
-                      generosSeleccionados.size === 0
-                        ? "bg-blue-600 border-blue-500 text-white"
-                        : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
-                    }`}
-                  >
-                    Todos
-                  </button>
-                  {generosDisponibles.map(({ name, emoji }) => {
-                    const active = generosSeleccionados.has(name);
-                    return (
+                    <li key={key}>
                       <button
-                        key={name}
                         type="button"
                         onClick={() =>
-                          setGenerosSeleccionados((prev) => {
+                          setAmbientesSeleccionados((prev) => {
                             const next = new Set(prev);
-                            if (next.has(name)) next.delete(name);
-                            else next.add(name);
+                            if (next.has(key)) next.delete(key);
+                            else next.add(key);
                             return next;
                           })
                         }
@@ -220,17 +178,66 @@ export function MapFilters({
                             : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
                         }`}
                       >
-                        {emoji} {name}
+                        {label}
                       </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Géneros */}
+            {generosDisponibles.length > 0 && (
+              <div>
+                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+                  Género musical
+                </label>
+                <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => setGenerosSeleccionados(new Set())}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                        generosSeleccionados.size === 0
+                          ? "bg-blue-600 border-blue-500 text-white"
+                          : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                      }`}
+                    >
+                      Todos
+                    </button>
+                  </li>
+                  {generosDisponibles.map(({ name, emoji }) => {
+                    const active = generosSeleccionados.has(name);
+                    return (
+                      <li key={name}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setGenerosSeleccionados((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(name)) next.delete(name);
+                              else next.add(name);
+                              return next;
+                            })
+                          }
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                            active
+                              ? "bg-blue-600 border-blue-500 text-white"
+                              : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                          }`}
+                        >
+                          {emoji} {name}
+                        </button>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-5 py-4 border-t border-gray-700 bg-gray-900/95">
+          <footer className="px-5 py-4 border-t border-gray-700 bg-gray-900/95">
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-xs">Locales visibles</span>
               <span className="text-white text-sm font-bold">
@@ -238,7 +245,7 @@ export function MapFilters({
                 <span className="text-gray-500 font-normal"> / {totalCount}</span>
               </span>
             </div>
-          </div>
+          </footer>
         </div>
       </aside>
     </>

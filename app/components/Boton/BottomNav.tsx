@@ -41,40 +41,45 @@ function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
-      <div className="max-w-md mx-auto flex items-center justify-around relative py-2">
-        {navItems.map(({ icon, path, special, requiresAuth }) => (
-          <NavItem
-            key={path}
-            icon={icon}
-            active={pathname === path}
-            onClick={() => {
-              if (requiresAuth && !isAuthenticated) {
-                setShowAuthModal(true);
-                return;
-              }
-              if (path === '__add__') {
-                setShowAddModal(true);
-                return;
-              }
-              router.push(path);
-            }}
-            special={special}
-          />
+      <ul className="max-w-md mx-auto flex items-center justify-around relative py-2 list-none p-0 m-0">
+        {navItems.map(({ icon, label, path, special, requiresAuth }) => (
+          <li key={path}>
+            <NavItem
+              icon={icon}
+              label={label}
+              active={pathname === path}
+              onClick={() => {
+                if (requiresAuth && !isAuthenticated) {
+                  setShowAuthModal(true);
+                  return;
+                }
+                if (path === '__add__') {
+                  setShowAddModal(true);
+                  return;
+                }
+                router.push(path);
+              }}
+              special={special}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* Modal: elegir qué añadir */}
       {showAddModal && (
         <div
           className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 px-4 pb-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-modal-title"
           onClick={() => setShowAddModal(false)}
         >
           <div
             className="w-full max-w-sm rounded-2xl bg-ozio-card p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold text-base">¿Qué quieres añadir?</h3>
+            <header className="flex items-center justify-between mb-4">
+              <h3 id="add-modal-title" className="text-white font-semibold text-base">¿Qué quieres añadir?</h3>
               <button
                 type="button"
                 aria-label="Cerrar"
@@ -85,39 +90,42 @@ function BottomNav() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-            </div>
+            </header>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddModal(false);
-                  router.push('/anadir?tipo=historia');
-                }}
-                className="flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
-              >
-                <span className="text-4xl">📸</span>
-                <div className="text-center">
-                  <p className="text-white font-semibold text-sm group-hover:text-ozio-purple transition">Historia</p>
-                  <p className="text-gray-500 text-xs mt-0.5">Foto o vídeo del momento</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddModal(false);
-                  router.push('/anadir?tipo=evento');
-                }}
-                className="flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
-              >
-                <span className="text-4xl">🎉</span>
-                <div className="text-center">
-                  <p className="text-white font-semibold text-sm group-hover:text-ozio-blue transition">Evento</p>
-                  <p className="text-gray-500 text-xs mt-0.5">Crea un evento en tu local</p>
-                </div>
-              </button>
-            </div>
+            <ul className="grid grid-cols-2 gap-3 list-none p-0 m-0">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    router.push('/anadir?tipo=historia');
+                  }}
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
+                >
+                  <span className="text-4xl">📸</span>
+                  <div className="text-center">
+                    <p className="text-white font-semibold text-sm group-hover:text-ozio-purple transition">Historia</p>
+                    <p className="text-gray-500 text-xs mt-0.5">Foto o vídeo del momento</p>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    router.push('/anadir?tipo=evento');
+                  }}
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
+                >
+                  <span className="text-4xl">🎉</span>
+                  <div className="text-center">
+                    <p className="text-white font-semibold text-sm group-hover:text-ozio-blue transition">Evento</p>
+                    <p className="text-gray-500 text-xs mt-0.5">Crea un evento en tu local</p>
+                  </div>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       )}
@@ -159,11 +167,13 @@ function BottomNav() {
 
 function NavItem({
   icon,
+  label,
   active,
   onClick,
   special,
 }: {
   icon: React.ReactNode;
+  label: string;
   active?: boolean;
   onClick?: () => void;
   special?: boolean;
@@ -171,6 +181,8 @@ function NavItem({
   return (
     <button
       type="button"
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
       onClick={onClick}
       className={`
         flex flex-col items-center justify-center text-xs transition relative

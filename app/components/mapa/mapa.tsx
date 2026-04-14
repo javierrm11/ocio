@@ -54,9 +54,9 @@ function LocationBanner({
   };
 
   return (
-    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm">
+    <aside role="alert" aria-label="Ubicación no disponible" className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm">
       <div className="bg-ozio-dark/95 backdrop-blur border border-white/10 rounded-2xl shadow-xl px-4 py-3">
-        <div className="flex items-start justify-between gap-2 mb-2">
+        <header className="flex items-start justify-between gap-2 mb-2">
           <p className="text-white text-sm font-semibold leading-snug">
             Ubicación no disponible
           </p>
@@ -70,7 +70,7 @@ function LocationBanner({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </div>
+        </header>
         <p className="text-white/50 text-xs mb-3">
           El mapa usa una ubicación por defecto. Introduce tu ciudad para centrarlo correctamente.
         </p>
@@ -94,7 +94,7 @@ function LocationBanner({
         </div>
         {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -314,7 +314,7 @@ function MyMap() {
 
   if (!loaded) {
     return (
-      <div className="fixed inset-0 bg-ozio-dark flex flex-col items-center justify-center z-50">
+      <div className="fixed inset-0 bg-ozio-dark flex flex-col items-center justify-center z-50" role="status" aria-label="Cargando mapa">
         <div className="relative">
           <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-ozio-blue"></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -330,7 +330,7 @@ function MyMap() {
     <>
       {/* Points toast */}
       {pointsToast !== null && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-yellow-400 text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
+        <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-yellow-400 text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
           <span>+{pointsToast} puntos ganados</span>
         </div>
       )}
@@ -372,7 +372,7 @@ function MyMap() {
 
       {/* Active route banner */}
       {routePoints.length > 0 && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
+        <aside role="status" aria-label="Ruta activa" className="absolute top-4 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
           <span>🗺️ Ruta activa</span>
           <button
             type="button"
@@ -384,7 +384,7 @@ function MyMap() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-        </div>
+        </aside>
       )}
 
       {/* Location denied banner */}

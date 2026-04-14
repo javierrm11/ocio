@@ -30,7 +30,7 @@ export default function AnadirPage() {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
-      <div className="sticky top-0 z-20 bg-ozio-darker border-b border-gray-800/50 px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 z-20 bg-ozio-darker border-b border-gray-800/50 px-4 py-3 flex items-center gap-3">
         <button
           type="button"
           onClick={() => (tipo ? setTipo(null) : router.back())}
@@ -42,12 +42,12 @@ export default function AnadirPage() {
         <h1 className="text-white font-semibold text-base">
           {tipo === "evento" ? "Nuevo evento" : "¿Qué quieres añadir?"}
         </h1>
-      </div>
+      </header>
 
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <section className="px-4 pt-6 max-w-lg mx-auto" aria-label={tipo === "evento" ? "Formulario de evento" : "Seleccionar tipo de contenido"}>
         {!tipo && <Selector onSelect={setTipo} />}
         {tipo === "evento" && <FormEvento />}
-      </div>
+      </section>
     </div>
   );
 }
@@ -55,31 +55,34 @@ export default function AnadirPage() {
 /* ─── Selector inicial ─── */
 function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <button
-        type="button"
-        onClick={() => onSelect("historia")}
-        className="flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-8 transition group"
-      >
-        <span className="text-5xl">📸</span>
-        <div className="text-center">
-          <p className="text-white font-semibold group-hover:text-ozio-purple transition">Historia</p>
-          <p className="text-gray-500 text-xs mt-1">Foto o vídeo del momento</p>
-        </div>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onSelect("evento")}
-        className="flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-8 transition group"
-      >
-        <span className="text-5xl">🎉</span>
-        <div className="text-center">
-          <p className="text-white font-semibold group-hover:text-ozio-blue transition">Evento</p>
-          <p className="text-gray-500 text-xs mt-1">Crea un evento en tu local</p>
-        </div>
-      </button>
-    </div>
+    <ul className="grid grid-cols-2 gap-4 list-none p-0 m-0">
+      <li>
+        <button
+          type="button"
+          onClick={() => onSelect("historia")}
+          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-8 transition group"
+        >
+          <span className="text-5xl">📸</span>
+          <div className="text-center">
+            <p className="text-white font-semibold group-hover:text-ozio-purple transition">Historia</p>
+            <p className="text-gray-500 text-xs mt-1">Foto o vídeo del momento</p>
+          </div>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          onClick={() => onSelect("evento")}
+          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-8 transition group"
+        >
+          <span className="text-5xl">🎉</span>
+          <div className="text-center">
+            <p className="text-white font-semibold group-hover:text-ozio-blue transition">Evento</p>
+            <p className="text-gray-500 text-xs mt-1">Crea un evento en tu local</p>
+          </div>
+        </button>
+      </li>
+    </ul>
   );
 }
 

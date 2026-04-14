@@ -236,6 +236,7 @@ export default function VenueDetail() {
             El local que buscas no existe o ha sido eliminado
           </p>
           <button
+            type="button"
             onClick={() => router.back()}
             className="bg-ozio-blue text-white px-6 py-3 rounded-xl font-medium hover:bg-ozio-blue/80 transition"
           >
@@ -277,7 +278,9 @@ export default function VenueDetail() {
           {/* Avatar con anillo degradado + botón volver */}
           <div className="relative flex-shrink-0">
             <button
+              type="button"
               onClick={() => router.back()}
+              aria-label="Volver"
               className="absolute -top-1 -left-1 w-6 h-6 bg-gray-800 hover:bg-gray-700 rounded-full border border-gray-700 flex items-center justify-center z-10 transition"
             >
               <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,10 +326,10 @@ export default function VenueDetail() {
             </span>
           </div>
           {venue.address && (
-            <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-1">
+            <address className="text-gray-500 text-sm mt-0.5 flex items-center gap-1 not-italic">
               <MapPin size={12} className="text-ozio-orange flex-shrink-0" />
               {venue.address}
-            </p>
+            </address>
           )}
           {venue.description && (
             <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{venue.description}</p>
@@ -334,20 +337,19 @@ export default function VenueDetail() {
           {/* ── Géneros musicales (solo venue) ── */}
               {venue.genres && venue.genres.length > 0 && (
                 <div className="mt-3">
-                  <div className="flex flex-wrap gap-1.5">
+                  <ul className="flex flex-wrap gap-1.5 list-none p-0 m-0">
                     {venue.genres.map((item) => {
                       const genre = item.genre || item;
                       return (
-                        <span
-                          key={genre.slug}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25"
-                        >
-                          <span>{genre.emoji}</span>
-                          <span>{genre.name}</span>
-                        </span>
+                        <li key={genre.slug}>
+                          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25">
+                            <span>{genre.emoji}</span>
+                            <span>{genre.name}</span>
+                          </span>
+                        </li>
                       );
                     })}
-                  </div>
+                  </ul>
                 </div>
               )}
         </div>
@@ -357,6 +359,7 @@ export default function VenueDetail() {
           {isUserProfile && (
             hasCheckedIn ? (
               <button
+                type="button"
                 onClick={onCheckOut}
                 disabled={checkingOut}
                 className="flex-1 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-600/40 text-red-400 text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
@@ -374,6 +377,7 @@ export default function VenueDetail() {
               </button>
             ) : (
               <button
+                type="button"
                 onClick={onCheckIn}
                 disabled={checkingIn}
                 className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-red-500 hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
@@ -388,6 +392,7 @@ export default function VenueDetail() {
           )}
           {isUserProfile && (
             <button
+              type="button"
               onClick={toggleFavorite}
               disabled={togglingFavorite}
               className={`w-10 border rounded-xl transition flex items-center justify-center disabled:opacity-70 ${
@@ -409,13 +414,19 @@ export default function VenueDetail() {
       {/* ── Tabs solo iconos ── */}
       <nav className="flex border-t border-b border-gray-800" aria-label="Navegación del local">
         <button
+          type="button"
           onClick={() => setActiveTab("events")}
+          aria-label="Eventos"
+          aria-current={activeTab === "events" ? "page" : undefined}
           className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
         >
           <CalendarDays size={22} />
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("location")}
+          aria-label="Ubicación"
+          aria-current={activeTab === "location" ? "page" : undefined}
           className={`flex-1 py-3 flex justify-center transition ${activeTab === "location" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
         >
           <MapPin size={22} />
@@ -429,7 +440,7 @@ export default function VenueDetail() {
         {activeTab === "events" && (
           <>
             {activeEvents.length > 0 && (
-              <div className="bg-ozio-card border border-green-500/40 rounded-2xl p-4">
+              <section className="bg-ozio-card border border-green-500/40 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-white font-bold text-sm flex items-center gap-2">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -446,12 +457,12 @@ export default function VenueDetail() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             )}
 
             {upcomingEvents.length > 0 ? (
               <div className="space-y-3">
-                <p className="text-gray-500 text-xs uppercase tracking-widest font-semibold px-1">Próximos</p>
+                <h2 className="text-gray-500 text-xs uppercase tracking-widest font-semibold px-1">Próximos</h2>
                 <ul className="space-y-3">
                   {upcomingEvents.map((event) => (
                     <li key={event.id}>
@@ -475,10 +486,11 @@ export default function VenueDetail() {
           <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden">
             <div className="h-72 relative overflow-hidden">
               <iframe
+                title={`Mapa de ${venue.name}`}
                 src={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}&z=15&output=embed`}
                 width="100%"
                 height="100%"
-                style={{ border: 0 }}
+                className="border-0"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -486,6 +498,7 @@ export default function VenueDetail() {
             </div>
             <div className="p-4">
               <button
+                type="button"
                 onClick={() => window.open(`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`, "_blank")}
                 className="w-full bg-ozio-blue/20 hover:bg-ozio-blue/30 border border-ozio-blue/30 text-ozio-blue py-3 rounded-xl font-medium transition flex items-center justify-center gap-2"
               >
@@ -524,12 +537,12 @@ function EventMiniCard({ event }: { event: Event }) {
               <span className="text-white text-xs font-bold">LIVE</span>
             </>
           ) : (
-            <>
+            <time dateTime={event.starts_at} className="flex flex-col items-center">
               <span className="text-white text-xs font-medium">
                 {startDate.toLocaleDateString("es-ES", { month: "short" }).toUpperCase()}
               </span>
               <span className="text-white text-2xl font-bold">{startDate.getDate()}</span>
-            </>
+            </time>
           )}
         </div>
 
@@ -542,11 +555,11 @@ function EventMiniCard({ event }: { event: Event }) {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>
+            <time dateTime={isActive ? event.ends_at : event.starts_at}>
               {isActive
                 ? `Hasta las ${endDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
                 : startDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
-            </span>
+            </time>
           </div>
         </div>
 

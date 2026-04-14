@@ -112,18 +112,18 @@ export default function Premium() {
             </div>
 
             {/* Features */}
-            <div className="space-y-2.5 mb-6">
+            <ul className="space-y-2.5 mb-6 list-none p-0 m-0">
               {PREMIUM_FEATURES.map((f) => (
-                <div key={f.text} className="flex items-center gap-3">
+                <li key={f.text} className="flex items-center gap-3">
                   <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 premium-check-icon">
                     <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none">
                       <path d="M1.5 5.5L4 8L8.5 2.5" stroke="#fbbf24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                   <span className="text-gray-200 text-sm">{f.text}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
 
             {/* CTA */}
             {premium ? (
@@ -157,9 +157,9 @@ export default function Premium() {
             </div>
           </div>
 
-          <div className="space-y-2.5 mb-6">
+          <ul className="space-y-2.5 mb-6 list-none p-0 m-0">
             {FREE_FEATURES.map((f) => (
-              <div key={f.text} className="flex items-center gap-3">
+              <li key={f.text} className="flex items-center gap-3">
                 <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${f.ok ? "free-check-icon" : "free-cross-icon"}`}>
                   {f.ok ? (
                     <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none">
@@ -172,9 +172,9 @@ export default function Premium() {
                   )}
                 </span>
                 <span className={`text-sm ${f.ok ? "text-gray-300" : "text-gray-600"}`}>{f.text}</span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
 
           {/* CTA */}
           {!premium ? (

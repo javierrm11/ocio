@@ -184,61 +184,65 @@ export default function Stories() {
   return (
     <>
       {/* ── Stories Bar ─────────────────────────────────────────────────── */}
-      <div className="flex gap-4 p-4 overflow-x-auto max-w-7xl mx-auto">
+      <section className="max-w-7xl mx-auto" aria-label="Historias">
+        <ul className="flex gap-4 p-4 overflow-x-auto list-none m-0">
 
-        {canUploadStories && (
-          <div
-            className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
-            onClick={() => router.push('/anadir?tipo=historia')}
-          >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-xs text-white font-semibold">Tu historia</span>
-          </div>
-        )}
-
-        {/* ✅ Un bubble por empresa */}
-        {storyGroups.map(group => (
-          <div
-            key={group.venue_id}
-            className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"
-            onClick={() => openGroup(group)}
-          >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-0.5">
-              <div className="w-full h-full rounded-full bg-gray-900 p-0.5">
-                {group.venue_avatar ? (
-                  <img
-                    src={group.venue_avatar}
-                    alt={group.venue_name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  // Fallback: inicial del nombre
-                  <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-xl">
-                    {group.venue_name[0].toUpperCase()}
-                  </div>
-                )}
+          {canUploadStories && (
+            <li>
+              <div
+                className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
+                onClick={() => router.push('/anadir?tipo=historia')}
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <span className="text-xs text-white font-semibold">Tu historia</span>
               </div>
-            </div>
-            {/* ✅ Contador de stories del grupo */}
-            <span className="text-xs text-white truncate max-w-[64px] text-center">
-              {group.venue_name}
-            </span>
-            {group.stories.length > 1 && (
-              <span className="text-[10px] text-gray-400 -mt-1">
-                {group.stories.length} historias
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
+            </li>
+          )}
 
-      {/* ── Upload Modal (sin cambios) ───────────────────────────────────── */}
+          {/* ✅ Un bubble por empresa */}
+          {storyGroups.map(group => (
+            <li
+              key={group.venue_id}
+              className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"
+              onClick={() => openGroup(group)}
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-0.5">
+                <div className="w-full h-full rounded-full bg-gray-900 p-0.5">
+                  {group.venue_avatar ? (
+                    <img
+                      src={group.venue_avatar}
+                      alt={group.venue_name}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    // Fallback: inicial del nombre
+                    <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-xl">
+                      {group.venue_name[0].toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* ✅ Contador de stories del grupo */}
+              <span className="text-xs text-white truncate max-w-[64px] text-center">
+                {group.venue_name}
+              </span>
+              {group.stories.length > 1 && (
+                <span className="text-[10px] text-gray-400 -mt-1">
+                  {group.stories.length} historias
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ── Upload Modal ─────────────────────────────────────────────────── */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Subir historia">
           <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full">
             <div className="border-b border-gray-700/50 px-6 py-4 flex items-center justify-between">
               <h2 className="text-white text-xl font-bold">📸 Nueva Historia</h2>
@@ -290,7 +294,7 @@ export default function Stories() {
 
       {/* ── Story Viewer ─────────────────────────────────────────────────── */}
       {activeGroup && currentStory && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label={activeGroup.venue_name}>
 
           {/* ✅ Barra de progreso solo del grupo activo */}
           <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">

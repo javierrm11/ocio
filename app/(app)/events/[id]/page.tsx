@@ -266,16 +266,15 @@ export default function EventDetailPage() {
                 </p>
               )}
               {event.genres && event.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
+                <ul className="flex flex-wrap gap-2 mt-3 list-none p-0 m-0">
                   {event.genres.map((g) => (
-                    <span
-                      key={g.genre_id}
-                      className="flex items-center gap-1.5 text-sm bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-3 py-1 rounded-full"
-                    >
-                      {g.genre?.emoji} {g.genre?.name}
-                    </span>
+                    <li key={g.genre_id}>
+                      <span className="flex items-center gap-1.5 text-sm bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25 px-3 py-1 rounded-full">
+                        {g.genre?.emoji} {g.genre?.name}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </section>
 
@@ -299,7 +298,7 @@ export default function EventDetailPage() {
                   )}
                   <div className="flex-1">
                     <p className="text-white font-semibold">{event.venues.name}</p>
-                    {event.venues.address && <p className="text-gray-400 text-sm">{event.venues.address}</p>}
+                    {event.venues.address && <address className="text-gray-400 text-sm not-italic">{event.venues.address}</address>}
                     {event.venues.description && <p className="text-gray-500 text-xs mt-1">{event.venues.description}</p>}
                   </div>
                   <button
@@ -350,8 +349,8 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Inicio</p>
-                    <p className="text-white font-semibold">{formatDate(event.starts_at)}</p>
-                    <p className={`text-sm ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</p>
+                    <time dateTime={event.starts_at} className="text-white font-semibold block">{formatDate(event.starts_at)}</time>
+                    <time dateTime={event.starts_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</time>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -362,8 +361,8 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Fin</p>
-                    <p className="text-white font-semibold">{formatDate(event.ends_at)}</p>
-                    <p className={`text-sm ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</p>
+                    <time dateTime={event.ends_at} className="text-white font-semibold block">{formatDate(event.ends_at)}</time>
+                    <time dateTime={event.ends_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</time>
                   </div>
                 </div>
               </div>

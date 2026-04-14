@@ -133,7 +133,8 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   return (
     <div className="min-h-screen bg-ozio-dark pb-24 max-w-4xl mx-auto">
       <div className="h-[72px]" />
-      <div className="px-4 pt-4">
+      <h1 className="sr-only">{user.name} — Perfil</h1>
+      <section className="px-4 pt-4" aria-label="Información de perfil">
         <div className="flex items-center gap-5">
           <div className="relative flex-shrink-0">
             <div className={`w-[82px] h-[82px] rounded-full p-[2.5px] ${isVenue ? "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue" : "bg-gradient-to-tr from-ozio-blue via-ozio-purple to-pink-500"}`}>
@@ -189,14 +190,16 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           </p>
           {isVenue && user.genres && user.genres.length > 0 && (
             <div className="mt-3">
-              <div className="flex flex-wrap gap-1.5">
+              <ul className="flex flex-wrap gap-1.5 list-none p-0 m-0">
                 {user.genres.map(({ genre }) => (
-                  <span key={genre.id} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25">
-                    <span>{genre.emoji}</span>
-                    <span>{genre.name}</span>
-                  </span>
+                  <li key={genre.id}>
+                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-ozio-purple/10 text-ozio-purple border border-ozio-purple/25">
+                      <span>{genre.emoji}</span>
+                      <span>{genre.name}</span>
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
         </div>
@@ -214,9 +217,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <Settings size={16} />
           </button>
         </div>
-      </div>
+      </section>
 
-      <div className="flex border-t border-b border-gray-800">
+      <nav className="flex border-t border-b border-gray-800" aria-label="Secciones del perfil">
         {isVenue ? (
           <>
             <button onClick={() => setActiveTab("events")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
@@ -249,9 +252,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             </button>
           </>
         )}
-      </div>
+      </nav>
 
-      <div className="px-4 pt-4">
+      <section className="px-4 pt-4" aria-label="Contenido del perfil">
         <div className="space-y-3">
           {isVenue && activeTab === "events" && (
             <div className="space-y-3">
@@ -261,7 +264,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                   .map((event) => {
                     const isPast = new Date(event.ends_at) <= new Date();
                     return (
-                      <div key={event.id} className={`bg-ozio-card border border-gray-700/50 rounded-2xl flex gap-3 p-4 hover:bg-gray-800/50 transition ${isPast ? "opacity-55" : ""}`}>
+                      <article key={event.id} className={`bg-ozio-card border border-gray-700/50 rounded-2xl flex gap-3 p-4 hover:bg-gray-800/50 transition ${isPast ? "opacity-55" : ""}`}>
                         <img src={event.image_path || "https://via.placeholder.com/80"} alt="Event" className={`w-16 h-16 rounded-xl object-cover flex-shrink-0 ${isPast ? "grayscale" : ""}`} />
                         <div className="flex-1 min-w-0">
                           <h3 className="text-white font-semibold text-sm truncate">{event.name || event.title}</h3>
@@ -271,13 +274,15 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                           <p className="text-gray-500 text-xs mt-1">👥 {event.event_attendees[0]?.count || 0} asistentes</p>
                           {/* Géneros del evento */}
                           {event.genres && event.genres.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1.5">
+                            <ul className="flex flex-wrap gap-1 mt-1.5 list-none p-0 m-0">
                               {event.genres.slice(0, 3).map((g: any) => (
-                                <span key={g.genre_id} className="text-[10px] bg-ozio-blue/10 text-ozio-blue border border-ozio-blue/20 px-1.5 py-0.5 rounded-full">
-                                  {g.genre?.emoji} {g.genre?.name}
-                                </span>
+                                <li key={g.genre_id}>
+                                  <span className="text-[10px] bg-ozio-blue/10 text-ozio-blue border border-ozio-blue/20 px-1.5 py-0.5 rounded-full">
+                                    {g.genre?.emoji} {g.genre?.name}
+                                  </span>
+                                </li>
                               ))}
-                            </div>
+                            </ul>
                           )}
                           <div className="flex items-center gap-1.5 mt-1.5">
                             {isPast && <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">Finalizado</span>}
@@ -300,7 +305,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                             </svg>
                           </button>
                         </div>
-                      </div>
+                      </article>
                     );
                   })
               ) : (
@@ -350,7 +355,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {showEditModal && (
         <EditProfileModal user={user} onClose={() => setShowEditModal(false)} onProfileUpdated={(updatedUser) => { setUser({ ...user, ...updatedUser }); setShowEditModal(false); }} />
@@ -506,7 +511,7 @@ function StatsTab() {
 function PremiumModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="premium-modal-title" onClick={onClose}>
       <div
         className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
         onClick={(e) => e.stopPropagation()}
@@ -519,20 +524,20 @@ function PremiumModal({ onClose }: { onClose: () => void }) {
             style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 24px rgba(251,191,36,0.4)" }}>
             <span className="text-3xl">👑</span>
           </div>
-          <h2 className="text-white text-xl font-black mb-2">Estadísticas Premium</h2>
+          <h2 id="premium-modal-title" className="text-white text-xl font-black mb-2">Estadísticas Premium</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Accede a estadísticas detalladas de tu local o actividad: visitas, hora pico, tendencias y mucho más.
           </p>
         </div>
 
-        <div className="space-y-3 mb-6">
+        <ul className="space-y-3 mb-6 list-none p-0 m-0">
           {["📊 Gráficos de actividad en tiempo real", "🕐 Hora pico de visitas", "🏆 Top eventos y locales", "📅 Análisis mensual y tendencias"].map((feat) => (
-            <div key={feat} className="flex items-center gap-3 text-sm">
+            <li key={feat} className="flex items-center gap-3 text-sm">
               <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
               <span className="text-gray-300">{feat.slice(3)}</span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <button
           className="w-full py-3.5 rounded-2xl font-bold text-sm text-[#1a0a00]"
@@ -600,19 +605,19 @@ function GenreSelector({ selected, onChange }: { selected: number[]; onChange: (
 
 function FavoriteSpotCard({ favorite }: { favorite: any }) {
   return (
-    <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition">
+    <article className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-gray-800/50 transition">
       <img src={favorite?.avatar_path || "https://via.placeholder.com/80"} alt="Venue" className="w-20 h-20 rounded-xl object-cover" />
       <div className="flex-1">
         <h3 className="text-white font-semibold">{favorite?.name}</h3>
-        <p className="text-gray-400 text-sm">{favorite?.address}</p>
+        <address className="text-gray-400 text-sm not-italic">{favorite?.address}</address>
         <button className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-white text-xs font-medium rounded-full transition" onClick={() => alert("Función de mapa no implementada")}>
           Ver en mapa
         </button>
       </div>
-      <button className="text-red-400 hover:text-red-500 transition">
+      <button type="button" aria-label="Quitar de favoritos" className="text-red-400 hover:text-red-500 transition">
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
       </button>
-    </div>
+    </article>
   );
 }
 
@@ -680,10 +685,10 @@ function EditProfileModal({ user, onClose, onProfileUpdated }: { user: UserProfi
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title">
       <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-          <h2 className="text-white text-xl font-bold">✏️ Editar Perfil</h2>
+          <h2 id="edit-profile-title" className="text-white text-xl font-bold">✏️ Editar Perfil</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>

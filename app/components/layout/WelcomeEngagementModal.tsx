@@ -26,6 +26,9 @@ export default function WelcomeEngagementModal() {
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 px-5"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-modal-title"
       onClick={() => setOpen(false)}
     >
       <div
@@ -35,7 +38,7 @@ export default function WelcomeEngagementModal() {
         <p className="text-xs font-semibold uppercase tracking-wider text-ozio-blue">
           Bienvenido a Ozio
         </p>
-        <h2 className="mt-2 text-2xl font-bold text-white">
+        <h2 id="welcome-modal-title" className="mt-2 text-2xl font-bold text-white">
           Descubre el mejor plan de esta noche en segundos
         </h2>
         <p className="mt-3 text-sm text-zinc-300">

@@ -182,8 +182,10 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
                 </span>
               )}
             </div>
-            <button 
+            <button
+              type="button"
               onClick={onClose}
+              aria-label="Cerrar notificaciones"
               className="text-gray-400 hover:text-white transition"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,8 +195,9 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
           </div>
 
           {/* Filtros */}
-          <div className="flex gap-2">
+          <div role="toolbar" aria-label="Filtrar notificaciones" className="flex gap-2">
             <button
+              type="button"
               onClick={() => setFilter('all')}
               className={`flex-1 py-2 px-4 rounded-xl font-medium transition ${
                 filter === 'all'
@@ -205,7 +208,9 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
               Todas
             </button>
             <button
+              type="button"
               onClick={() => setFilter('unread')}
+              aria-pressed={filter === 'unread' ? 'true' : 'false'}
               className={`flex-1 py-2 px-4 rounded-xl font-medium transition ${
                 filter === 'unread'
                   ? 'bg-ozio-blue text-white'
@@ -216,6 +221,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
             </button>
             {unreadCount > 0 && (
               <button
+                type="button"
                 onClick={markAllAsRead}
                 className="px-4 py-2 bg-ozio-purple hover:bg-ozio-purple/80 text-white rounded-xl font-medium transition"
               >
@@ -228,7 +234,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
         {/* Lista de notificaciones */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
+            <div role="status" aria-label="Cargando notificaciones" className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-ozio-blue"></div>
             </div>
           ) : notifications?.length === 0 ? (
@@ -284,6 +290,8 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
                       {/* Botón eliminar */}
                       <button
+                        type="button"
+                        aria-label="Eliminar notificación"
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteNotification(notification.id);

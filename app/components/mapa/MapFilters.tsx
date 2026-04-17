@@ -38,7 +38,7 @@ export function MapFilters({
   return (
     <>
       {/* Trigger button */}
-      <div className="absolute bottom-20 right-3 z-[992] pointer-events-none max-w-xl">
+      <div className="absolute bottom-20 right-3 z-[938] pointer-events-none max-w-xl">
         <button
           type="button"
           onClick={() => setShowFilters(true)}

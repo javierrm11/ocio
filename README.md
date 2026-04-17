@@ -239,9 +239,10 @@ npm run lint
 - [✅] **Sin rate limiting en las rutas API** — Endpoints como `/api/auth/login` o `/api/checkins` son susceptibles a abuso. Añadir rate limiting (e.g. con `upstash/ratelimit` o middleware de Vercel).
 
 ### Pendientes de producto
-- [ ] Historias en la vista de los establecimientos
-- [ ] Fix z-index de los filtros del mapa (se solapan con el panel lateral)
+- [✅] Fix z-index de los filtros del mapa (se solapan con el panel lateral)
+- [✅] SEO Html5
 - [ ] Radio de visualización en el mapa variable según el plan del usuario
 - [ ] Filtros adicionales en la búsqueda (aforo, precio, horario)
 - [ ] Notificaciones push (Web Push API / service worker)
-- [✅] SEO Html5
+- [ ] Historias en la vista de los establecimientos
+- [ ] Control de seguridad de rutas /anadir

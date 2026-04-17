@@ -230,11 +230,7 @@ export default function Stories() {
               <span className="text-xs text-ozio-text truncate max-w-[64px] text-center">
                 {group.venue_name}
               </span>
-              {group.stories.length > 1 && (
-                <span className="text-[10px] text-ozio-text-muted -mt-1">
-                  {group.stories.length} historias
-                </span>
-              )}
+
             </li>
           ))}
         </ul>

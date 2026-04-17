@@ -319,14 +319,14 @@ export default function VenueDetail() {
               type="button"
               onClick={() => router.back()}
               aria-label="Volver"
-              className="absolute -top-1 -left-1 w-6 h-6 bg-gray-800 hover:bg-gray-700 rounded-full border border-gray-700 flex items-center justify-center z-10 transition"
+              className="absolute -top-1 -left-1 w-6 h-6 bg-ozio-card hover:bg-ozio-card/70 rounded-full border border-ozio-card/70 flex items-center justify-center z-10 transition"
             >
               <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div
-              className={`w-[82px] h-[82px] rounded-full p-[2.5px] transition ${hasStories ? "bg-gradient-to-tr from-blue-400 to-blue-600 cursor-pointer" : "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue"}`}
+              className={`w-[82px] h-[82px] rounded-full p-[2.5px] transition ${hasStories ? "bg-gradient-to-tr from-ozio-blue/70 to-ozio-blue cursor-pointer" : "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue"}`}
               onClick={hasStories ? openStories : undefined}
             >
               {venue.avatar_path ? (
@@ -349,7 +349,7 @@ export default function VenueDetail() {
               <p className="text-white text-xl font-black leading-none">{totalCheckIns}</p>
               <p className="text-gray-400 text-xs mt-1">Visitas</p>
             </div>
-            <div className="w-px h-8 bg-gray-800" />
+            <div className="w-px h-8 bg-ozio-card" />
             <div className="text-center">
               <p className="text-white text-xl font-black leading-none">{venue.events?.length || 0}</p>
               <p className="text-gray-400 text-xs mt-1">Eventos</p>
@@ -403,10 +403,10 @@ export default function VenueDetail() {
                 type="button"
                 onClick={onCheckOut}
                 disabled={checkingOut}
-                className="flex-1 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-600/40 text-red-400 text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
+                className="flex-1 py-2 bg-ambience-high/20 hover:bg-ambience-high/30 border border-ambience-high/40 text-ambience-high text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
               >
                 {checkingOut ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-400" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-ambience-high" />
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,7 +421,7 @@ export default function VenueDetail() {
                 type="button"
                 onClick={onCheckIn}
                 disabled={checkingIn}
-                className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-red-500 hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
+                className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-ambience-high hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
               >
                 {checkingIn ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
@@ -438,8 +438,8 @@ export default function VenueDetail() {
               disabled={togglingFavorite}
               className={`w-10 border rounded-xl transition flex items-center justify-center disabled:opacity-70 ${
                 venueFromStore?.is_favorite
-                  ? "bg-red-600/20 border-red-600/40 text-red-400"
-                  : "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
+                  ? "bg-ambience-high/20 border-ambience-high/40 text-ambience-high"
+                  : "bg-ozio-card border-ozio-card/70 text-gray-300 hover:bg-ozio-card/70"
               }`}
             >
               {togglingFavorite ? (
@@ -453,7 +453,7 @@ export default function VenueDetail() {
       </header>
 
       {/* ── Tabs solo iconos ── */}
-      <nav className="flex border-t border-b border-gray-800" aria-label="Navegación del local">
+      <nav className="flex border-t border-b border-ozio-darker" aria-label="Navegación del local">
         <button
           type="button"
           onClick={() => setActiveTab("events")}
@@ -481,13 +481,13 @@ export default function VenueDetail() {
         {activeTab === "events" && (
           <>
             {activeEvents.length > 0 && (
-              <section className="bg-ozio-card border border-green-500/40 rounded-2xl p-4">
+              <section className="bg-ozio-card border border-ambience-low/40 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-white font-bold text-sm flex items-center gap-2">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-ambience-low rounded-full animate-pulse" />
                     En curso
                   </h2>
-                  <span className="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded-full font-medium border border-green-500/30">
+                  <span className="bg-ambience-low/20 text-ambience-low text-[10px] px-2 py-0.5 rounded-full font-medium border border-ambience-low/30">
                     {activeEvents.length} activo{activeEvents.length > 1 ? "s" : ""}
                   </span>
                 </div>
@@ -513,7 +513,7 @@ export default function VenueDetail() {
                 </ul>
               </div>
             ) : activeEvents.length === 0 && (
-              <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-10 text-center">
+              <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
                 <p className="text-4xl mb-3">📅</p>
                 <p className="text-white font-semibold mb-1">Sin eventos</p>
                 <p className="text-gray-500 text-sm">No hay eventos programados</p>
@@ -524,7 +524,7 @@ export default function VenueDetail() {
 
         {/* Ubicación */}
         {activeTab === "location" && (
-          <div className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden">
+          <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl overflow-hidden">
             <div className="h-72 relative overflow-hidden">
               <iframe
                 title={`Mapa de ${venue.name}`}
@@ -563,7 +563,7 @@ export default function VenueDetail() {
         {/* Barras de progreso */}
         <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
           {venueStories.map((_, index) => (
-            <div key={index} className="flex-1 h-1 bg-gray-600 rounded-full overflow-hidden">
+            <div key={index} className="flex-1 h-1 bg-ozio-card rounded-full overflow-hidden">
               <div className={`h-full rounded-full ${
                 index < storyIndex ? "bg-white w-full" :
                 index === storyIndex ? "bg-white animate-story-progress" : "w-0"
@@ -575,11 +575,11 @@ export default function VenueDetail() {
         {/* Header */}
         <div className="absolute top-4 left-0 right-0 flex items-center justify-between px-4 z-10 mt-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-blue-600 p-0.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-ozio-blue/70 to-ozio-blue p-0.5">
               {venue.avatar_path ? (
                 <img src={venue.avatar_path} alt={venue.name} className="w-full h-full rounded-full object-cover" />
               ) : (
-                <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-full h-full rounded-full bg-ozio-card/70 flex items-center justify-center text-white text-xs font-bold">
                   {venue.name[0].toUpperCase()}
                 </div>
               )}
@@ -642,14 +642,14 @@ function EventMiniCard({ event }: { event: Event }) {
 
   return (
     <article
-      className="bg-ozio-dark border border-gray-700/50 rounded-2xl p-4 hover:border-ozio-blue/50 transition cursor-pointer"
+      className="bg-ozio-dark border border-ozio-card/50 rounded-2xl p-4 hover:border-ozio-blue/50 transition cursor-pointer"
       onClick={() => {
         const eventData = encodeURIComponent(JSON.stringify(event));
         router.push(`/events/${event.id}?data=${eventData}`);
       }}
     >
       <div className="flex gap-3">
-        <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex flex-col items-center justify-center bg-gradient-to-br ${isActive ? "from-green-600 to-green-700" : "from-ozio-purple to-ozio-blue"}`}>
+        <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex flex-col items-center justify-center bg-gradient-to-br ${isActive ? "from-ambience-low to-ambience-low/70" : "from-ozio-purple to-ozio-blue"}`}>
           {isActive ? (
             <>
               <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse mb-1" />
@@ -696,7 +696,7 @@ function EventMiniCard({ event }: { event: Event }) {
       </div>
 
       {event.featured && (
-        <div className="mt-3 pt-3 border-t border-gray-700/50">
+        <div className="mt-3 pt-3 border-t border-ozio-card/50">
           <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full font-medium">
             ⭐ Destacado
           </span>

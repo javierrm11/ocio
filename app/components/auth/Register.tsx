@@ -183,7 +183,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num, idx) => (
               <li key={num} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition border-2 ${
-                  step >= num ? 'bg-ozio-blue text-white border-ozio-blue' : 'bg-ozio-card text-gray-400 border-gray-600'
+                  step >= num ? 'bg-ozio-blue text-ozio-text border-ozio-blue' : 'bg-ozio-card text-gray-400 border-gray-600'
                 }`}>
                   {num}
                 </div>
@@ -194,7 +194,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             ))}
           </ol>
 
-          <h2 id="register-title" className="text-2xl font-bold text-white mb-2">{stepTitle()}</h2>
+          <h2 id="register-title" className="text-2xl font-bold text-ozio-text mb-2">{stepTitle()}</h2>
           <p className="text-gray-400 text-sm mb-6">Paso {step} de {totalSteps}</p>
 
           {error && (
@@ -211,24 +211,24 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   Nombre {formData.profileType === 'user' ? 'completo' : 'del establecimiento'}
                 </label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder={formData.profileType === 'user' ? 'Tu nombre' : 'Nombre del local'} autoFocus />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="tu@email.com" />
               </div>
               <div>
                 <label htmlFor="profileType" className="block text-sm font-medium text-gray-300 mb-2">Tipo de cuenta</label>
                 <select id="profileType" name="profileType" value={formData.profileType} onChange={handleChange}
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
                   <option value="user">👤 Usuario</option>
                   <option value="venue">🏢 Establecimiento</option>
                 </select>
               </div>
-              <button type="submit" className="w-full bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition mt-6">
+              <button type="submit" className="w-full bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition mt-6">
                 Continuar →
               </button>
             </form>
@@ -243,7 +243,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
                   <input type="text" name="username" value={formData.username} onChange={handleChange}
                     required minLength={3} pattern="[a-zA-Z0-9_]+"
-                    className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                    className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                     placeholder="tunombre" autoFocus />
                 </div>
                 <p className="text-xs text-gray-400 mt-1">Mínimo 3 caracteres, sin espacios</p>
@@ -252,13 +252,13 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 <label className="block text-sm font-medium text-gray-300 mb-2">Descripción (opcional)</label>
                 <textarea name="description" value={formData.description} onChange={handleChange}
                   rows={4} maxLength={150}
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition resize-none"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition resize-none"
                   placeholder="Cuéntanos sobre ti..." />
                 <p className="text-xs text-gray-400 mt-1 text-right">{formData.description.length}/150</p>
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
-                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
+                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
           )}
@@ -269,7 +269,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Dirección</label>
                 <input type="text" name="address" value={formData.address} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Calle, número, ciudad" autoFocus />
               </div>
               <div>
@@ -285,8 +285,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
-                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
+                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
           )}
@@ -308,8 +308,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                           onClick={() => toggleGenre(genre.id)}
                           className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all border ${
                             selected
-                              ? 'bg-ozio-blue border-ozio-blue text-white scale-105'
-                              : 'bg-ozio-dark border-ozio-card text-gray-300 hover:border-ozio-blue/50 hover:text-white'
+                              ? 'bg-ozio-blue border-ozio-blue text-ozio-text scale-105'
+                              : 'bg-ozio-dark border-ozio-card text-gray-300 hover:border-ozio-blue/50 hover:text-ozio-text'
                           }`}
                         >
                           <span>{genre.emoji}</span>
@@ -326,8 +326,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 )}
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(2)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
-                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
+                <button type="button" onClick={() => setStep(2)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
           )}
@@ -339,14 +339,14 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange}
                   required minLength={6}
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Mínimo 6 caracteres" autoFocus />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Confirmar contraseña</label>
                 <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}
                   required minLength={6}
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Repite tu contraseña" />
               </div>
               {formData.password && (
@@ -365,8 +365,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </div>
               )}
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(step - 1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
-                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
+                <button type="button" onClick={() => setStep(step - 1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
           )}
@@ -381,14 +381,14 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                       className="w-32 h-32 rounded-full object-cover border-4 border-ozio-blue" />
                   ) : (
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-ozio-blue to-ozio-purple border-4 border-ozio-card flex items-center justify-center">
-                      <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-16 h-16 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                   )}
                   <button type="button" aria-label="Cambiar foto de perfil" onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-0 right-0 bg-ozio-blue p-2 rounded-full border-2 border-ozio-dark hover:bg-ozio-purple transition">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -400,7 +400,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </p>
                 <p className="text-xs text-gray-400 text-center">Opcional. Formatos: JPG, PNG (máx. 5MB)</p>
                 <button type="button" onClick={() => fileInputRef.current?.click()}
-                  className="mt-4 px-6 py-2 bg-ozio-card hover:bg-ozio-card/70 text-white font-medium rounded-xl transition">
+                  className="mt-4 px-6 py-2 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-medium rounded-xl transition">
                   {formData.profileImagePreview ? 'Cambiar imagen' : 'Seleccionar imagen'}
                 </button>
                 {loading && uploadProgress > 0 && (
@@ -414,11 +414,11 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
               </div>
               <div className="flex gap-3 mt-8">
                 <button type="button" onClick={() => setStep(step - 1)} disabled={loading}
-                  className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50">
+                  className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50">
                   ← Atrás
                 </button>
                 <button type="submit" disabled={loading}
-                  className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
                       <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">

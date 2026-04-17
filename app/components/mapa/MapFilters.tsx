@@ -42,7 +42,7 @@ export function MapFilters({
         <button
           type="button"
           onClick={() => setShowFilters(true)}
-          className="pointer-events-auto bg-ozio-dark/95 text-white px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-ozio-card hover:bg-ozio-card transition"
+          className="pointer-events-auto bg-ozio-dark/95 text-ozio-text px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-ozio-card hover:bg-ozio-card transition"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
@@ -73,7 +73,7 @@ export function MapFilters({
           {/* Header */}
           <header className="px-5 py-4 border-b border-ozio-card flex items-center justify-between">
             <div>
-              <h3 id="filters-title" className="text-white font-semibold">Filtros</h3>
+              <h3 id="filters-title" className="text-ozio-text font-semibold">Filtros</h3>
               <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
             </div>
             <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export function MapFilters({
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
-                className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-ozio-card"
+                className="rounded-lg p-2 text-gray-400 hover:text-ozio-text hover:bg-ozio-card"
                 aria-label="Cerrar filtros"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,8 +147,8 @@ export function MapFilters({
                     onClick={() => setAmbientesSeleccionados(new Set())}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                       ambientesSeleccionados.size === 0
-                        ? "bg-ozio-blue border-ozio-blue text-white"
-                        : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
+                        ? "bg-ozio-blue border-ozio-blue text-ozio-text"
+                        : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
                     }`}
                   >
                     Todos
@@ -174,8 +174,8 @@ export function MapFilters({
                         }
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                           active
-                            ? "bg-ozio-blue border-ozio-blue text-white"
-                            : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
+                            ? "bg-ozio-blue border-ozio-blue text-ozio-text"
+                            : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
                         }`}
                       >
                         {label}
@@ -199,8 +199,8 @@ export function MapFilters({
                       onClick={() => setGenerosSeleccionados(new Set())}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                         generosSeleccionados.size === 0
-                          ? "bg-ozio-blue border-ozio-blue text-white"
-                          : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
+                          ? "bg-ozio-blue border-ozio-blue text-ozio-text"
+                          : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
                       }`}
                     >
                       Todos
@@ -222,8 +222,8 @@ export function MapFilters({
                           }
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                             active
-                              ? "bg-ozio-blue border-ozio-blue text-white"
-                              : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
+                              ? "bg-ozio-blue border-ozio-blue text-ozio-text"
+                              : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
                           }`}
                         >
                           {emoji} {name}
@@ -240,7 +240,7 @@ export function MapFilters({
           <footer className="px-5 py-4 border-t border-ozio-card bg-ozio-dark/95">
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-xs">Locales visibles</span>
-              <span className="text-white text-sm font-bold">
+              <span className="text-ozio-text text-sm font-bold">
                 {filteredCount}
                 <span className="text-gray-500 font-normal"> / {totalCount}</span>
               </span>

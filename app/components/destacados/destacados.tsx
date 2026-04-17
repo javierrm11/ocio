@@ -55,13 +55,13 @@ export default function Destacados() {
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => router.back()}
-              className="text-white hover:text-ozio-blue transition"
+              className="text-ozio-text hover:text-ozio-blue transition"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-white text-2xl font-bold">⭐ Destacados</h1>
+            <h1 className="text-ozio-text text-2xl font-bold">⭐ Destacados</h1>
             <div className="w-6"></div>
           </div>
 
@@ -71,8 +71,8 @@ export default function Destacados() {
               onClick={() => setActiveTab('eventos')}
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'eventos'
-                  ? 'bg-ozio-blue text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-ozio-card/50'
+                  ? 'bg-ozio-blue text-ozio-text shadow-lg'
+                  : 'text-gray-400 hover:text-ozio-text hover:bg-ozio-card/50'
               }`}
             >
               🎉 Eventos
@@ -81,8 +81,8 @@ export default function Destacados() {
               onClick={() => setActiveTab('locales')}
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'locales'
-                  ? 'bg-ozio-blue text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-ozio-card/50'
+                  ? 'bg-ozio-blue text-ozio-text shadow-lg'
+                  : 'text-gray-400 hover:text-ozio-text hover:bg-ozio-card/50'
               }`}
             >
               🏆 Top Locales
@@ -99,7 +99,7 @@ export default function Destacados() {
               {featuredEvents.length > 0 ? (
                 <>
                   <div className="flex items-center gap-2 mb-2">
-                    <h2 className="text-white font-semibold">Eventos destacados</h2>
+                    <h2 className="text-ozio-text font-semibold">Eventos destacados</h2>
                     <span className="bg-ozio-blue/20 text-ozio-blue text-xs px-2 py-1 rounded-full">
                       {featuredEvents.length}
                     </span>
@@ -122,7 +122,7 @@ export default function Destacados() {
           {activeTab === 'locales' && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-white font-semibold">Locales más populares</h2>
+                <h2 className="text-ozio-text font-semibold">Locales más populares</h2>
                 <span className="bg-ozio-orange/20 text-ozio-orange text-xs px-2 py-1 rounded-full">
                   Top {topVenues.length}
                 </span>
@@ -161,14 +161,14 @@ function EventCard({ event }: { event: Event }) {
     }
     if (isActiveEvent) {
       return (
-        <span className="bg-ambience-low/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ambience-low/30 flex items-center gap-1 animate-pulse">
+        <span className="bg-ambience-low/90 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-full font-medium border border-ambience-low/30 flex items-center gap-1 animate-pulse">
           <div className="w-2 h-2 bg-white rounded-full"></div>
           En curso
         </span>
       );
     }
     return (
-      <span className="bg-ozio-blue/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-blue/30">
+      <span className="bg-ozio-blue/90 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-blue/30">
         ⭐ Destacado
       </span>
     );
@@ -194,7 +194,7 @@ function EventCard({ event }: { event: Event }) {
         />
         {isPastEvent && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-ozio-card/90 backdrop-blur-sm text-white text-sm font-bold px-4 py-2 rounded-xl border border-ozio-card">
+            <div className="bg-ozio-card/90 backdrop-blur-sm text-ozio-text text-sm font-bold px-4 py-2 rounded-xl border border-ozio-card">
               Evento Finalizado
             </div>
           </div>
@@ -205,7 +205,7 @@ function EventCard({ event }: { event: Event }) {
       </figure>
 
       <div className="p-4">
-        <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-gray-400' : 'text-white'}`}>
+        <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-gray-400' : 'text-ozio-text'}`}>
           {event.title}
         </h3>
 
@@ -278,7 +278,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
     >
       <div className="flex gap-4 p-4">
         <div className="flex-shrink-0">
-          <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getRankColor(rank)} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+          <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getRankColor(rank)} flex items-center justify-center text-ozio-text font-bold text-2xl shadow-lg`}>
             {getRankEmoji(rank)}
           </div>
         </div>
@@ -290,7 +290,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
         />
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-bold text-lg truncate">{venue.name}</h3>
+          <h3 className="text-ozio-text font-bold text-lg truncate">{venue.name}</h3>
 
           {venue.address && (
             <div className="flex items-center gap-1 text-gray-400 text-sm mt-1">

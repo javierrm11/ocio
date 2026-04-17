@@ -57,7 +57,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="bg-ozio-dark flex items-center justify-center">
       <section className="w-full max-w-md bg-ozio-card rounded-3xl p-8 shadow-xl" aria-labelledby="login-title">
-        <h2 id="login-title" className="text-2xl font-bold text-white mb-6">Iniciar sesión</h2>
+        <h2 id="login-title" className="text-2xl font-bold text-ozio-text mb-6">Iniciar sesión</h2>
 
         {error && (
           <div className="bg-ambience-high/10 border border-ambience-high/50 text-ambience-high rounded-xl p-3 mb-4 text-sm">
@@ -78,7 +78,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               onChange={handleChange}
               required
               placeholder="tu@email.com"
-              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
             />
           </div>
 
@@ -94,7 +94,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               onChange={handleChange}
               required
               placeholder="Tu contraseña"
-              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
             />
           </div>
 
@@ -107,7 +107,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            className="w-full bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>

@@ -175,9 +175,9 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
         <header className="sticky top-0 bg-ozio-card border-b border-ozio-card/50 px-6 py-4 rounded-t-3xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h2 id="notifications-title" className="text-white text-xl font-bold">🔔 Notificaciones</h2>
+              <h2 id="notifications-title" className="text-ozio-text text-xl font-bold">🔔 Notificaciones</h2>
               {unreadCount > 0 && (
-                <span className="bg-ozio-blue text-white text-xs font-bold px-2 py-1 rounded-full">
+                <span className="bg-ozio-blue text-ozio-text text-xs font-bold px-2 py-1 rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -186,7 +186,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
               type="button"
               onClick={onClose}
               aria-label="Cerrar notificaciones"
-              className="text-gray-400 hover:text-white transition"
+              className="text-gray-400 hover:text-ozio-text transition"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -201,8 +201,8 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
               onClick={() => setFilter('all')}
               className={`flex-1 py-2 px-4 rounded-xl font-medium transition ${
                 filter === 'all'
-                  ? 'bg-ozio-blue text-white'
-                  : 'bg-ozio-dark text-gray-400 hover:text-white'
+                  ? 'bg-ozio-blue text-ozio-text'
+                  : 'bg-ozio-dark text-gray-400 hover:text-ozio-text'
               }`}
             >
               Todas
@@ -213,8 +213,8 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
               aria-pressed={filter === 'unread' ? 'true' : 'false'}
               className={`flex-1 py-2 px-4 rounded-xl font-medium transition ${
                 filter === 'unread'
-                  ? 'bg-ozio-blue text-white'
-                  : 'bg-ozio-dark text-gray-400 hover:text-white'
+                  ? 'bg-ozio-blue text-ozio-text'
+                  : 'bg-ozio-dark text-gray-400 hover:text-ozio-text'
               }`}
             >
               No leídas
@@ -223,7 +223,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="px-4 py-2 bg-ozio-purple hover:bg-ozio-purple/80 text-white rounded-xl font-medium transition"
+                className="px-4 py-2 bg-ozio-purple hover:bg-ozio-purple/80 text-ozio-text rounded-xl font-medium transition"
               >
                 ✓ Marcar todas
               </button>
@@ -275,7 +275,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
                       {/* Contenido */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="text-white font-semibold text-sm">{notification.title}</h3>
+                          <h3 className="text-ozio-text font-semibold text-sm">{notification.title}</h3>
                           <time className="text-gray-500 text-xs whitespace-nowrap" dateTime={notification.created_at}>
                             {getTimeAgo(notification.created_at)}
                           </time>

@@ -38,7 +38,7 @@ export default function WelcomeEngagementModal() {
         <p className="text-xs font-semibold uppercase tracking-wider text-ozio-blue">
           Bienvenido a Ozio
         </p>
-        <h2 id="welcome-modal-title" className="mt-2 text-2xl font-bold text-white">
+        <h2 id="welcome-modal-title" className="mt-2 text-2xl font-bold text-ozio-text">
           Descubre el mejor plan de esta noche en segundos
         </h2>
         <p className="mt-3 text-sm text-gray-300">
@@ -59,7 +59,7 @@ export default function WelcomeEngagementModal() {
               setOpen(false);
               router.push("/events");
             }}
-            className="rounded-xl bg-ozio-blue px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="rounded-xl bg-ozio-blue px-4 py-2.5 text-sm font-semibold text-ozio-text hover:opacity-90"
           >
             Ver eventos
           </button>

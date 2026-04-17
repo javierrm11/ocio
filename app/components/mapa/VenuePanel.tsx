@@ -119,14 +119,14 @@ export function VenuePanel({
             title="Cerrar panel"
             className="absolute top-4 right-4 bg-black/50 rounded-full p-2 hover:bg-black/70 transition"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
           {/* Heat badge */}
           <div
-            className="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1 rounded-full"
+            className="absolute top-4 left-4 text-ozio-text text-xs font-bold px-3 py-1 rounded-full"
             style={{
               backgroundColor:
                 heatState === "full"   ? "#b91c1c"
@@ -141,7 +141,7 @@ export function VenuePanel({
           {/* Active/upcoming event banner */}
           {activeOrSoonEvent && eventStatus !== "none" && (
             <div
-              className="absolute bottom-4 left-4 right-4 flex items-center gap-2 px-3 py-2 rounded-xl text-white text-xs font-semibold"
+              className="absolute bottom-4 left-4 right-4 flex items-center gap-2 px-3 py-2 rounded-xl text-ozio-text text-xs font-semibold"
               style={{
                 backgroundColor:
                   eventStatus === "active"
@@ -164,7 +164,7 @@ export function VenuePanel({
           <div>
             {/* Name + premium */}
             <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-white text-2xl font-bold">{venue.name}</h2>
+              <h2 className="text-ozio-text text-2xl font-bold">{venue.name}</h2>
               {isPremium(venue) && <span className="premium-badge">👑 PREMIUM</span>}
             </div>
 
@@ -204,7 +204,7 @@ export function VenuePanel({
                   <span className="text-xl">
                     {heatState === "full" ? "🔴" : heatState === "hot" ? "🟠" : heatState === "warm" ? "🟡" : "🟢"}
                   </span>
-                  <span className="text-white font-black text-base">{heatLabel}</span>
+                  <span className="text-ozio-text font-black text-base">{heatLabel}</span>
                 </div>
                 <span className={`text-sm font-black heat-count-${heatState}`}>
                   {heatStep * 10}%
@@ -217,7 +217,7 @@ export function VenuePanel({
               <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
                 <span className="text-lg">{trendDelta > 0 ? "📈" : "📉"}</span>
                 <div>
-                  <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">15 min</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">15 min</p>
                   <p className={`text-xs font-black ${trendDelta > 0 ? "text-ambience-low" : "text-ambience-high"}`}>
                     {trendDelta > 0 ? `+${trendDelta} personas` : "Sin cambios"}
                   </p>
@@ -226,21 +226,21 @@ export function VenuePanel({
               <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
                 <span className={`text-xl font-black leading-none ${directionColor}`}>{dirArrow}</span>
                 <div>
-                  <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Tendencia</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Tendencia</p>
                   <p className={`text-xs font-black ${directionColor}`}>{direction}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
                 <span className="text-lg">🔥</span>
                 <div>
-                  <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Pico hoy</p>
-                  <p className="text-white text-xs font-black">02:00</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Pico hoy</p>
+                  <p className="text-ozio-text text-xs font-black">02:00</p>
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-xl bg-ozio-blue/10 border border-ozio-blue/20 px-3 py-2.5">
                 <span className="text-lg">🕑</span>
                 <div>
-                  <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Mejor hora</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Mejor hora</p>
                   <p className="text-ozio-blue/80 text-xs font-black">01:30</p>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export function VenuePanel({
             <section className="bg-ozio-card border border-ambience-low/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="w-2 h-2 bg-ambience-low rounded-full animate-pulse" />
-                <h3 className="text-white font-semibold text-sm">Evento en curso</h3>
+                <h3 className="text-ozio-text font-semibold text-sm">Evento en curso</h3>
               </div>
               <div className="space-y-2">
                 {activeEvents.map((event) => (
@@ -287,11 +287,11 @@ export function VenuePanel({
                       <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-ambience-low to-ambience-low/70 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-lg">🎉</span>
+                        <span className="text-ozio-text text-lg">🎉</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-semibold truncate">{event.title}</p>
+                      <p className="text-ozio-text text-sm font-semibold truncate">{event.title}</p>
                       <p className="text-ambience-low text-xs">{formatEventTime(event)}</p>
                     </div>
                     <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,7 +308,7 @@ export function VenuePanel({
             <section className="bg-ozio-card border border-ozio-orange/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-orange-400 text-sm">🕐</span>
-                <h3 className="text-white font-semibold text-sm">Próximamente hoy</h3>
+                <h3 className="text-ozio-text font-semibold text-sm">Próximamente hoy</h3>
               </div>
               <div className="space-y-2">
                 {soonEvents.map((event) => (
@@ -324,11 +324,11 @@ export function VenuePanel({
                       <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-lg">🕐</span>
+                        <span className="text-ozio-text text-lg">🕐</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-semibold truncate">{event.title}</p>
+                      <p className="text-ozio-text text-sm font-semibold truncate">{event.title}</p>
                       <p className="text-orange-400 text-xs">{formatEventTime(event)}</p>
                     </div>
                     <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,7 +346,7 @@ export function VenuePanel({
               (hasUserActiveCheckIn ? (
                 <button
                   type="button"
-                  className="w-full bg-ambience-high hover:bg-ambience-high/80 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  className="w-full bg-ambience-high hover:bg-ambience-high/80 text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                   onClick={() => onCheckOut(venue.id)}
                 >
                   Quitar check-in
@@ -357,7 +357,7 @@ export function VenuePanel({
               ) : (
                 <button
                   type="button"
-                  className="w-full bg-ozio-blue hover:bg-ozio-blue/80 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  className="w-full bg-ozio-blue hover:bg-ozio-blue/80 text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                   onClick={() => onCheckIn(venue.id)}
                 >
                   Hacer check-in
@@ -370,7 +370,7 @@ export function VenuePanel({
             <div className="flex gap-2 w-full">
               <button
                 type="button"
-                className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                 onClick={() => router.push(`/venues/${venue.id}`)}
               >
                 Ir ahora
@@ -378,7 +378,7 @@ export function VenuePanel({
               <button
                 type="button"
                 disabled={loadingRoute}
-                className="flex-1 bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                className="flex-1 bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-60 text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                 onClick={() => onFetchRoute(venue.latitude, venue.longitude)}
               >
                 {loadingRoute ? (
@@ -397,8 +397,8 @@ export function VenuePanel({
                   title={venue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
                   className={`aspect-square py-3 px-4 rounded-full flex items-center justify-center transition ${
                     venue.is_favorite
-                      ? "bg-ambience-high hover:bg-ambience-high/80 text-white"
-                      : "bg-ozio-card hover:bg-ozio-card/80 text-white"
+                      ? "bg-ambience-high hover:bg-ambience-high/80 text-ozio-text"
+                      : "bg-ozio-card hover:bg-ozio-card/80 text-ozio-text"
                   }`}
                   onClick={() => onToggleFavorite(venue.id, venue.is_favorite || false)}
                 >

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0A0E1A] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0E1A] text-ozio-text overflow-x-hidden">
 
       {/* ── Fondo con destellos ──────────────────────────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -17,11 +17,11 @@ export default function LandingPage() {
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2E5CFF] to-[#8B5CF6] flex items-center justify-center shadow-lg shadow-[#2E5CFF]/30">
             <img src="/logo.jpeg" alt="Ozio Logo" className="w-4 h-4" />
           </div>
-          <span className="text-white font-black text-xl tracking-tight">Ozio</span>
+          <span className="text-ozio-text font-black text-xl tracking-tight">Ozio</span>
         </div>
         <Link
           href="/mapa"
-          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white transition"
+          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-ozio-text transition"
         >
           Abrir app
         </Link>
@@ -52,7 +52,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/mapa"
-            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#2E5CFF] to-[#8B5CF6] text-white font-bold text-base hover:opacity-90 hover:scale-[1.02] transition shadow-xl shadow-[#2E5CFF]/30"
+            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#2E5CFF] to-[#8B5CF6] text-ozio-text font-bold text-base hover:opacity-90 hover:scale-[1.02] transition shadow-xl shadow-[#2E5CFF]/30"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -63,7 +63,7 @@ export default function LandingPage() {
           <button
             type="button"
             disabled
-            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-base opacity-50 cursor-not-allowed"
+            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-ozio-text font-semibold text-base opacity-50 cursor-not-allowed"
             title="Próximamente"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -76,7 +76,7 @@ export default function LandingPage() {
           <button
             type="button"
             disabled
-            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-semibold text-base opacity-50 cursor-not-allowed"
+            className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-ozio-text font-semibold text-base opacity-50 cursor-not-allowed"
             title="Próximamente"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -99,7 +99,7 @@ export default function LandingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="text-white font-bold mb-1.5">Mapa en vivo</h3>
+            <h3 className="text-ozio-text font-bold mb-1.5">Mapa en vivo</h3>
             <p className="text-gray-500 text-sm leading-relaxed">Visualiza el ambiente de cada local en el mapa. Cuanta más gente, más caliente el marcador.</p>
           </article>
 
@@ -109,7 +109,7 @@ export default function LandingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-white font-bold mb-1.5">Check-in real</h3>
+            <h3 className="text-ozio-text font-bold mb-1.5">Check-in real</h3>
             <p className="text-gray-500 text-sm leading-relaxed">Haz check-in cuando llegues a un local y ayuda a otros a saber dónde está la gente.</p>
           </article>
 
@@ -119,7 +119,7 @@ export default function LandingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-white font-bold mb-1.5">Eventos</h3>
+            <h3 className="text-ozio-text font-bold mb-1.5">Eventos</h3>
             <p className="text-gray-500 text-sm leading-relaxed">Descubre eventos activos y próximas noches especiales en los locales de tu ciudad.</p>
           </article>
         </div>
@@ -132,7 +132,7 @@ export default function LandingPage() {
           <p className="text-gray-400 mb-7">Entra al mapa y mira el ambiente de tu ciudad ahora mismo.</p>
           <Link
             href="/mapa"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#2E5CFF] to-[#8B5CF6] text-white font-bold hover:opacity-90 hover:scale-[1.02] transition shadow-xl shadow-[#2E5CFF]/25"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#2E5CFF] to-[#8B5CF6] text-ozio-text font-bold hover:opacity-90 hover:scale-[1.02] transition shadow-xl shadow-[#2E5CFF]/25"
           >
             Ver el mapa
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

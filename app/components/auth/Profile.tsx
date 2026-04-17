@@ -142,23 +142,23 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                 <img src={user.avatar_path} alt={user.name} className="w-full h-full rounded-full object-cover border-2 border-ozio-dark" />
               ) : (
                 <div className="w-full h-full rounded-full border-2 border-ozio-dark bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center">
-                  <span className="text-white text-2xl font-black">{user.name?.charAt(0).toUpperCase()}</span>
+                  <span className="text-ozio-text text-2xl font-black">{user.name?.charAt(0).toUpperCase()}</span>
                 </div>
               )}
             </div>
             <button onClick={() => setShowEditModal(true)} className="absolute -bottom-1 -right-1 w-6 h-6 bg-ozio-blue rounded-full border-2 border-ozio-dark hover:bg-ozio-purple transition flex items-center justify-center shadow-md">
-              <Plus size={12} className="text-white" />
+              <Plus size={12} className="text-ozio-text" />
             </button>
           </div>
 
           <div className="flex flex-1 items-center justify-around">
             <div className="text-center">
-              <p className="text-white text-xl font-black leading-none">{isVenue ? user.events?.length || 0 : user.check_ins?.length || 0}</p>
+              <p className="text-ozio-text text-xl font-black leading-none">{isVenue ? user.events?.length || 0 : user.check_ins?.length || 0}</p>
               <p className="text-gray-400 text-xs mt-1">{isVenue ? "Eventos" : "Check-ins"}</p>
             </div>
             <div className="w-px h-8 bg-ozio-card" />
             <div className="text-center">
-              <p className="text-white text-xl font-black leading-none">{isVenue ? user.check_ins?.length || 0 : user.favorites?.length || 0}</p>
+              <p className="text-ozio-text text-xl font-black leading-none">{isVenue ? user.check_ins?.length || 0 : user.favorites?.length || 0}</p>
               <p className="text-gray-400 text-xs mt-1">{isVenue ? "Visitas" : "Favoritos"}</p>
             </div>
             {!isVenue && (
@@ -178,7 +178,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
         <div className="mt-3 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-white font-black text-base leading-tight">{user.name}</h2>
+            <h2 className="text-ozio-text font-black text-base leading-tight">{user.name}</h2>
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${isVenue ? "bg-ozio-orange/10 text-ozio-orange border-ozio-orange/25" : "bg-ozio-blue/10 text-ozio-blue border-ozio-blue/25"}`}>
               {isVenue ? "Local" : "Usuario"}
             </span>
@@ -205,11 +205,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         </div>
 
         <div className="flex gap-2 mb-4">
-          <button onClick={() => setShowEditModal(true)} className="flex-1 py-2 bg-ozio-card hover:bg-ozio-card/70 border border-ozio-card text-white text-sm font-semibold rounded-xl transition">
+          <button onClick={() => setShowEditModal(true)} className="flex-1 py-2 bg-ozio-card hover:bg-ozio-card/70 border border-ozio-card text-ozio-text text-sm font-semibold rounded-xl transition">
             Editar perfil
           </button>
           {isVenue && (
-            <button onClick={() => router.push("/anadir?tipo=evento")} className="flex-1 py-2 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <button onClick={() => router.push("/anadir?tipo=evento")} className="flex-1 py-2 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-ozio-text text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
               <Plus size={15} /> Crear evento
             </button>
           )}
@@ -222,7 +222,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       <nav className="flex border-t border-b border-ozio-darker" aria-label="Secciones del perfil">
         {isVenue ? (
           <>
-            <button onClick={() => setActiveTab("events")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
+            <button onClick={() => setActiveTab("events")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <CalendarDays size={22} />
             </button>
             <button
@@ -232,22 +232,22 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               <BarChart3 size={22} />
               {!isPremium(user) && <Lock size={12} className="text-gray-600" />}
             </button>
-            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
+            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
             </button>
           </>
         ) : (
           <>
-            <button onClick={() => setActiveTab("favorites")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "favorites" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
+            <button onClick={() => setActiveTab("favorites")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "favorites" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Heart size={22} />
             </button>
-            <button onClick={() => setActiveTab("historial")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
+            <button onClick={() => setActiveTab("historial")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "historial" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Clock size={22} />
             </button>
             <button onClick={() => setActiveTab("puntos")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "puntos" ? "border-b-2 border-ozio-orange" : "opacity-30 hover:opacity-60"}`}>
               <DiamondIcon size={22} />
             </button>
-            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-white border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
+            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}>
               <Settings size={22} />
             </button>
           </>
@@ -267,7 +267,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
                       <article key={event.id} className={`bg-ozio-card border border-ozio-card/50 rounded-2xl flex gap-3 p-4 hover:bg-ozio-card/50 transition ${isPast ? "opacity-55" : ""}`}>
                         <img src={event.image_path || "https://via.placeholder.com/80"} alt="Event" className={`w-16 h-16 rounded-xl object-cover flex-shrink-0 ${isPast ? "grayscale" : ""}`} />
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-white font-semibold text-sm truncate">{event.name || event.title}</h3>
+                          <h3 className="text-ozio-text font-semibold text-sm truncate">{event.name || event.title}</h3>
                           <p className="text-gray-400 text-xs mt-0.5">
                             {new Date(event.starts_at).toLocaleDateString("es-ES")} · {new Date(event.starts_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })} – {new Date(event.ends_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
                           </p>
@@ -311,11 +311,11 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               ) : (
                 <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
                   <p className="text-4xl mb-3">🎉</p>
-                  <p className="text-white font-semibold mb-1">Sin eventos aún</p>
+                  <p className="text-ozio-text font-semibold mb-1">Sin eventos aún</p>
                   <p className="text-gray-500 text-sm">Crea tu primer evento para que aparezca aquí</p>
                 </div>
               )}
-              <button onClick={() => router.push("/anadir?tipo=evento")} className="w-full py-3.5 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white font-semibold rounded-2xl transition">
+              <button onClick={() => router.push("/anadir?tipo=evento")} className="w-full py-3.5 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-ozio-text font-semibold rounded-2xl transition">
                 + Crear Evento
               </button>
             </div>
@@ -328,7 +328,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               ) : (
                 <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
                   <p className="text-4xl mb-3">❤️</p>
-                  <p className="text-white font-semibold mb-1">Sin favoritos</p>
+                  <p className="text-ozio-text font-semibold mb-1">Sin favoritos</p>
                   <p className="text-gray-500 text-sm">Guarda tus locales preferidos aquí</p>
                 </div>
               )}
@@ -408,12 +408,12 @@ function StatsTab() {
         </div>
         {isVenueStats ? (
           <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 text-center">
-            <p className="text-white text-3xl font-black">{stats.daily_avg}</p>
+            <p className="text-ozio-text text-3xl font-black">{stats.daily_avg}</p>
             <p className="text-gray-400 text-xs mt-1">Media diaria</p>
           </div>
         ) : (
           <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 text-center">
-            <p className="text-white text-3xl font-black">{stats.fav_day ?? "—"}</p>
+            <p className="text-ozio-text text-3xl font-black">{stats.fav_day ?? "—"}</p>
             <p className="text-gray-400 text-xs mt-1">Día favorito</p>
           </div>
         )}
@@ -424,7 +424,7 @@ function StatsTab() {
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 flex items-center gap-3">
           <span className="text-2xl">🕐</span>
           <div>
-            <p className="text-white font-bold text-lg">{stats.peak_hour}</p>
+            <p className="text-ozio-text font-bold text-lg">{stats.peak_hour}</p>
             <p className="text-gray-400 text-xs">Hora pico de visitas</p>
           </div>
         </div>
@@ -433,7 +433,7 @@ function StatsTab() {
       {/* Gráfico de barras simple — actividad */}
       {isVenueStats && stats.daily_data?.length > 0 && (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
-          <p className="text-white font-semibold text-sm mb-3">Visitas últimos 30 días</p>
+          <p className="text-ozio-text font-semibold text-sm mb-3">Visitas últimos 30 días</p>
           <div className="flex items-end gap-1 h-20">
             {stats.daily_data.slice(-20).map((d: any) => {
               const max = Math.max(...stats.daily_data.map((x: any) => x.count), 1);
@@ -453,7 +453,7 @@ function StatsTab() {
 
       {!isVenueStats && stats.monthly_data?.length > 0 && (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
-          <p className="text-white font-semibold text-sm mb-3">Check-ins por mes</p>
+          <p className="text-ozio-text font-semibold text-sm mb-3">Check-ins por mes</p>
           <div className="flex items-end gap-2 h-20">
             {stats.monthly_data.map((d: any) => {
               const max = Math.max(...stats.monthly_data.map((x: any) => x.count), 1);
@@ -473,13 +473,13 @@ function StatsTab() {
       {/* Top lista */}
       {isVenueStats && stats.top_events?.length > 0 && (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
-          <p className="text-white font-semibold text-sm mb-3">Top eventos</p>
+          <p className="text-ozio-text font-semibold text-sm mb-3">Top eventos</p>
           <div className="space-y-2">
             {stats.top_events.map((e: any, i: number) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-ozio-orange font-black text-xs w-4">#{i + 1}</span>
-                  <p className="text-white text-sm truncate max-w-[180px]">{e.title}</p>
+                  <p className="text-ozio-text text-sm truncate max-w-[180px]">{e.title}</p>
                 </div>
                 <span className="text-gray-400 text-xs">👥 {e.attendees}</span>
               </div>
@@ -490,13 +490,13 @@ function StatsTab() {
 
       {!isVenueStats && stats.top_venues?.length > 0 && (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
-          <p className="text-white font-semibold text-sm mb-3">Locales más visitados</p>
+          <p className="text-ozio-text font-semibold text-sm mb-3">Locales más visitados</p>
           <div className="space-y-2">
             {stats.top_venues.map((v: any, i: number) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="text-ozio-orange font-black text-xs w-4">#{i + 1}</span>
                 {v.avatar_path && <img src={v.avatar_path} alt={v.name} className="w-8 h-8 rounded-full object-cover" />}
-                <p className="text-white text-sm flex-1 truncate">{v.name}</p>
+                <p className="text-ozio-text text-sm flex-1 truncate">{v.name}</p>
                 <span className="text-gray-400 text-xs">{v.count}x</span>
               </div>
             ))}
@@ -524,7 +524,7 @@ function PremiumModal({ onClose }: { onClose: () => void }) {
             style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", boxShadow: "0 0 24px rgba(251,191,36,0.4)" }}>
             <span className="text-3xl">👑</span>
           </div>
-          <h2 id="premium-modal-title" className="text-white text-xl font-black mb-2">Estadísticas Premium</h2>
+          <h2 id="premium-modal-title" className="text-ozio-text text-xl font-black mb-2">Estadísticas Premium</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Accede a estadísticas detalladas de tu local o actividad: visitas, hora pico, tendencias y mucho más.
           </p>
@@ -572,7 +572,7 @@ function GenreSelector({ selected, onChange }: { selected: number[]; onChange: (
 
   return (
     <div>
-      <label className="block text-white font-medium mb-2">Géneros musicales</label>
+      <label className="block text-ozio-text font-medium mb-2">Géneros musicales</label>
       <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
         {genres.map((genre) => {
           const isSelected = selected.includes(genre.id);
@@ -583,8 +583,8 @@ function GenreSelector({ selected, onChange }: { selected: number[]; onChange: (
               onClick={() => toggle(genre.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                 isSelected
-                  ? "bg-ozio-blue border-ozio-blue text-white scale-105"
-                  : "bg-ozio-dark border-ozio-card text-gray-400 hover:border-ozio-blue/50 hover:text-white"
+                  ? "bg-ozio-blue border-ozio-blue text-ozio-text scale-105"
+                  : "bg-ozio-dark border-ozio-card text-gray-400 hover:border-ozio-blue/50 hover:text-ozio-text"
               }`}
             >
               <span>{genre.emoji}</span>
@@ -608,9 +608,9 @@ function FavoriteSpotCard({ favorite }: { favorite: any }) {
     <article className="bg-ozio-card border border-ozio-card/50 rounded-2xl overflow-hidden flex gap-4 p-4 hover:bg-ozio-card/50 transition">
       <img src={favorite?.avatar_path || "https://via.placeholder.com/80"} alt="Venue" className="w-20 h-20 rounded-xl object-cover" />
       <div className="flex-1">
-        <h3 className="text-white font-semibold">{favorite?.name}</h3>
+        <h3 className="text-ozio-text font-semibold">{favorite?.name}</h3>
         <address className="text-gray-400 text-sm not-italic">{favorite?.address}</address>
-        <button className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-white text-xs font-medium rounded-full transition" onClick={() => alert("Función de mapa no implementada")}>
+        <button className="mt-2 px-3 py-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text text-xs font-medium rounded-full transition" onClick={() => alert("Función de mapa no implementada")}>
           Ver en mapa
         </button>
       </div>
@@ -627,7 +627,7 @@ function SettingsItem({ icon, title, toggle, onClick }: { icon: string; title: s
     <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 flex items-center justify-between hover:bg-ozio-card/50 transition" onClick={onClick} style={onClick ? { cursor: "pointer" } : undefined}>
       <div className="flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
-        <span className="text-white font-medium">{title}</span>
+        <span className="text-ozio-text font-medium">{title}</span>
       </div>
       {toggle ? (
         <button type="button" onClick={(e) => { e.stopPropagation(); setEnabled(!enabled); }} className={`w-12 h-6 rounded-full transition relative ${enabled ? "bg-ozio-blue" : "bg-ozio-card"}`}>
@@ -688,8 +688,8 @@ function EditProfileModal({ user, onClose, onProfileUpdated }: { user: UserProfi
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title">
       <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto">
         <div className="sticky top-0 bg-ozio-card border-b border-ozio-card/50 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-          <h2 id="edit-profile-title" className="text-white text-xl font-bold">✏️ Editar Perfil</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
+          <h2 id="edit-profile-title" className="text-ozio-text text-xl font-bold">✏️ Editar Perfil</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-ozio-text transition">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -700,42 +700,42 @@ function EditProfileModal({ user, onClose, onProfileUpdated }: { user: UserProfi
                 <img src={avatarPreview} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-ozio-blue" />
               ) : (
                 <div className="w-24 h-24 rounded-full border-4 border-ozio-blue bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center">
-                  <span className="text-white text-3xl font-bold">{user.name?.charAt(0).toUpperCase()}</span>
+                  <span className="text-ozio-text text-3xl font-bold">{user.name?.charAt(0).toUpperCase()}</span>
                 </div>
               )}
               <label htmlFor="edit-avatar" className="absolute bottom-0 right-0 bg-ozio-blue p-2 rounded-full border-2 border-ozio-card cursor-pointer hover:bg-ozio-purple transition">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <svg className="w-4 h-4 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               </label>
               <input id="edit-avatar" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </div>
             <p className="text-gray-400 text-xs">Toca la cámara para cambiar tu foto</p>
           </div>
           <div>
-            <label className="block text-white font-medium mb-2">{isVenue ? "Nombre del local *" : "Nombre *"}</label>
+            <label className="block text-ozio-text font-medium mb-2">{isVenue ? "Nombre del local *" : "Nombre *"}</label>
             <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none" placeholder="Tu nombre" />
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:border-ozio-blue focus:outline-none" placeholder="Tu nombre" />
           </div>
           {!isVenue && (
             <div>
-              <label className="block text-white font-medium mb-2">Usuario</label>
+              <label className="block text-ozio-text font-medium mb-2">Usuario</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
                 <input type="text" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none" placeholder="tu_usuario" />
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-ozio-text placeholder-gray-500 focus:border-ozio-blue focus:outline-none" placeholder="tu_usuario" />
               </div>
             </div>
           )}
           <div>
-            <label className="block text-white font-medium mb-2">Descripción</label>
+            <label className="block text-ozio-text font-medium mb-2">Descripción</label>
             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3} maxLength={200}
-              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-ozio-blue focus:outline-none resize-none"
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:border-ozio-blue focus:outline-none resize-none"
               placeholder={isVenue ? "Describe tu establecimiento..." : "Cuéntanos algo sobre ti..."} />
             <p className="text-gray-500 text-xs text-right mt-1">{formData.description.length}/200</p>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-3 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold rounded-xl transition">Cancelar</button>
-            <button type="submit" disabled={loading} className="flex-1 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold rounded-xl transition">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex-1 py-3 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
@@ -830,10 +830,10 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
         {/* Header con gradiente */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-ozio-purple/20 to-ozio-blue/10 border-b border-ozio-card/50 px-7 py-5 flex items-center justify-between rounded-t-3xl backdrop-blur-sm">
           <div>
-            <h2 className="text-white text-2xl font-bold">Editar evento</h2>
+            <h2 className="text-ozio-text text-2xl font-bold">Editar evento</h2>
             <p className="text-gray-400 text-sm mt-0.5 truncate max-w-xs">{event.title}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-ozio-card hover:bg-ozio-card/70 text-gray-400 hover:text-white transition flex-shrink-0">
+          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-ozio-card hover:bg-ozio-card/70 text-gray-400 hover:text-ozio-text transition flex-shrink-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -849,8 +849,8 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
                 <>
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <span className="text-white text-sm font-medium">Cambiar imagen</span>
+                    <svg className="w-8 h-8 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span className="text-ozio-text text-sm font-medium">Cambiar imagen</span>
                   </div>
                 </>
               ) : (
@@ -867,13 +867,13 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
             <div>
               <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2">Título *</label>
               <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full bg-ozio-dark border border-ozio-card/80 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition"
+                className="w-full bg-ozio-dark border border-ozio-card/80 rounded-xl px-4 py-3 text-ozio-text placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition"
                 placeholder="Nombre del evento" />
             </div>
             <div>
               <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2">Descripción</label>
               <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3} className="w-full bg-ozio-dark border border-ozio-card/80 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition resize-none"
+                rows={3} className="w-full bg-ozio-dark border border-ozio-card/80 rounded-xl px-4 py-3 text-ozio-text placeholder-gray-600 focus:border-ozio-blue focus:outline-none focus:ring-1 focus:ring-ozio-blue/30 transition resize-none"
                 placeholder="Describe tu evento..." />
             </div>
           </div>
@@ -886,13 +886,13 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
                 <p className="text-gray-500 text-xs mb-1">Inicio</p>
                 <DatePicker selected={formData.starts_at} onChange={(date: Date | null) => setFormData({ ...formData, starts_at: date })}
                   showTimeSelect dateFormat="Pp" minDate={new Date()}
-                  className="w-full bg-transparent text-white focus:outline-none text-sm" />
+                  className="w-full bg-transparent text-ozio-text focus:outline-none text-sm" />
               </div>
               <div className="bg-ozio-dark border border-ozio-card/80 rounded-xl px-4 py-3">
                 <p className="text-gray-500 text-xs mb-1">Fin</p>
                 <DatePicker selected={formData.ends_at} onChange={(date: Date | null) => setFormData({ ...formData, ends_at: date })}
                   showTimeSelect dateFormat="Pp" minDate={new Date()}
-                  className="w-full bg-transparent text-white focus:outline-none text-sm" />
+                  className="w-full bg-transparent text-ozio-text focus:outline-none text-sm" />
               </div>
             </div>
           </div>
@@ -906,7 +906,7 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
           {/* Destacado */}
           <div className="flex items-center justify-between bg-ozio-dark/80 rounded-xl px-5 py-4 border border-ozio-card/80">
             <div>
-              <p className="text-white font-medium">Evento destacado</p>
+              <p className="text-ozio-text font-medium">Evento destacado</p>
               <p className="text-gray-500 text-xs mt-0.5">Aparece en la sección de destacados</p>
             </div>
             <button type="button" onClick={() => setFormData({ ...formData, featured: !formData.featured })}
@@ -922,11 +922,11 @@ function EditEventModal({ event, onClose, onEventUpdated, onEventDeleted }: { ev
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
               {loading ? "..." : "Eliminar"}
             </button>
-            <button type="button" onClick={onClose} className="flex-1 py-3 bg-ozio-card hover:bg-ozio-card/70 text-gray-300 hover:text-white font-semibold rounded-xl border border-ozio-card/50 transition">
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-ozio-card hover:bg-ozio-card/70 text-gray-300 hover:text-ozio-text font-semibold rounded-xl border border-ozio-card/50 transition">
               Cancelar
             </button>
             <button type="submit" disabled={loading}
-              className="flex-1 py-3 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-ozio-blue/20">
+              className="flex-1 py-3 bg-gradient-to-r from-ozio-blue to-ozio-purple hover:opacity-90 text-ozio-text font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-ozio-blue/20">
               {loading ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
@@ -969,7 +969,7 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
   if (history.length === 0) return (
     <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
       <div className="text-5xl mb-3">📍</div>
-      <p className="text-white font-semibold mb-1">Sin historial</p>
+      <p className="text-ozio-text font-semibold mb-1">Sin historial</p>
       <p className="text-gray-400 text-sm">Aún no has hecho check-in en ningún local</p>
     </div>
   );
@@ -994,11 +994,11 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
           <span className="text-2xl">📍</span>
         </div>
         <div>
-          <p className="text-white font-bold text-xl">{history.length}</p>
+          <p className="text-ozio-text font-bold text-xl">{history.length}</p>
           <p className="text-gray-400 text-sm">check-ins totales</p>
         </div>
         <div className="ml-auto text-right">
-          <p className="text-white font-bold text-xl">{new Set(history.map((h) => h.venue_id)).size}</p>
+          <p className="text-ozio-text font-bold text-xl">{new Set(history.map((h) => h.venue_id)).size}</p>
           <p className="text-gray-400 text-sm">locales distintos</p>
         </div>
       </div>
@@ -1013,11 +1013,11 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
                   <img src={item.venues.avatar_path} alt={item.venues.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xl font-bold">{item.venues?.name?.charAt(0).toUpperCase()}</span>
+                    <span className="text-ozio-text text-xl font-bold">{item.venues?.name?.charAt(0).toUpperCase()}</span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold truncate">{item.venues?.name || "Local desconocido"}</p>
+                  <p className="text-ozio-text font-semibold truncate">{item.venues?.name || "Local desconocido"}</p>
                   {item.venues?.address && <p className="text-gray-500 text-xs truncate mt-0.5">{item.venues.address}</p>}
                   <p className="text-gray-400 text-xs mt-1 flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1035,7 +1035,7 @@ function CheckInHistoryTab({ userId }: { userId: string }) {
       ))}
 
       {page < totalPages && (
-        <button onClick={() => setPage(page + 1)} className="w-full py-3 bg-ozio-card border border-ozio-card/50 hover:border-ozio-blue/50 text-gray-400 hover:text-white font-medium rounded-2xl transition text-sm">
+        <button onClick={() => setPage(page + 1)} className="w-full py-3 bg-ozio-card border border-ozio-card/50 hover:border-ozio-blue/50 text-gray-400 hover:text-ozio-text font-medium rounded-2xl transition text-sm">
           Ver más ({history.length - page * PER_PAGE} restantes)
         </button>
       )}
@@ -1109,7 +1109,7 @@ function PointsTab({ totalPoints }: { totalPoints: number }) {
           <p className="text-gray-400 text-sm mt-1">puntos acumulados</p>
         </div>
         <div className="ml-auto text-right">
-          <p className="text-white font-bold text-lg">{transactions.length}</p>
+          <p className="text-ozio-text font-bold text-lg">{transactions.length}</p>
           <p className="text-gray-500 text-xs">movimientos</p>
         </div>
       </div>
@@ -1138,7 +1138,7 @@ function PointsTab({ totalPoints }: { totalPoints: number }) {
       ) : transactions.length === 0 ? (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
           <div className="text-5xl mb-3">⭐</div>
-          <p className="text-white font-semibold mb-1">Sin puntos aún</p>
+          <p className="text-ozio-text font-semibold mb-1">Sin puntos aún</p>
           <p className="text-gray-400 text-sm">Haz check-in en un local para empezar a ganar</p>
         </div>
       ) : (
@@ -1151,7 +1151,7 @@ function PointsTab({ totalPoints }: { totalPoints: number }) {
                   <div key={t.id} className="bg-ozio-card border border-ozio-card/50 rounded-2xl px-4 py-3 flex items-center gap-3">
                     <span className="text-xl w-7 text-center flex-shrink-0">{POINT_TYPE_ICON[t.type]}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium">{POINT_TYPE_LABEL[t.type]}</p>
+                      <p className="text-ozio-text text-sm font-medium">{POINT_TYPE_LABEL[t.type]}</p>
                       <p className="text-gray-500 text-xs mt-0.5">
                         {new Date(t.created_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
                       </p>

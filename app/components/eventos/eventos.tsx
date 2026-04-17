@@ -173,7 +173,7 @@ export default function Eventos() {
 
           {/* Título + badge activos */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-white text-3xl font-bold">Eventos</h1>
+            <h1 className="text-ozio-text text-3xl font-bold">Eventos</h1>
             {activeCount > 0 && (
               <span className="bg-ambience-low/20 text-ambience-low border border-ambience-low/30 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-ambience-low rounded-full animate-pulse" />
@@ -197,12 +197,12 @@ export default function Eventos() {
                 placeholder="Buscar eventos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-ozio-card border border-ozio-card/50 rounded-md pl-10 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
+                className="w-full bg-ozio-card border border-ozio-card/50 rounded-md pl-10 pr-10 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-sm"
               />
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-ozio-text transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -217,8 +217,8 @@ export default function Eventos() {
                 onClick={() => setFiltrosAbiertos(!filtrosAbiertos)}
                 className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
                   filtrosAbiertos || filtrosActivos > 0
-                    ? 'bg-ozio-purple border-ozio-purple text-white'
-                    : 'bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-white hover:border-gray-500'
+                    ? 'bg-ozio-purple border-ozio-purple text-ozio-text'
+                    : 'bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500'
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function Eventos() {
 
                   {/* Cabecera */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-ozio-card/50">
-                    <span className="text-white font-semibold text-sm">Filtrar eventos</span>
+                    <span className="text-ozio-text font-semibold text-sm">Filtrar eventos</span>
                     {filter !== 'todos' && (
                       <button
                         onClick={() => { setFilter('todos'); setFiltrosAbiertos(false); }}
@@ -255,8 +255,8 @@ export default function Eventos() {
                         onClick={() => { setFilter(f.key as FilterType); setFiltrosAbiertos(false); }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
                           filter === f.key
-                            ? 'bg-ozio-purple/20 border-ozio-purple/50 text-white'
-                            : 'bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-white hover:border-gray-500'
+                            ? 'bg-ozio-purple/20 border-ozio-purple/50 text-ozio-text'
+                            : 'bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500'
                         }`}
                       >
                         <span className="text-lg w-6 text-center flex-shrink-0">{f.icon}</span>
@@ -293,8 +293,8 @@ export default function Eventos() {
                           onClick={() => setGenerosSeleccionados(new Set())}
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                             generosSeleccionados.size === 0
-                              ? 'bg-ozio-purple border-ozio-purple/80 text-white'
-                              : 'border-ozio-card text-gray-400 hover:text-white hover:border-gray-500'
+                              ? 'bg-ozio-purple border-ozio-purple/80 text-ozio-text'
+                              : 'border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500'
                           }`}
                         >
                           Todos
@@ -315,8 +315,8 @@ export default function Eventos() {
                               }}
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                                 active
-                                  ? 'bg-ozio-purple border-ozio-purple/80 text-white'
-                                  : 'border-ozio-card text-gray-400 hover:text-white hover:border-gray-500'
+                                  ? 'bg-ozio-purple border-ozio-purple/80 text-ozio-text'
+                                  : 'border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500'
                               }`}
                             >
                               {emoji} {name}
@@ -338,7 +338,7 @@ export default function Eventos() {
               {filter !== 'todos' && (
                 <span className="flex items-center gap-1.5 bg-ozio-purple/20 border border-ozio-purple/40 text-purple-300 text-xs font-medium px-3 py-1.5 rounded-full">
                   {currentFilter?.icon} {currentFilter?.label}
-                  <button type="button" onClick={() => setFilter('todos')} className="ml-1 hover:text-white transition">×</button>
+                  <button type="button" onClick={() => setFilter('todos')} className="ml-1 hover:text-ozio-text transition">×</button>
                 </span>
               )}
               {Array.from(generosSeleccionados).map((name) => {
@@ -349,7 +349,7 @@ export default function Eventos() {
                     <button
                       type="button"
                       onClick={() => setGenerosSeleccionados((prev) => { const next = new Set(prev); next.delete(name); return next; })}
-                      className="ml-1 hover:text-white transition"
+                      className="ml-1 hover:text-ozio-text transition"
                     >×</button>
                   </span>
                 );
@@ -366,7 +366,7 @@ export default function Eventos() {
           {filteredEvents.length === 0 ? (
             <div className="bg-ozio-card border border-ozio-card/50 rounded-md p-12 text-center mt-4">
               <div className="text-6xl mb-4">🎉</div>
-              <p className="text-white font-semibold mb-1">No hay eventos</p>
+              <p className="text-ozio-text font-semibold mb-1">No hay eventos</p>
               <p className="text-gray-400 text-sm">
                 {search ? 'Prueba con otra búsqueda' : 'No hay eventos para este filtro'}
               </p>
@@ -421,18 +421,18 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
       </span>
     );
     if (isActive) return (
-      <span className="bg-ambience-low/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ambience-low/30 flex items-center gap-1.5">
+      <span className="bg-ambience-low/90 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-full font-medium border border-ambience-low/30 flex items-center gap-1.5">
         <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
         En curso
       </span>
     );
     if (isSoon) return (
-      <span className="bg-orange-500/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-orange-400/30 flex items-center gap-1">
+      <span className="bg-orange-500/90 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-full font-medium border border-orange-400/30 flex items-center gap-1">
         🕐 Próximamente
       </span>
     );
     if (event.featured) return (
-      <span className="bg-ozio-purple/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-purple/30">
+      <span className="bg-ozio-purple/90 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-purple/30">
         ⭐ Destacado
       </span>
     );
@@ -472,14 +472,14 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
 
         <div className="absolute top-3 right-3">{getStatusBadge()}</div>
 
-        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-xl border border-white/10 font-medium">
+        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-ozio-text text-xs px-3 py-1.5 rounded-xl border border-white/10 font-medium">
           {dayLabel}
         </div>
       </figure>
 
       {/* Contenido */}
       <div className="p-4">
-        <h3 className={`font-bold text-lg mb-1 leading-tight ${isPast ? 'text-gray-400' : 'text-white'}`}>
+        <h3 className={`font-bold text-lg mb-1 leading-tight ${isPast ? 'text-gray-400' : 'text-ozio-text'}`}>
           {event.title}
         </h3>
 

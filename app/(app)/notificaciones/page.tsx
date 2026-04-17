@@ -140,11 +140,11 @@ export default function NotificationsPage() {
               onClick={() => router.back()}
               className="p-2 hover:bg-ozio-card rounded-full transition"
             >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-white text-xl font-bold">Notificaciones</h1>
+            <h1 className="text-ozio-text text-xl font-bold">Notificaciones</h1>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function NotificationsPage() {
                   {/* Contenido */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="text-white font-bold text-base">
+                      <h3 className="text-ozio-text font-bold text-base">
                         {notification.title}
                       </h3>
                       <span className="text-gray-500 text-sm whitespace-nowrap">

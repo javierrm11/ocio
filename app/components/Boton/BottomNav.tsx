@@ -92,7 +92,7 @@ function BottomNav() {
             <header className="flex items-center justify-between mb-4">
               <h3
                 id="add-modal-title"
-                className="text-white font-semibold text-base"
+                className="text-ozio-text font-semibold text-base"
               >
                 ¿Qué quieres añadir?
               </h3>
@@ -100,7 +100,7 @@ function BottomNav() {
                 type="button"
                 aria-label="Cerrar"
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-white transition"
+                className="text-gray-400 hover:text-ozio-text transition"
               >
                 <svg
                   className="w-5 h-5"
@@ -130,7 +130,7 @@ function BottomNav() {
                 >
                   <span className="text-4xl">📸</span>
                   <div className="text-center">
-                    <p className="text-white font-semibold text-sm group-hover:text-ozio-purple transition">
+                    <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-purple transition">
                       Historia
                     </p>
                     <p className="text-gray-500 text-xs mt-0.5">
@@ -150,7 +150,7 @@ function BottomNav() {
                 >
                   <span className="text-4xl">🎉</span>
                   <div className="text-center">
-                    <p className="text-white font-semibold text-sm group-hover:text-ozio-blue transition">
+                    <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-blue transition">
                       Evento
                     </p>
                     <p className="text-gray-500 text-xs mt-0.5">
@@ -168,7 +168,7 @@ function BottomNav() {
       {showAuthModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-6">
           <div className="w-full max-w-sm rounded-2xl bg-ozio-card p-6 text-center shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-ozio-text">
               Debes iniciar sesión
             </h3>
             <p className="mt-2 text-sm text-gray-300">
@@ -189,7 +189,7 @@ function BottomNav() {
                   setShowAuthModal(false);
                   router.push("/profile");
                 }}
-                className="flex-1 rounded-xl bg-ozio-blue px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+                className="flex-1 rounded-xl bg-ozio-blue px-4 py-2 text-sm font-medium text-ozio-text hover:opacity-90"
               >
                 Iniciar sesión
               </button>
@@ -225,7 +225,7 @@ function NavItem({
     w-12 h-12
     ${
       special
-        ? "bg-ozio-blue text-white rounded-full shadow-xl"
+        ? "bg-ozio-blue text-ozio-text rounded-full shadow-xl"
         : active
           ? "text-ozio-blue"
           : "text-gray-400 hover:text-gray-200"

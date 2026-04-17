@@ -66,21 +66,21 @@ function LocationBanner({
     <aside role="alert" aria-label="Ubicación no disponible" className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm">
       <div className="bg-ozio-dark/95 backdrop-blur border border-white/10 rounded-2xl shadow-xl px-4 py-3">
         <header className="flex items-start justify-between gap-2 mb-2">
-          <p className="text-white text-sm font-semibold leading-snug">
+          <p className="text-ozio-text text-sm font-semibold leading-snug">
             Ubicación no disponible
           </p>
           <button
             type="button"
             aria-label="Cerrar"
             onClick={() => setDismissed(true)}
-            className="text-white/40 hover:text-white/80 transition shrink-0 mt-0.5"
+            className="text-ozio-text/40 hover:text-ozio-text/80 transition shrink-0 mt-0.5"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </header>
-        <p className="text-white/50 text-xs mb-3">
+        <p className="text-ozio-text/50 text-xs mb-3">
           El mapa usa una ubicación por defecto. Introduce tu ciudad para centrarlo correctamente.
         </p>
         <div className="flex gap-2">
@@ -90,13 +90,13 @@ function LocationBanner({
             onChange={(e) => setCity(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="Ej: Sevilla, Madrid…"
-            className="flex-1 bg-white/10 text-white placeholder-white/30 text-sm rounded-xl px-3 py-2 outline-none border border-white/10 focus:border-ozio-blue transition"
+            className="flex-1 bg-white/10 text-ozio-text placeholder-white/30 text-sm rounded-xl px-3 py-2 outline-none border border-white/10 focus:border-ozio-blue transition"
           />
           <button
             type="button"
             onClick={handleSearch}
             disabled={loading || !city.trim()}
-            className="bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-40 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
+            className="bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-40 text-ozio-text text-sm font-semibold px-4 py-2 rounded-xl transition"
           >
             {loading ? "…" : "Ir"}
           </button>
@@ -344,7 +344,7 @@ function MyMap() {
             <div className="w-12 h-12 bg-gradient-to-br from-ozio-blue to-ozio-purple rounded-full opacity-50"></div>
           </div>
         </div>
-        <p className="text-white text-lg font-semibold mt-6 animate-pulse">Cargando mapa...</p>
+        <p className="text-ozio-text text-lg font-semibold mt-6 animate-pulse">Cargando mapa...</p>
       </div>
     );
   }
@@ -396,7 +396,7 @@ function MyMap() {
 
       {/* Active route banner */}
       {routePoints.length > 0 && (
-        <aside role="status" aria-label="Ruta activa" className="absolute top-16 left-1/2 -translate-x-1/2 z-[999] bg-ozio-blue text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
+        <aside role="status" aria-label="Ruta activa" className="absolute top-16 left-1/2 -translate-x-1/2 z-[999] bg-ozio-blue text-ozio-text text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
           <span>🗺️ Ruta activa</span>
           <button
             type="button"

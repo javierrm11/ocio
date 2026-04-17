@@ -14,7 +14,7 @@ function Header() {
   const points: number = isUserProfile ? (currentUser as any).points ?? 0 : 0;
 
   return (
-    <header className="w-full bg-ozio-darker text-white z-50">
+    <header className="w-full bg-ozio-darker text-ozio-text z-50">
 
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
 
@@ -24,7 +24,7 @@ function Header() {
             <img src="/logo.jpeg" alt="Ozio" className="w-5 h-5 rounded" />
           </div>
           <div className="leading-none">
-            <h1 className="text-xl font-semibold tracking-wide text-white">OZIO</h1>
+            <h1 className="text-xl font-semibold tracking-wide text-ozio-text">OZIO</h1>
           </div>
         </Link>
 
@@ -51,7 +51,7 @@ function Header() {
                 </defs>
               </svg>
               <div className="flex flex-col items-start leading-none">
-                <span className="text-white text-sm font-black">{points}</span>
+                <span className="text-ozio-text text-sm font-black">{points}</span>
               </div>
             </button>
           )}
@@ -59,7 +59,7 @@ function Header() {
           {/* Notificaciones */}
           <button
             type="button"
-            className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.06] transition-all"
+            className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-ozio-text/50 hover:text-ozio-text hover:bg-white/[0.06] transition-all"
             onClick={() => router.push('/notificaciones')}
             aria-label="Notificaciones"
           >
@@ -85,13 +85,13 @@ function Header() {
             ) : currentUser ? (
               // Sesión iniciada pero sin foto → inicial
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-ozio-blue to-ozio-purple flex items-center justify-center border border-ozio-purple/40">
-                <span className="text-white text-[11px] font-medium select-none">
+                <span className="text-ozio-text text-[11px] font-medium select-none">
                   {currentUser.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
             ) : (
               // Sin sesión → icono genérico
-              <User size={17} strokeWidth={1.8} className="text-white/50" />
+              <User size={17} strokeWidth={1.8} className="text-ozio-text/50" />
             )}
           </button>
 

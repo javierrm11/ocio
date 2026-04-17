@@ -7,8 +7,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = ({ variant = 'primary', children, className, ...props }: ButtonProps) => {
   const variants = {
-    primary: "bg-weai-primary text-white hover:bg-slate-800",
-    secondary: "bg-weai-secondary text-white hover:bg-ozio-blue",
+    primary: "bg-weai-primary text-ozio-text hover:bg-slate-800",
+    secondary: "bg-weai-secondary text-ozio-text hover:bg-ozio-blue",
     outline: "border border-weai-border text-weai-primary hover:bg-slate-50"
   };
 

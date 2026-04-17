@@ -67,7 +67,7 @@ export default function Premium() {
           <span className="text-4xl">👑</span>
         </div>
 
-        <h1 className="text-white text-4xl font-black tracking-tight mb-2">
+        <h1 className="text-ozio-text text-4xl font-black tracking-tight mb-2">
           Ozio <span className="premium-title-gradient">Premium</span>
         </h1>
         <p className="text-gray-400 text-base max-w-xs mx-auto leading-relaxed">
@@ -105,7 +105,7 @@ export default function Premium() {
             <div className="mb-5">
               <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-1">Plan Premium</p>
               <div className="flex items-end gap-1">
-                <span className="text-white text-5xl font-black leading-none">29€</span>
+                <span className="text-ozio-text text-5xl font-black leading-none">29€</span>
                 <span className="text-gray-500 text-sm mb-1">/mes</span>
               </div>
               <p className="text-ozio-orange/70 text-xs mt-1">Actívalo en menos de 24h</p>
@@ -152,7 +152,7 @@ export default function Premium() {
           <div className="mb-5">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
             <div className="flex items-end gap-1">
-              <span className="text-white text-4xl font-black leading-none">0€</span>
+              <span className="text-ozio-text text-4xl font-black leading-none">0€</span>
               <span className="text-gray-600 text-sm mb-0.5">/mes</span>
             </div>
           </div>

@@ -34,12 +34,12 @@ export default function AnadirPage() {
         <button
           type="button"
           onClick={() => (tipo ? setTipo(null) : router.back())}
-          className="text-gray-400 hover:text-white transition"
+          className="text-gray-400 hover:text-ozio-text transition"
           aria-label="Volver"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-white font-semibold text-base">
+        <h1 className="text-ozio-text font-semibold text-base">
           {tipo === "evento" ? "Nuevo evento" : "¿Qué quieres añadir?"}
         </h1>
       </header>
@@ -64,7 +64,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
         >
           <span className="text-5xl">📸</span>
           <div className="text-center">
-            <p className="text-white font-semibold group-hover:text-ozio-purple transition">Historia</p>
+            <p className="text-ozio-text font-semibold group-hover:text-ozio-purple transition">Historia</p>
             <p className="text-gray-500 text-xs mt-1">Foto o vídeo del momento</p>
           </div>
         </button>
@@ -77,7 +77,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
         >
           <span className="text-5xl">🎉</span>
           <div className="text-center">
-            <p className="text-white font-semibold group-hover:text-ozio-blue transition">Evento</p>
+            <p className="text-ozio-text font-semibold group-hover:text-ozio-blue transition">Evento</p>
             <p className="text-gray-500 text-xs mt-1">Crea un evento en tu local</p>
           </div>
         </button>
@@ -269,18 +269,18 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
         {/* Barra superior (siempre encima) */}
         <header className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-10 pb-3 z-20">
           <button type="button" aria-label="Cerrar" onClick={onBack} className="w-10 h-10 flex items-center justify-center">
-            <X className="w-7 h-7 text-white drop-shadow-lg" />
+            <X className="w-7 h-7 text-ozio-text drop-shadow-lg" />
           </button>
           {!preview && (
             <div className="flex items-center gap-3">
               <button type="button" aria-label="Flash" className="w-10 h-10 flex items-center justify-center opacity-80">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-6 h-6 text-ozio-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none" opacity={0.5}/>
                   <line x1="2" y1="2" x2="22" y2="22" />
                 </svg>
               </button>
               <button type="button" aria-label="Ajustes" className="w-10 h-10 flex items-center justify-center opacity-80">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-ozio-text" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -292,7 +292,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
 
         {/* Hint reposicionar imagen */}
         {preview && !isVideo && (
-          <p className="absolute bottom-4 left-0 right-0 text-center text-white/50 text-xs pointer-events-none">
+          <p className="absolute bottom-4 left-0 right-0 text-center text-ozio-text/50 text-xs pointer-events-none">
             Arrastra o pellizca para reencuadrar
           </p>
         )}
@@ -305,7 +305,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
             {/* Galería */}
             <button type="button" aria-label="Abrir galería" onClick={() => galleryRef.current?.click()}
               className="w-14 h-14 rounded-xl border-2 border-white/50 bg-ozio-card flex items-center justify-center active:scale-95 transition">
-              <ImageIcon className="w-7 h-7 text-white/70" />
+              <ImageIcon className="w-7 h-7 text-ozio-text/70" />
             </button>
             {/* Capturar */}
             <button type="button" aria-label="Tomar foto" onClick={capturePhoto}
@@ -314,14 +314,14 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
             </button>
             {/* Girar */}
             <button type="button" aria-label="Girar cámara" onClick={flipCamera} className="w-14 h-14 flex items-center justify-center opacity-70">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
           </div>
 
           {/* Modo activo */}
-          <p className="text-white text-xs font-bold tracking-widest uppercase">Historia</p>
+          <p className="text-ozio-text text-xs font-bold tracking-widest uppercase">Historia</p>
         </div>
       ) : (
         /* ── Controles con preview ── */
@@ -332,7 +332,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
           <div className="flex items-center justify-center gap-4 w-full">
             <button type="button" aria-label="Descartar" onClick={() => { setFile(null); setPreview(null); startCamera(); }}
               className="w-14 h-14 rounded-full border-2 border-white/50 bg-white/10 flex items-center justify-center active:scale-95 transition">
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-ozio-text" />
             </button>
             <button type="button" aria-label="Publicar historia" onClick={submit} disabled={loading}
               className="flex-1 flex items-center justify-center gap-2 bg-white text-black font-bold py-4 rounded-full text-base disabled:opacity-60 active:scale-95 transition shadow-xl">
@@ -460,7 +460,7 @@ function FormEvento() {
   };
 
   const inputClass =
-    "w-full bg-ozio-card border border-ozio-card/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
+    "w-full bg-ozio-card border border-ozio-card/50 rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
   const labelClass = "text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1.5 block";
 
   const limitReached = !userIsPremium && monthlyCount !== null && monthlyCount >= 2;
@@ -550,8 +550,8 @@ function FormEvento() {
                     onClick={() => toggleGenre(genre.id)}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
                       selected
-                        ? "bg-ozio-blue border-ozio-blue text-white scale-105"
-                        : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
+                        ? "bg-ozio-blue border-ozio-blue text-ozio-text scale-105"
+                        : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:border-ozio-blue/50 hover:text-ozio-text"
                     }`}
                   >
                     <span>{genre.emoji}</span>
@@ -590,7 +590,7 @@ function FormEvento() {
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setImageFile(null); setImagePreview(null); }}
-                className="absolute top-2 right-2 bg-black/60 rounded-full p-1 text-white hover:bg-black/80 transition"
+                className="absolute top-2 right-2 bg-black/60 rounded-full p-1 text-ozio-text hover:bg-black/80 transition"
                 aria-label="Eliminar imagen"
               >
                 <X className="w-4 h-4" />
@@ -614,7 +614,7 @@ function FormEvento() {
           className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm ${
             form.featured
               ? "bg-ozio-orange/10 border-ozio-orange/40 text-ozio-orange"
-              : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-white hover:border-ozio-card/70"
+              : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-ozio-card/70"
           }`}
         >
           <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-ozio-orange" : ""}`} />
@@ -652,7 +652,7 @@ function FormEvento() {
         type="button"
         onClick={limitReached ? () => setShowLimitModal(true) : submit}
         disabled={loading}
-        className="w-full bg-ozio-blue hover:bg-ozio-blue/90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition text-sm"
+        className="w-full bg-ozio-blue hover:bg-ozio-blue/90 disabled:opacity-40 disabled:cursor-not-allowed text-ozio-text font-semibold py-3.5 rounded-xl transition text-sm"
       >
         {loading ? "Creando evento..." : "Crear evento"}
       </button>
@@ -680,9 +680,9 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
           >
             <span className="text-3xl">🎉</span>
           </div>
-          <h2 id="limit-modal-title" className="text-white text-xl font-black mb-2">Límite de eventos alcanzado</h2>
+          <h2 id="limit-modal-title" className="text-ozio-text text-xl font-black mb-2">Límite de eventos alcanzado</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Con el plan gratuito puedes crear <span className="text-white font-semibold">2 eventos al mes</span>. Actualiza a Premium para crear eventos ilimitados.
+            Con el plan gratuito puedes crear <span className="text-ozio-text font-semibold">2 eventos al mes</span>. Actualiza a Premium para crear eventos ilimitados.
           </p>
         </div>
 
@@ -729,7 +729,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
           >
             <span className="text-3xl">⭐</span>
           </div>
-          <h2 id="featured-modal-title" className="text-white text-xl font-black mb-2">Eventos destacados</h2>
+          <h2 id="featured-modal-title" className="text-ozio-text text-xl font-black mb-2">Eventos destacados</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Con Premium tus eventos aparecen primero en el listado y consiguen más visibilidad.
           </p>

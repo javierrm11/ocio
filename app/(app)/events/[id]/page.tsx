@@ -194,10 +194,10 @@ export default function EventDetailPage() {
     return (
       <main className="min-h-screen bg-ozio-dark flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-white text-2xl font-bold mb-4">Evento no encontrado</h1>
+          <h1 className="text-ozio-text text-2xl font-bold mb-4">Evento no encontrado</h1>
           <button
             onClick={() => router.back()}
-            className="px-6 py-3 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold rounded-full transition"
+            className="px-6 py-3 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold rounded-full transition"
           >
             Volver
           </button>
@@ -212,11 +212,11 @@ export default function EventDetailPage() {
       <header className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-ozio-darker">
         <div className="px-4 md:px-8 py-4 flex items-center gap-3 max-w-6xl mx-auto">
           <button onClick={() => router.back()} className="p-2 hover:bg-ozio-card rounded-full transition">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="text-white text-xl font-bold">Detalles del Evento</span>
+          <span className="text-ozio-text text-xl font-bold">Detalles del Evento</span>
         </div>
       </header>
 
@@ -230,13 +230,13 @@ export default function EventDetailPage() {
               className={`w-full h-full object-cover ${isPastEvent ? 'grayscale opacity-60' : ''}`}
             />
             {event.featured && (
-              <div className="absolute top-4 right-4 bg-ozio-blue text-white text-xs font-bold px-3 py-1 rounded-full">
+              <div className="absolute top-4 right-4 bg-ozio-blue text-ozio-text text-xs font-bold px-3 py-1 rounded-full">
                 ⭐ Destacado
               </div>
             )}
             {isPastEvent && (
               <div className="absolute inset-0 bg-ozio-darker/80 flex items-center justify-center">
-                <div className="bg-ozio-card/90 backdrop-blur-sm text-white text-lg font-bold px-6 py-3 rounded-2xl border border-ozio-card">
+                <div className="bg-ozio-card/90 backdrop-blur-sm text-ozio-text text-lg font-bold px-6 py-3 rounded-2xl border border-ozio-card">
                   Evento Finalizado
                 </div>
               </div>
@@ -253,7 +253,7 @@ export default function EventDetailPage() {
             {/* Título y estado */}
             <section>
               <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
-                <h1 className="text-white text-3xl font-bold flex-1">{event.title}</h1>
+                <h1 className="text-ozio-text text-3xl font-bold flex-1">{event.title}</h1>
                 {getEventStatusBadge()}
               </div>
               <p className={`font-semibold text-sm mb-2 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>
@@ -281,7 +281,7 @@ export default function EventDetailPage() {
             {/* Venue */}
             {event.venues && (
               <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
-                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <h3 className="text-ozio-text font-semibold mb-3 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -297,13 +297,13 @@ export default function EventDetailPage() {
                     />
                   )}
                   <div className="flex-1">
-                    <p className="text-white font-semibold">{event.venues.name}</p>
+                    <p className="text-ozio-text font-semibold">{event.venues.name}</p>
                     {event.venues.address && <address className="text-gray-400 text-sm not-italic">{event.venues.address}</address>}
                     {event.venues.description && <p className="text-gray-500 text-xs mt-1">{event.venues.description}</p>}
                   </div>
                   <button
                     onClick={() => router.push(`/venues/${event.venue_id}`)}
-                    className="px-4 py-2 bg-ozio-blue hover:bg-ozio-purple text-white text-sm font-semibold rounded-full transition"
+                    className="px-4 py-2 bg-ozio-blue hover:bg-ozio-purple text-ozio-text text-sm font-semibold rounded-full transition"
                   >
                     Ver local
                   </button>
@@ -314,7 +314,7 @@ export default function EventDetailPage() {
             {/* Mapa */}
             {event.venues?.latitude && event.venues?.longitude && (
               <section className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
-                <h3 className="text-white font-semibold p-4">🗺️ Mapa</h3>
+                <h3 className="text-ozio-text font-semibold p-4">🗺️ Mapa</h3>
                 <div className="h-64 md:h-80 relative overflow-hidden">
                   <iframe
                     src={`https://www.google.com/maps?q=${event.venues.latitude},${event.venues.longitude}&z=15&output=embed`}
@@ -334,7 +334,7 @@ export default function EventDetailPage() {
 
             {/* Fechas */}
             <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-ozio-text font-semibold mb-3 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -349,7 +349,7 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Inicio</p>
-                    <time dateTime={event.starts_at} className="text-white font-semibold block">{formatDate(event.starts_at)}</time>
+                    <time dateTime={event.starts_at} className="text-ozio-text font-semibold block">{formatDate(event.starts_at)}</time>
                     <time dateTime={event.starts_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</time>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export default function EventDetailPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Fin</p>
-                    <time dateTime={event.ends_at} className="text-white font-semibold block">{formatDate(event.ends_at)}</time>
+                    <time dateTime={event.ends_at} className="text-ozio-text font-semibold block">{formatDate(event.ends_at)}</time>
                     <time dateTime={event.ends_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</time>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ export default function EventDetailPage() {
               <div>
                 {isAttending ? (
                   <button
-                    className="w-full bg-ambience-high hover:bg-ambience-high/80 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
+                    className="w-full bg-ambience-high hover:bg-ambience-high/80 text-ozio-text font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
                     onClick={handleUnattend}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,7 +383,7 @@ export default function EventDetailPage() {
                   </button>
                 ) : (
                   <button
-                    className="w-full bg-ozio-blue hover:bg-ozio-purple text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
+                    className="w-full bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
                     onClick={handleAttend}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,7 +401,7 @@ export default function EventDetailPage() {
                 <svg className="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h4 className="text-white font-bold text-lg mb-2">Este evento ya finalizó</h4>
+                <h4 className="text-ozio-text font-bold text-lg mb-2">Este evento ya finalizó</h4>
                 <p className="text-gray-400 text-sm">
                   {isAttending
                     ? `Asististe a este evento junto a ${attendees.length - 1} ${attendees.length - 1 === 1 ? 'persona más' : 'personas más'}.`

@@ -8,6 +8,7 @@ html {
 
 @theme {
   /* Colores de Ozio */
+  --color-ozio-text: var(--ozio-text);
   --color-ozio-dark: var(--ozio-dark);
   --color-ozio-darker: var(--ozio-darker);
   --color-ozio-card: var(--ozio-card);
@@ -28,6 +29,7 @@ html {
 
 :root {
   /* Colores principales de Ozio */
+  --ozio-text: #ffffff;
   --ozio-dark: #0A0E1A;
   --ozio-darker: #060911;
   --ozio-card: #1A1F2E;
@@ -109,7 +111,7 @@ html {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-ozio-dark text-white antialiased;
+    @apply bg-ozio-dark text-ozio-text antialiased;
   }
 }
 

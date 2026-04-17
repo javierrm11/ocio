@@ -194,11 +194,11 @@ export default function Stories() {
                 onClick={() => router.push('/anadir?tipo=historia')}
               >
                 <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-ozio-blue/70 to-ozio-purple flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <span className="text-xs text-white font-semibold">Tu historia</span>
+                <span className="text-xs text-ozio-text font-semibold">Tu historia</span>
               </div>
             </li>
           )}
@@ -220,14 +220,14 @@ export default function Stories() {
                     />
                   ) : (
                     // Fallback: inicial del nombre
-                    <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-ozio-text font-bold text-xl">
                       {group.venue_name[0].toUpperCase()}
                     </div>
                   )}
                 </div>
               </div>
               {/* ✅ Contador de stories del grupo */}
-              <span className="text-xs text-white truncate max-w-[64px] text-center">
+              <span className="text-xs text-ozio-text truncate max-w-[64px] text-center">
                 {group.venue_name}
               </span>
               {group.stories.length > 1 && (
@@ -245,8 +245,8 @@ export default function Stories() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Subir historia">
           <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-lg w-full">
             <div className="border-b border-ozio-card/50 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-white text-xl font-bold">📸 Nueva Historia</h2>
-              <button onClick={() => { setShowUploadModal(false); setSelectedFile(null); setPreviewUrl(null); }} className="text-gray-400 hover:text-white transition">
+              <h2 className="text-ozio-text text-xl font-bold">📸 Nueva Historia</h2>
+              <button onClick={() => { setShowUploadModal(false); setSelectedFile(null); setPreviewUrl(null); }} className="text-gray-400 hover:text-ozio-text transition">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -261,7 +261,7 @@ export default function Stories() {
                     <img src={previewUrl} alt="Preview" className="w-full h-96 object-cover rounded-2xl" />
                   )}
                   <button onClick={() => { setSelectedFile(null); setPreviewUrl(null); }} className="absolute top-2 right-2 bg-black/50 rounded-full p-2 hover:bg-black/70 transition">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -270,20 +270,20 @@ export default function Stories() {
                 <div className="space-y-4">
                   <label className="block">
                     <input type="file" accept="image/*,video/*" onChange={handleFileSelect} className="hidden" />
-                    <div className="bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
+                    <div className="bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
                       Seleccionar de galería
                     </div>
                   </label>
                   <label className="block">
                     <input type="file" accept="image/*" capture="environment" onChange={handleFileSelect} className="hidden" />
-                    <div className="bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
+                    <div className="bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
                       Tomar foto
                     </div>
                   </label>
                 </div>
               )}
               {previewUrl && (
-                <button onClick={handleUploadStory} disabled={uploading} className="w-full mt-4 bg-ozio-blue hover:bg-ozio-purple text-white font-bold py-4 px-6 rounded-2xl transition disabled:opacity-50">
+                <button onClick={handleUploadStory} disabled={uploading} className="w-full mt-4 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-bold py-4 px-6 rounded-2xl transition disabled:opacity-50">
                   {uploading ? 'Subiendo...' : '✨ Publicar historia'}
                 </button>
               )}
@@ -315,18 +315,18 @@ export default function Stories() {
                 {activeGroup.venue_avatar ? (
                   <img src={activeGroup.venue_avatar} alt={activeGroup.venue_name} className="w-full h-full rounded-full object-cover" />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-ozio-text text-xs font-bold">
                     {activeGroup.venue_name[0].toUpperCase()}
                   </div>
                 )}
               </div>
-              <span className="text-white font-semibold text-sm">{activeGroup.venue_name}</span>
+              <span className="text-ozio-text font-semibold text-sm">{activeGroup.venue_name}</span>
               {/* ✅ Índice de story dentro del grupo */}
               <span className="text-gray-400 text-xs">
                 {new Date(currentStory.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
-            <button onClick={closeViewer} className="text-white hover:text-gray-300">
+            <button onClick={closeViewer} className="text-ozio-text hover:text-gray-300">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>

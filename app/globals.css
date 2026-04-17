@@ -61,7 +61,27 @@ html {
   /* Grises */
   --gray-850: #1F2937;
   --gray-950: #0F1419;
-  
+}
+
+/* ── Modo claro ───────────────────────────────────────────────────────────── */
+html.light {
+  --ozio-text: #111827;
+  --ozio-text-bright: #1f2937;
+  --ozio-text-secondary: #374151;
+  --ozio-text-muted: #6b7280;
+  --ozio-text-subtle: #9ca3af;
+  --ozio-text-dim: #d1d5db;
+  --ozio-dark: #f3f4f6;
+  --ozio-darker: #e5e7eb;
+  --ozio-card: #ffffff;
+}
+
+html.light body {
+  background: var(--ozio-dark);
+  color: var(--ozio-text);
+}
+
+:root {
   --radius: 1rem;
   --background: oklch(0.05 0.02 264);
   --foreground: oklch(0.98 0.01 264);

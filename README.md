@@ -244,7 +244,7 @@ npm run lint
 - [✅] Añadir buscar local desde el mapa
 - [✅] Historias en la vista de los establecimientos
 - [✅] Control de seguridad de rutas /anadir
-- [ ] Utilizar todos los colores de las variables
+- [✅] Utilizar todos los colores de las variables
 - [✅] Fix color register, boton
 - [ ] Arreglar hora pico
   

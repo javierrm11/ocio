@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from "@/lib/hooks/getToken";
-import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock, Gem } from "lucide-react";
+import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock, Sun, Moon } from "lucide-react";
 import { isPremium } from "@/lib/hooks/plan";
 
 interface CheckInHistory {
@@ -343,6 +343,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
           {activeTab === "settings" && (
             <div className="space-y-2">
+              <ThemeToggleItem />
               <SettingsItem icon="🔔" title="Notificaciones" />
               <SettingsItem icon="🔒" title="Privacidad" />
               {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
@@ -618,6 +619,37 @@ function FavoriteSpotCard({ favorite }: { favorite: any }) {
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
       </button>
     </article>
+  );
+}
+
+function ThemeToggleItem() {
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    setIsLight(document.documentElement.classList.contains("light"));
+  }, []);
+
+  const toggle = () => {
+    const next = !isLight;
+    setIsLight(next);
+    document.documentElement.classList.toggle("light", next);
+    localStorage.setItem("ozio-theme", next ? "light" : "dark");
+  };
+
+  return (
+    <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <span className="text-2xl">{isLight ? <Sun size={22} className="text-ozio-orange" /> : <Moon size={22} className="text-ozio-blue" />}</span>
+        <span className="text-ozio-text font-medium">{isLight ? "Modo claro" : "Modo oscuro"}</span>
+      </div>
+      <button
+        type="button"
+        onClick={toggle}
+        className={`w-12 h-6 rounded-full transition-colors relative ${isLight ? "bg-ozio-orange" : "bg-ozio-blue"}`}
+      >
+        <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform absolute top-0.5 ${isLight ? "translate-x-6" : "translate-x-0.5"}`} />
+      </button>
+    </div>
   );
 }
 

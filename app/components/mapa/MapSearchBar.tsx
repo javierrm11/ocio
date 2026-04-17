@@ -33,7 +33,7 @@ export function MapSearchBar() {
   return (
     <div
       ref={containerRef}
-      className="px-4 py-2"
+      className="px-4 py-2 max-w-7xl mx-auto"
     >
       {/* Input pill */}
       <div className="bg-white/10 backdrop-blur border border-white/10 rounded-2xl flex items-center px-3 gap-2">
@@ -66,7 +66,7 @@ export function MapSearchBar() {
         <ul
           role="listbox"
           aria-label="Resultados de búsqueda"
-          className="absolute left-4 right-4 mt-1.5 bg-gray-900/98 backdrop-blur border border-white/10 rounded-2xl shadow-2xl overflow-hidden list-none p-0 m-0 z-[999]"
+          className="max-w-7xl mx-auto absolute left-4 right-4 mt-1.5 bg-gray-900/98 backdrop-blur border border-white/10 rounded-2xl shadow-2xl overflow-hidden list-none p-0 m-0 z-[999]"
         >
           {results.map((venue) => (
             <li key={venue.id} role="option" aria-selected={false}>

@@ -66,13 +66,13 @@ export default function Destacados() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 bg-ozio-card rounded-2xl p-2 border border-gray-700/50">
+          <div className="flex gap-2 bg-ozio-card rounded-2xl p-2 border border-ozio-card/50">
             <button
               onClick={() => setActiveTab('eventos')}
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'eventos'
                   ? 'bg-ozio-blue text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                  : 'text-gray-400 hover:text-white hover:bg-ozio-card/50'
               }`}
             >
               🎉 Eventos
@@ -82,7 +82,7 @@ export default function Destacados() {
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'locales'
                   ? 'bg-ozio-blue text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                  : 'text-gray-400 hover:text-white hover:bg-ozio-card/50'
               }`}
             >
               🏆 Top Locales
@@ -111,7 +111,7 @@ export default function Destacados() {
                   </ul>
                 </>
               ) : (
-                <div className="bg-ozio-card border border-gray-700/50 rounded-2xl p-8 text-center">
+                <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-8 text-center">
                   <div className="text-6xl mb-4">🎉</div>
                   <p className="text-gray-400">No hay eventos destacados en este momento</p>
                 </div>
@@ -151,7 +151,7 @@ function EventCard({ event }: { event: Event }) {
   const getStatusBadge = () => {
     if (isPastEvent) {
       return (
-        <span className="bg-gray-700/90 backdrop-blur-sm text-gray-400 text-xs px-3 py-1.5 rounded-full font-medium border border-gray-600/30 flex items-center gap-1">
+        <span className="bg-ozio-card/90 backdrop-blur-sm text-gray-400 text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-card/30 flex items-center gap-1">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -161,7 +161,7 @@ function EventCard({ event }: { event: Event }) {
     }
     if (isActiveEvent) {
       return (
-        <span className="bg-green-600/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-green-500/30 flex items-center gap-1 animate-pulse">
+        <span className="bg-ambience-low/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium border border-ambience-low/30 flex items-center gap-1 animate-pulse">
           <div className="w-2 h-2 bg-white rounded-full"></div>
           En curso
         </span>
@@ -178,8 +178,8 @@ function EventCard({ event }: { event: Event }) {
     <article
       className={`bg-ozio-card border rounded-2xl overflow-hidden transition cursor-pointer ${
         isPastEvent
-          ? 'border-gray-800/50 opacity-70 hover:opacity-90'
-          : 'border-gray-700/50 hover:border-ozio-blue/50'
+          ? 'border-ozio-darker/50 opacity-70 hover:opacity-90'
+          : 'border-ozio-card/50 hover:border-ozio-blue/50'
       }`}
       onClick={() => {
         const eventData = encodeURIComponent(JSON.stringify(event));
@@ -194,7 +194,7 @@ function EventCard({ event }: { event: Event }) {
         />
         {isPastEvent && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-gray-800/90 backdrop-blur-sm text-white text-sm font-bold px-4 py-2 rounded-xl border border-gray-600">
+            <div className="bg-ozio-card/90 backdrop-blur-sm text-white text-sm font-bold px-4 py-2 rounded-xl border border-ozio-card">
               Evento Finalizado
             </div>
           </div>
@@ -236,7 +236,7 @@ function EventCard({ event }: { event: Event }) {
         <div className="flex items-center gap-2 mt-3">
           <div className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${
             isPastEvent
-              ? 'bg-gray-700/50 text-gray-500 border border-gray-700/30'
+              ? 'bg-ozio-card/50 text-gray-500 border border-ozio-card/30'
               : 'bg-ozio-blue/20 text-ozio-blue border border-ozio-blue/30'
           }`}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
 
   const getRankColor = (rank: number) => {
     switch (rank) {
-      case 1: return 'from-yellow-500 to-yellow-600';
+      case 1: return 'from-ozio-orange to-ozio-orange/80';
       case 2: return 'from-gray-400 to-gray-500';
       case 3: return 'from-orange-600 to-orange-700';
       default: return 'from-ozio-blue to-ozio-purple';
@@ -273,7 +273,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
 
   return (
     <article
-      className="bg-ozio-card border border-gray-700/50 rounded-2xl overflow-hidden hover:border-ozio-orange/50 transition cursor-pointer"
+      className="bg-ozio-card border border-ozio-card/50 rounded-2xl overflow-hidden hover:border-ozio-orange/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       <div className="flex gap-4 p-4">

@@ -32,7 +32,7 @@ export default function WelcomeEngagementModal() {
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-md rounded-3xl border border-zinc-700 bg-ozio-card p-6 shadow-2xl"
+        className="w-full max-w-md rounded-3xl border border-ozio-card bg-ozio-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-xs font-semibold uppercase tracking-wider text-ozio-blue">
@@ -41,7 +41,7 @@ export default function WelcomeEngagementModal() {
         <h2 id="welcome-modal-title" className="mt-2 text-2xl font-bold text-white">
           Descubre el mejor plan de esta noche en segundos
         </h2>
-        <p className="mt-3 text-sm text-zinc-300">
+        <p className="mt-3 text-sm text-gray-300">
           Mira locales en tiempo real, encuentra ambiente al instante y no te pierdas los eventos más top cerca de ti.
         </p>
 
@@ -49,7 +49,7 @@ export default function WelcomeEngagementModal() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-xl border border-zinc-600 px-4 py-2.5 text-sm font-medium text-zinc-200 hover:bg-zinc-800"
+            className="rounded-xl border border-ozio-card px-4 py-2.5 text-sm font-medium text-gray-200 hover:bg-ozio-card"
           >
             Ver mapa
           </button>

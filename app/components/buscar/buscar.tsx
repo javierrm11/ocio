@@ -170,7 +170,7 @@ export default function Buscar() {
     <div className="min-h-screen bg-ozio-dark pb-24">
 
       {/* Header sticky */}
-      <header className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-gray-800/50 backdrop-blur-sm">
+      <header className="bg-ozio-dark px-4 md:px-8 pt-4 pb-4 sticky top-0 z-20 border-b border-ozio-darker/50 backdrop-blur-sm">
         <h1 className="sr-only">Buscar</h1>
         <div className="max-w-4xl mx-auto">
           <div className="relative flex items-center gap-2">
@@ -186,7 +186,7 @@ export default function Buscar() {
                 placeholder="Busca locales, géneros, direcciones..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full bg-ozio-card border border-gray-700/50 rounded-md pl-12 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
+                className="w-full bg-ozio-card border border-ozio-card/50 rounded-md pl-12 pr-10 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
               />
               {query && (
                 <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
@@ -204,7 +204,7 @@ export default function Buscar() {
                 className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
                   filtrosAbiertos || filtrosActivos > 0
                     ? "bg-ozio-purple border-ozio-purple text-white"
-                    : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                    : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-white hover:border-gray-500"
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,8 +219,8 @@ export default function Buscar() {
 
               {/* Panel de filtros */}
               {filtrosAbiertos && (
-                <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-gray-700/50 rounded-md shadow-2xl z-30 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+                <div className="absolute right-0 top-16 w-80 bg-ozio-card border border-ozio-card/50 rounded-md shadow-2xl z-30 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-ozio-card/50">
                     <span className="text-white font-semibold text-sm">Filtros</span>
                     {filtrosActivos > 0 && (
                       <button onClick={resetFiltros} className="text-xs text-ozio-blue hover:underline">
@@ -238,14 +238,14 @@ export default function Buscar() {
                         onClick={() => setSoloActivos(!soloActivos)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm font-medium ${
                           soloActivos
-                            ? "bg-green-600/20 border-green-500/50 text-green-400"
-                            : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                            ? "bg-ambience-low/20 border-ambience-low/50 text-ambience-low"
+                            : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-white hover:border-gray-500"
                         }`}
                       >
-                        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${soloActivos ? "bg-green-400 animate-pulse" : "bg-gray-600"}`} />
+                        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${soloActivos ? "bg-ambience-low animate-pulse" : "bg-ozio-card"}`} />
                         Evento en curso
                         {soloActivos && (
-                          <svg className="w-4 h-4 ml-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 ml-auto text-ambience-low" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
@@ -268,7 +268,7 @@ export default function Buscar() {
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
                               sort === s.key
                                 ? "bg-ozio-purple/20 border-ozio-purple/50 text-white"
-                                : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+                                : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-white hover:border-gray-500"
                             }`}
                           >
                             <span className="text-base w-5 text-center flex-shrink-0">{s.icon}</span>
@@ -296,7 +296,7 @@ export default function Buscar() {
                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                               !generoSeleccionado
                                 ? "bg-ozio-blue border-ozio-blue text-white"
-                                : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white"
+                                : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-white"
                             }`}
                           >
                             Todos
@@ -308,7 +308,7 @@ export default function Buscar() {
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                                 generoSeleccionado === name
                                   ? "bg-ozio-blue border-ozio-blue text-white"
-                                  : "bg-ozio-dark border-gray-700/50 text-gray-400 hover:text-white"
+                                  : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-white"
                               }`}
                             >
                               {emoji} {name}
@@ -345,8 +345,8 @@ export default function Buscar() {
           {filtrosActivos > 0 && (
             <div className="flex gap-2 flex-wrap mb-4">
               {soloActivos && (
-                <span className="flex items-center gap-1.5 bg-green-600/20 border border-green-500/40 text-green-400 text-xs font-medium px-3 py-1.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 bg-ambience-low/20 border border-ambience-low/40 text-ambience-low text-xs font-medium px-3 py-1.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-ambience-low animate-pulse" />
                   Evento en curso
                   <button onClick={() => setSoloActivos(false)} className="ml-1 hover:text-white transition">×</button>
                 </span>
@@ -388,7 +388,7 @@ export default function Buscar() {
                     <li key={s}>
                       <button
                         onClick={() => setQuery(s)}
-                        className="bg-ozio-card border border-gray-700/50 text-gray-300 text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-white transition"
+                        className="bg-ozio-card border border-ozio-card/50 text-gray-300 text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-white transition"
                       >
                         {s}
                       </button>
@@ -408,7 +408,7 @@ export default function Buscar() {
               </p>
 
               {filteredVenues.length === 0 ? (
-                <div className="bg-ozio-card border border-gray-700/50 rounded-md p-12 text-center">
+                <div className="bg-ozio-card border border-ozio-card/50 rounded-md p-12 text-center">
                   <div className="text-5xl mb-4">🏠</div>
                   <p className="text-white font-semibold mb-1">Sin resultados</p>
                   <p className="text-gray-400 text-sm">
@@ -449,7 +449,7 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
 
   return (
     <article
-      className="bg-ozio-card border border-gray-700/50 rounded-md p-3 flex items-center gap-3 hover:border-ozio-blue/50 transition cursor-pointer"
+      className="bg-ozio-card border border-ozio-card/50 rounded-md p-3 flex items-center gap-3 hover:border-ozio-blue/50 transition cursor-pointer"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       <span className="text-2xl w-8 text-center">{rankEmoji}</span>
@@ -509,7 +509,7 @@ function VenueCard({
 
   return (
     <article
-      className="bg-ozio-card border border-gray-700/50 rounded-md overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
+      className="bg-ozio-card border border-ozio-card/50 rounded-md overflow-hidden hover:border-ozio-blue/50 transition cursor-pointer group"
       onClick={() => router.push(`/venues/${venue.id}`)}
     >
       <figure className="relative h-44 overflow-hidden m-0">
@@ -526,7 +526,7 @@ function VenueCard({
             </span>
           )}
           {venue.is_favorite && (
-            <span className="bg-red-600/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium">❤️</span>
+            <span className="bg-ambience-high/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium">❤️</span>
           )}
         </div>
         <div
@@ -553,7 +553,7 @@ function VenueCard({
           <ul className="flex gap-1.5 flex-wrap list-none p-0 m-0">
             {venue.genres?.slice(0, 2).map((g) => (
               <li key={getGenreName(g)}>
-                <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-ozio-card text-gray-300 px-2 py-0.5 rounded-full">
                   {getGenreEmoji(g)} {getGenreName(g)}
                 </span>
               </li>

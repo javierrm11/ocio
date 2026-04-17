@@ -87,10 +87,10 @@ export function VenuePanel({
     : heatState === "warm" ? "Estable"
     : "Bajando";
   const directionColor =
-    heatState === "full" ? "text-red-400"
+    heatState === "full" ? "text-ambience-high"
     : heatState === "hot" ? "text-orange-400"
-    : heatState === "warm" ? "text-yellow-400"
-    : "text-emerald-400";
+    : heatState === "warm" ? "text-ozio-orange"
+    : "text-ambience-low";
   const dirArrow =
     heatState === "full" ? "↑↑" : heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
 
@@ -101,7 +101,7 @@ export function VenuePanel({
 
       {/* Panel */}
       <aside
-        className="fixed z-[1002] bg-gray-900 overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
+        className="fixed z-[1002] bg-ozio-dark overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
         aria-label={`Detalles de ${venue.name}`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -218,7 +218,7 @@ export function VenuePanel({
                 <span className="text-lg">{trendDelta > 0 ? "📈" : "📉"}</span>
                 <div>
                   <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">15 min</p>
-                  <p className={`text-xs font-black ${trendDelta > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <p className={`text-xs font-black ${trendDelta > 0 ? "text-ambience-low" : "text-ambience-high"}`}>
                     {trendDelta > 0 ? `+${trendDelta} personas` : "Sin cambios"}
                   </p>
                 </div>
@@ -237,11 +237,11 @@ export function VenuePanel({
                   <p className="text-white text-xs font-black">02:00</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 rounded-xl bg-[#2E5CFF]/10 border border-[#2E5CFF]/20 px-3 py-2.5">
+              <div className="flex items-center gap-2.5 rounded-xl bg-ozio-blue/10 border border-ozio-blue/20 px-3 py-2.5">
                 <span className="text-lg">🕑</span>
                 <div>
                   <p className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Mejor hora</p>
-                  <p className="text-[#6b9fff] text-xs font-black">01:30</p>
+                  <p className="text-ozio-blue/80 text-xs font-black">01:30</p>
                 </div>
               </div>
             </div>
@@ -268,9 +268,9 @@ export function VenuePanel({
 
           {/* Active events */}
           {activeEvents.length > 0 && (
-            <section className="bg-gray-800 border border-green-500/40 rounded-2xl p-4">
+            <section className="bg-ozio-card border border-ambience-low/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="w-2 h-2 bg-ambience-low rounded-full animate-pulse" />
                 <h3 className="text-white font-semibold text-sm">Evento en curso</h3>
               </div>
               <div className="space-y-2">
@@ -286,13 +286,13 @@ export function VenuePanel({
                     {event.image_path ? (
                       <img src={event.image_path} alt={event.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                     ) : (
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-ambience-low to-ambience-low/70 flex items-center justify-center flex-shrink-0">
                         <span className="text-white text-lg">🎉</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold truncate">{event.title}</p>
-                      <p className="text-green-400 text-xs">{formatEventTime(event)}</p>
+                      <p className="text-ambience-low text-xs">{formatEventTime(event)}</p>
                     </div>
                     <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -305,7 +305,7 @@ export function VenuePanel({
 
           {/* Upcoming events */}
           {soonEvents.length > 0 && (
-            <section className="bg-gray-800 border border-orange-500/40 rounded-2xl p-4">
+            <section className="bg-ozio-card border border-ozio-orange/40 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-orange-400 text-sm">🕐</span>
                 <h3 className="text-white font-semibold text-sm">Próximamente hoy</h3>
@@ -346,7 +346,7 @@ export function VenuePanel({
               (hasUserActiveCheckIn ? (
                 <button
                   type="button"
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  className="w-full bg-ambience-high hover:bg-ambience-high/80 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                   onClick={() => onCheckOut(venue.id)}
                 >
                   Quitar check-in
@@ -357,7 +357,7 @@ export function VenuePanel({
               ) : (
                 <button
                   type="button"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  className="w-full bg-ozio-blue hover:bg-ozio-blue/80 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                   onClick={() => onCheckIn(venue.id)}
                 >
                   Hacer check-in
@@ -370,7 +370,7 @@ export function VenuePanel({
             <div className="flex gap-2 w-full">
               <button
                 type="button"
-                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                 onClick={() => router.push(`/venues/${venue.id}`)}
               >
                 Ir ahora
@@ -378,7 +378,7 @@ export function VenuePanel({
               <button
                 type="button"
                 disabled={loadingRoute}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                className="flex-1 bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                 onClick={() => onFetchRoute(venue.latitude, venue.longitude)}
               >
                 {loadingRoute ? (
@@ -397,8 +397,8 @@ export function VenuePanel({
                   title={venue.is_favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
                   className={`aspect-square py-3 px-4 rounded-full flex items-center justify-center transition ${
                     venue.is_favorite
-                      ? "bg-red-600 hover:bg-red-700 text-white"
-                      : "bg-gray-600 hover:bg-gray-500 text-white"
+                      ? "bg-ambience-high hover:bg-ambience-high/80 text-white"
+                      : "bg-ozio-card hover:bg-ozio-card/80 text-white"
                   }`}
                   onClick={() => onToggleFavorite(venue.id, venue.is_favorite || false)}
                 >

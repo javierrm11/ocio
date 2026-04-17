@@ -52,7 +52,7 @@ export default function Premium() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B15] pb-28 pt-14 overflow-x-hidden">
+    <div className="min-h-screen bg-ozio-darker pb-28 pt-14 overflow-x-hidden">
 
       {/* ── Glows de fondo ── */}
       <div className="fixed inset-0 pointer-events-none">
@@ -91,7 +91,7 @@ export default function Premium() {
         <article className="relative rounded-3xl overflow-hidden premium-card flex-1" aria-label="Plan Premium">
 
           {/* Shimmer */}
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-amber-300/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-ozio-orange/10 rounded-full blur-2xl animate-pulse pointer-events-none" />
 
           {/* Badge RECOMENDADO */}
           <div className="absolute top-4 right-4">
@@ -108,7 +108,7 @@ export default function Premium() {
                 <span className="text-white text-5xl font-black leading-none">29€</span>
                 <span className="text-gray-500 text-sm mb-1">/mes</span>
               </div>
-              <p className="text-amber-400/70 text-xs mt-1">Actívalo en menos de 24h</p>
+              <p className="text-ozio-orange/70 text-xs mt-1">Actívalo en menos de 24h</p>
             </div>
 
             {/* Features */}
@@ -127,11 +127,11 @@ export default function Premium() {
 
             {/* CTA */}
             {premium ? (
-              <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-green-400 border border-green-500/30 bg-green-500/10">
+              <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-ambience-low border border-ambience-low/30 bg-ambience-low/10">
                 ✨ Plan activo
               </div>
             ) : sent === "premium" ? (
-              <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-amber-400 border border-amber-400/30 bg-amber-400/10">
+              <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-ozio-orange border border-ozio-orange/30 bg-ozio-orange/10">
                 ✅ Solicitud enviada — te contactamos en 24h
               </div>
             ) : (
@@ -178,7 +178,7 @@ export default function Premium() {
 
           {/* CTA */}
           {!premium ? (
-            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-green-400 border border-green-500/30 bg-green-500/10">
+            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-ambience-low border border-ambience-low/30 bg-ambience-low/10">
               ✅ Plan activo
             </div>
           ) : sent === "free" ? (

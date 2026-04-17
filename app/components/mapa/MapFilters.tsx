@@ -42,14 +42,14 @@ export function MapFilters({
         <button
           type="button"
           onClick={() => setShowFilters(true)}
-          className="pointer-events-auto bg-gray-900/95 text-white px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-gray-700 hover:bg-gray-800 transition"
+          className="pointer-events-auto bg-ozio-dark/95 text-white px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-ozio-card hover:bg-ozio-card transition"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
           </svg>
           <span className="text-sm font-medium">Filtros</span>
           {hasActiveFilters && (
-            <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-ozio-blue flex-shrink-0" />
           )}
         </button>
       </div>
@@ -64,14 +64,14 @@ export function MapFilters({
 
       {/* Drawer / sidebar */}
       <aside
-        className={`fixed top-0 right-0 z-[1002] h-full w-full md:w-80 lg:w-96 bg-gray-900 border-l border-gray-700 shadow-2xl transform transition-transform duration-300 ${
+        className={`fixed top-0 right-0 z-[1002] h-full w-full md:w-80 lg:w-96 bg-ozio-dark border-l border-ozio-card shadow-2xl transform transition-transform duration-300 ${
           showFilters ? "translate-x-0" : "translate-x-full"
         }`}
         aria-labelledby="filters-title"
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <header className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
+          <header className="px-5 py-4 border-b border-ozio-card flex items-center justify-between">
             <div>
               <h3 id="filters-title" className="text-white font-semibold">Filtros</h3>
               <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
@@ -81,7 +81,7 @@ export function MapFilters({
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="text-xs text-blue-400 hover:text-blue-300 transition"
+                  className="text-xs text-ozio-blue hover:text-ozio-blue/80 transition"
                 >
                   Resetear
                 </button>
@@ -89,7 +89,7 @@ export function MapFilters({
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
-                className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-gray-800"
+                className="rounded-lg p-2 text-gray-400 hover:text-white hover:bg-ozio-card"
                 aria-label="Cerrar filtros"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ export function MapFilters({
                 <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
                   Distancia máxima
                 </label>
-                <span className="text-blue-400 text-xs font-medium">
+                <span className="text-ozio-blue text-xs font-medium">
                   {filters.maxDistance !== null ? `${filters.maxDistance} km` : "Sin límite"}
                 </span>
               </div>
@@ -127,7 +127,7 @@ export function MapFilters({
                         : parseFloat(e.target.value),
                   }))
                 }
-                className="w-full accent-blue-500"
+                className="w-full accent-ozio-blue"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>500m</span>
@@ -147,8 +147,8 @@ export function MapFilters({
                     onClick={() => setAmbientesSeleccionados(new Set())}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                       ambientesSeleccionados.size === 0
-                        ? "bg-blue-600 border-blue-500 text-white"
-                        : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                        ? "bg-ozio-blue border-ozio-blue text-white"
+                        : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
                     }`}
                   >
                     Todos
@@ -174,8 +174,8 @@ export function MapFilters({
                         }
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                           active
-                            ? "bg-blue-600 border-blue-500 text-white"
-                            : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                            ? "bg-ozio-blue border-ozio-blue text-white"
+                            : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
                         }`}
                       >
                         {label}
@@ -199,8 +199,8 @@ export function MapFilters({
                       onClick={() => setGenerosSeleccionados(new Set())}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                         generosSeleccionados.size === 0
-                          ? "bg-blue-600 border-blue-500 text-white"
-                          : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                          ? "bg-ozio-blue border-ozio-blue text-white"
+                          : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
                       }`}
                     >
                       Todos
@@ -222,8 +222,8 @@ export function MapFilters({
                           }
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                             active
-                              ? "bg-blue-600 border-blue-500 text-white"
-                              : "border-gray-700 text-gray-400 hover:text-white hover:border-gray-500"
+                              ? "bg-ozio-blue border-ozio-blue text-white"
+                              : "border-ozio-card text-gray-400 hover:text-white hover:border-gray-500"
                           }`}
                         >
                           {emoji} {name}
@@ -237,7 +237,7 @@ export function MapFilters({
           </div>
 
           {/* Footer */}
-          <footer className="px-5 py-4 border-t border-gray-700 bg-gray-900/95">
+          <footer className="px-5 py-4 border-t border-ozio-card bg-ozio-dark/95">
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-xs">Locales visibles</span>
               <span className="text-white text-sm font-bold">

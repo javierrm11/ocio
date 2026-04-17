@@ -193,7 +193,7 @@ export default function Stories() {
                 className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
                 onClick={() => router.push('/anadir?tipo=historia')}
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 to-purple-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-ozio-blue/70 to-ozio-purple flex items-center justify-center">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
@@ -210,8 +210,8 @@ export default function Stories() {
               className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"
               onClick={() => openGroup(group)}
             >
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-0.5">
-                <div className="w-full h-full rounded-full bg-gray-900 p-0.5">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-ozio-orange via-ambience-high to-ozio-purple p-0.5">
+                <div className="w-full h-full rounded-full bg-ozio-dark p-0.5">
                   {group.venue_avatar ? (
                     <img
                       src={group.venue_avatar}
@@ -220,7 +220,7 @@ export default function Stories() {
                     />
                   ) : (
                     // Fallback: inicial del nombre
-                    <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-white font-bold text-xl">
                       {group.venue_name[0].toUpperCase()}
                     </div>
                   )}
@@ -243,8 +243,8 @@ export default function Stories() {
       {/* ── Upload Modal ─────────────────────────────────────────────────── */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Subir historia">
-          <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-lg w-full">
-            <div className="border-b border-gray-700/50 px-6 py-4 flex items-center justify-between">
+          <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-lg w-full">
+            <div className="border-b border-ozio-card/50 px-6 py-4 flex items-center justify-between">
               <h2 className="text-white text-xl font-bold">📸 Nueva Historia</h2>
               <button onClick={() => { setShowUploadModal(false); setSelectedFile(null); setPreviewUrl(null); }} className="text-gray-400 hover:text-white transition">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +276,7 @@ export default function Stories() {
                   </label>
                   <label className="block">
                     <input type="file" accept="image/*" capture="environment" onChange={handleFileSelect} className="hidden" />
-                    <div className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
+                    <div className="bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-4 px-6 rounded-2xl cursor-pointer text-center transition flex items-center justify-center gap-3">
                       Tomar foto
                     </div>
                   </label>
@@ -299,7 +299,7 @@ export default function Stories() {
           {/* ✅ Barra de progreso solo del grupo activo */}
           <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
             {activeGroup.stories.map((_, index) => (
-              <div key={index} className="flex-1 h-1 bg-gray-600 rounded-full overflow-hidden">
+              <div key={index} className="flex-1 h-1 bg-ozio-card rounded-full overflow-hidden">
                 <div className={`h-full rounded-full ${
                   index < currentStoryIndex ? 'bg-white w-full' :
                   index === currentStoryIndex ? 'bg-white animate-progress' : 'w-0'
@@ -311,11 +311,11 @@ export default function Stories() {
           {/* Header */}
           <div className="absolute top-4 left-0 right-0 flex items-center justify-between px-4 z-10 mt-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-0.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-ozio-orange via-ambience-high to-ozio-purple p-0.5">
                 {activeGroup.venue_avatar ? (
                   <img src={activeGroup.venue_avatar} alt={activeGroup.venue_name} className="w-full h-full rounded-full object-cover" />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-full h-full rounded-full bg-ozio-card flex items-center justify-center text-white text-xs font-bold">
                     {activeGroup.venue_name[0].toUpperCase()}
                   </div>
                 )}

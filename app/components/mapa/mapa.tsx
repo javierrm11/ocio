@@ -101,7 +101,7 @@ function LocationBanner({
             {loading ? "…" : "Ir"}
           </button>
         </div>
-        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+        {error && <p className="text-ambience-high text-xs mt-2">{error}</p>}
       </div>
     </aside>
   );
@@ -353,7 +353,7 @@ function MyMap() {
     <>
       {/* Points toast */}
       {pointsToast !== null && (
-        <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-yellow-400 text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
+        <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-ozio-orange text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
           <span>+{pointsToast} puntos ganados</span>
         </div>
       )}
@@ -396,7 +396,7 @@ function MyMap() {
 
       {/* Active route banner */}
       {routePoints.length > 0 && (
-        <aside role="status" aria-label="Ruta activa" className="absolute top-16 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
+        <aside role="status" aria-label="Ruta activa" className="absolute top-16 left-1/2 -translate-x-1/2 z-[999] bg-ozio-blue text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
           <span>🗺️ Ruta activa</span>
           <button
             type="button"

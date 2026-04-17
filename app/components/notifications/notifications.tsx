@@ -170,9 +170,9 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="notifications-title">
-      <div className="bg-ozio-card border border-gray-700/50 rounded-3xl max-w-2xl w-full max-h-[85dvh] flex flex-col">
+      <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-2xl w-full max-h-[85dvh] flex flex-col">
         {/* Header */}
-        <header className="sticky top-0 bg-ozio-card border-b border-gray-700/50 px-6 py-4 rounded-t-3xl">
+        <header className="sticky top-0 bg-ozio-card border-b border-ozio-card/50 px-6 py-4 rounded-t-3xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <h2 id="notifications-title" className="text-white text-xl font-bold">🔔 Notificaciones</h2>
@@ -252,7 +252,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
                     onClick={() => handleNotificationClick(notification)}
                     className={`relative p-4 rounded-2xl cursor-pointer transition group ${
                       notification.is_read
-                        ? 'bg-ozio-dark hover:bg-gray-800/50'
+                        ? 'bg-ozio-dark hover:bg-ozio-darker/50'
                         : 'bg-ozio-blue/10 border border-ozio-blue/30 hover:bg-ozio-blue/20'
                     }`}
                   >
@@ -296,7 +296,7 @@ export default function NotificationCenter({ onClose }: NotificationCenterProps)
                           e.stopPropagation();
                           deleteNotification(notification.id);
                         }}
-                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition text-gray-500 hover:text-red-400 p-2"
+                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition text-gray-500 hover:text-ambience-high p-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     .from("stories")
     .select("*, venues(name, avatar_path)") // ✅ Incluir datos del local
     .gt("expires_at", new Date().toISOString()) // ✅ Solo stories activas
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   const filterableFields = [
     "venue_id",

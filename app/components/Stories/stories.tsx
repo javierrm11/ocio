@@ -323,7 +323,7 @@ export default function Stories() {
               <span className="text-white font-semibold text-sm">{activeGroup.venue_name}</span>
               {/* ✅ Índice de story dentro del grupo */}
               <span className="text-gray-400 text-xs">
-                {currentStoryIndex + 1}/{activeGroup.stories.length} · {new Date(currentStory.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(currentStory.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
             <button onClick={closeViewer} className="text-white hover:text-gray-300">

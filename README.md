@@ -242,6 +242,6 @@ npm run lint
 - [✅] Fix z-index de los filtros del mapa (se solapan con el panel lateral)
 - [✅] SEO Html5
 - [✅] Añadir buscar local desde el mapa
-- [ ] Historias en la vista de los establecimientos
+- [✅] Historias en la vista de los establecimientos
 - [✅] Control de seguridad de rutas /anadir
 - [ ] Utilizar todos los colores de las variables

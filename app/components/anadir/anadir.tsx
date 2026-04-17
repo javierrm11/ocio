@@ -102,6 +102,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
   const galleryRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   /* ── Cámara ── */
   const startCamera = async (mode: "user" | "environment" = facingMode) => {
@@ -163,7 +164,20 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
     if (!dragRef.current) return;
     setImgPos((p) => ({ ...p, x: dragRef.current!.ox + e.clientX - dragRef.current!.startX, y: dragRef.current!.oy + e.clientY - dragRef.current!.startY }));
   };
-  const onMouseUp = () => { dragRef.current = null; };
+  const snapToBounds = () => {
+    const el = canvasRef.current;
+    dragRef.current = null;
+    pinchRef.current = null;
+    if (!el) return;
+    const { width: cw, height: ch } = el.getBoundingClientRect();
+    setImgPos((p) => {
+      const maxX = Math.max(0, cw * (p.scale - 1) / 2);
+      const maxY = Math.max(0, ch * (p.scale - 1) / 2);
+      return { ...p, x: Math.min(maxX, Math.max(-maxX, p.x)), y: Math.min(maxY, Math.max(-maxY, p.y)) };
+    });
+  };
+
+  const onMouseUp = () => { snapToBounds(); };
 
   /* ── Zoom rueda ── */
   const onWheel = (e: React.WheelEvent) => {
@@ -193,7 +207,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
       setImgPos((p) => ({ ...p, scale: Math.min(5, Math.max(0.5, p.scale * ratio)) }));
     }
   };
-  const onTouchEnd = () => { dragRef.current = null; pinchRef.current = null; };
+  const onTouchEnd = () => { snapToBounds(); };
 
   /* ── Submit ── */
   const submit = async () => {
@@ -227,7 +241,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
       <div className="relative flex flex-col w-full max-w-md h-full">
 
       {/* ── Canvas 9:16 ── */}
-      <div className="flex-1 relative overflow-hidden bg-black">
+      <div ref={canvasRef} className="flex-1 relative overflow-hidden bg-black">
 
         {/* Cámara en vivo (fondo, siempre montada) */}
         <video ref={videoRef} autoPlay playsInline muted

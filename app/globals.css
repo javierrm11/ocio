@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  overflow-y: scroll;
+}
+
 @plugin "tailwindcss-animate";
 
 @theme {

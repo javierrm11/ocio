@@ -46,6 +46,7 @@ interface AppStore {
   events: Event[];
   userLocation: { latitude: number; longitude: number } | null;
   locationDenied: boolean;
+  mapFlyTarget: { lat: number; lng: number; venueId: string } | null;
   setVenues: (v: Venue[]) => void;
   setUserFavorites: (ids: number[]) => void;
   setCurrentUser: (u: any | null) => void;
@@ -53,6 +54,7 @@ interface AppStore {
   setLoaded: (v: boolean) => void;
   setUserLocation: (location: { latitude: number; longitude: number } | null) => void;
   setLocationDenied: (denied: boolean) => void;
+  setMapFlyTarget: (target: { lat: number; lng: number; venueId: string } | null) => void;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -63,6 +65,7 @@ export const useAppStore = create<AppStore>((set) => ({
   events: [],
   userLocation: null,
   locationDenied: false,
+  mapFlyTarget: null,
   setVenues: (venues) => set({ venues }),
   setUserFavorites: (userFavorites) => set({ userFavorites }),
   setCurrentUser: (currentUser) => set({ currentUser }),
@@ -70,4 +73,5 @@ export const useAppStore = create<AppStore>((set) => ({
   setLoaded: (loaded) => set({ loaded }),
   setUserLocation: (userLocation) => set({ userLocation }),
   setLocationDenied: (locationDenied) => set({ locationDenied }),
+  setMapFlyTarget: (mapFlyTarget) => set({ mapFlyTarget }),
 }));

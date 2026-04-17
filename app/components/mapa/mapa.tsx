@@ -19,6 +19,15 @@ function MapViewSetter({ location }: { location: { latitude: number; longitude: 
   return null;
 }
 
+// Vuela al venue seleccionado desde la búsqueda
+function FlyToHandler({ target }: { target: { lat: number; lng: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo([target.lat, target.lng], 16, { duration: 1 });
+  }, [target, map]);
+  return null;
+}
+
 // Banner de ubicación denegada con búsqueda de ciudad
 function LocationBanner({
   onLocationFound,
@@ -111,6 +120,8 @@ function MyMap() {
     setUserLocation,
     locationDenied,
     setLocationDenied,
+    mapFlyTarget,
+    setMapFlyTarget,
   } = useAppStore();
 
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
@@ -118,6 +129,7 @@ function MyMap() {
   const [showFilters, setShowFilters] = useState(false);
   const [generosSeleccionados, setGenerosSeleccionados] = useState<Set<string>>(new Set());
   const [ambientesSeleccionados, setAmbientesSeleccionados] = useState<Set<string>>(new Set());
+  const [flyCoords, setFlyCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [routePoints, setRoutePoints] = useState<[number, number][]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [pointsToast, setPointsToast] = useState<number | null>(null);
@@ -191,6 +203,17 @@ function MyMap() {
       return false;
     return true;
   }), [venues, filters.maxDistance, ambientesSeleccionados, generosSeleccionados]);
+
+  // Reacciona a búsqueda: vuela al venue y abre su panel
+  useEffect(() => {
+    if (!mapFlyTarget) return;
+    const venue = venues.find((v) => v.id === mapFlyTarget.venueId);
+    if (venue) {
+      setFlyCoords({ lat: mapFlyTarget.lat, lng: mapFlyTarget.lng });
+      setSelectedVenue(venue);
+    }
+    setMapFlyTarget(null);
+  }, [mapFlyTarget, venues, setMapFlyTarget]);
 
   const showPointsToast = useCallback((points: number) => {
     setPointsToast(points);
@@ -361,6 +384,7 @@ function MyMap() {
             }
           />
           <MapViewSetter location={userLocation} />
+          <FlyToHandler target={flyCoords} />
           <MapMarkers
             filteredVenues={filteredVenues}
             userLocation={userLocation}
@@ -372,7 +396,7 @@ function MyMap() {
 
       {/* Active route banner */}
       {routePoints.length > 0 && (
-        <aside role="status" aria-label="Ruta activa" className="absolute top-4 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
+        <aside role="status" aria-label="Ruta activa" className="absolute top-16 left-1/2 -translate-x-1/2 z-[999] bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
           <span>🗺️ Ruta activa</span>
           <button
             type="button"

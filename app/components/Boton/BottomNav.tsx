@@ -222,10 +222,10 @@ function NavItem({
       onClick={onClick}
       className={`
     flex flex-col items-center justify-center text-xs transition relative
-    
+    w-12 h-12
     ${
       special
-        ? "bg-ozio-blue text-white p-3 rounded-full shadow-xl"
+        ? "bg-ozio-blue text-white rounded-full shadow-xl"
         : active
           ? "text-blue-500"
           : "text-zinc-400 hover:text-zinc-200"

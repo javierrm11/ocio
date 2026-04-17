@@ -182,8 +182,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           <ol className="flex items-center justify-center gap-2 mb-6 list-none p-0 m-0" aria-label="Pasos del registro">
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num, idx) => (
               <li key={num} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition ${
-                  step >= num ? 'bg-ozio-blue text-white' : 'bg-ozio-card text-gray-400'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition border-2 ${
+                  step >= num ? 'bg-ozio-blue text-white border-ozio-blue' : 'bg-ozio-card text-gray-400 border-gray-600'
                 }`}>
                   {num}
                 </div>

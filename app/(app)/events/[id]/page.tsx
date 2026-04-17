@@ -113,7 +113,7 @@ export default function EventDetailPage() {
   const getEventStatusBadge = () => {
     if (isPastEvent) {
       return (
-        <div className="bg-gray-700/50 text-gray-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
+        <div className="bg-ozio-card/50 text-gray-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -123,8 +123,8 @@ export default function EventDetailPage() {
     }
     if (isActiveEvent) {
       return (
-        <div className="bg-green-600/20 text-green-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2 animate-pulse">
-          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+        <div className="bg-ambience-low/20 text-ambience-low text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2 animate-pulse">
+          <div className="w-2 h-2 bg-ambience-low rounded-full"></div>
           En curso ahora
         </div>
       );
@@ -209,9 +209,9 @@ export default function EventDetailPage() {
   return (
     <main className="min-h-screen bg-ozio-dark pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-gray-800">
+      <header className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-ozio-darker">
         <div className="px-4 md:px-8 py-4 flex items-center gap-3 max-w-6xl mx-auto">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-800 rounded-full transition">
+          <button onClick={() => router.back()} className="p-2 hover:bg-ozio-card rounded-full transition">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -235,8 +235,8 @@ export default function EventDetailPage() {
               </div>
             )}
             {isPastEvent && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="bg-gray-800/90 backdrop-blur-sm text-white text-lg font-bold px-6 py-3 rounded-2xl border border-gray-600">
+              <div className="absolute inset-0 bg-ozio-darker/80 flex items-center justify-center">
+                <div className="bg-ozio-card/90 backdrop-blur-sm text-white text-lg font-bold px-6 py-3 rounded-2xl border border-ozio-card">
                   Evento Finalizado
                 </div>
               </div>
@@ -280,7 +280,7 @@ export default function EventDetailPage() {
 
             {/* Venue */}
             {event.venues && (
-              <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+              <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -313,7 +313,7 @@ export default function EventDetailPage() {
 
             {/* Mapa */}
             {event.venues?.latitude && event.venues?.longitude && (
-              <section className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+              <section className={`bg-ozio-card border rounded-2xl overflow-hidden ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
                 <h3 className="text-white font-semibold p-4">🗺️ Mapa</h3>
                 <div className="h-64 md:h-80 relative overflow-hidden">
                   <iframe
@@ -333,7 +333,7 @@ export default function EventDetailPage() {
           <aside className="space-y-6 mt-6 lg:mt-0">
 
             {/* Fechas */}
-            <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-gray-800/50 opacity-60' : 'border-gray-700/50'}`}>
+            <section className={`bg-ozio-card border rounded-2xl p-4 ${isPastEvent ? 'border-ozio-darker/50 opacity-60' : 'border-ozio-card/50'}`}>
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -342,7 +342,7 @@ export default function EventDetailPage() {
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-gray-700/20' : 'bg-ozio-blue/20'}`}>
+                  <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-ozio-card/20' : 'bg-ozio-blue/20'}`}>
                     <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -354,7 +354,7 @@ export default function EventDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-gray-700/20' : 'bg-ozio-purple/20'}`}>
+                  <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-ozio-card/20' : 'bg-ozio-purple/20'}`}>
                     <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -373,7 +373,7 @@ export default function EventDetailPage() {
               <div>
                 {isAttending ? (
                   <button
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
+                    className="w-full bg-ambience-high hover:bg-ambience-high/80 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2"
                     onClick={handleUnattend}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -397,7 +397,7 @@ export default function EventDetailPage() {
 
             {/* Mensaje evento pasado */}
             {isPastEvent && (
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-6 text-center">
+              <div className="bg-ozio-darker/50 border border-ozio-card/50 rounded-2xl p-6 text-center">
                 <svg className="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>

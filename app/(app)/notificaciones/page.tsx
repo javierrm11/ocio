@@ -133,12 +133,12 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-ozio-dark pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-gray-800">
+      <div className="sticky top-0 z-10 bg-ozio-dark/95 backdrop-blur-sm border-b border-ozio-darker">
         <div className="px-4 py-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-800 rounded-full transition"
+              className="p-2 hover:bg-ozio-card rounded-full transition"
             >
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -164,7 +164,7 @@ export default function NotificationsPage() {
                 onClick={() => handleNotificationClick(notification)}
                 className={`relative rounded-2xl overflow-hidden cursor-pointer transition ${
                   notification.is_read 
-                    ? 'bg-ozio-card hover:bg-gray-800/70' 
+                    ? 'bg-ozio-card hover:bg-ozio-card/70'
                     : 'bg-ozio-card border-l-4 border-ozio-blue'
                 }`}
               >

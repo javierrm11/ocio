@@ -76,7 +76,7 @@ export default function EventDetailPage() {
 
     const fetchEvent = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/events/${eventId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/events/${eventId}`);
         if (!res.ok) throw new Error("Error al cargar el evento");
         const data = await res.json();
         setEvent(data);
@@ -145,7 +145,7 @@ export default function EventDetailPage() {
   const handleAttend = async () => {
     const token = getToken();
     try {
-      const res = await fetch(`http://localhost:3000/api/eventAttendees`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/eventAttendees`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +168,7 @@ export default function EventDetailPage() {
     if (!myAttendance) return;
     try {
       const res = await fetch(
-        `http://localhost:3000/api/eventAttendees/${myAttendance.id}`,
+        `${process.env.NEXT_PUBLIC_APP_URL}/eventAttendees/${myAttendance.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

@@ -47,6 +47,8 @@ interface AppStore {
   userLocation: { latitude: number; longitude: number } | null;
   locationDenied: boolean;
   mapFlyTarget: { lat: number; lng: number; venueId: string } | null;
+  showFilters: boolean;
+  hasActiveFilters: boolean;
   setVenues: (v: Venue[]) => void;
   setUserFavorites: (ids: number[]) => void;
   setCurrentUser: (u: any | null) => void;
@@ -55,6 +57,8 @@ interface AppStore {
   setUserLocation: (location: { latitude: number; longitude: number } | null) => void;
   setLocationDenied: (denied: boolean) => void;
   setMapFlyTarget: (target: { lat: number; lng: number; venueId: string } | null) => void;
+  setShowFilters: (v: boolean) => void;
+  setHasActiveFilters: (v: boolean) => void;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -66,6 +70,8 @@ export const useAppStore = create<AppStore>((set) => ({
   userLocation: null,
   locationDenied: false,
   mapFlyTarget: null,
+  showFilters: false,
+  hasActiveFilters: false,
   setVenues: (venues) => set({ venues }),
   setUserFavorites: (userFavorites) => set({ userFavorites }),
   setCurrentUser: (currentUser) => set({ currentUser }),
@@ -74,4 +80,6 @@ export const useAppStore = create<AppStore>((set) => ({
   setUserLocation: (userLocation) => set({ userLocation }),
   setLocationDenied: (locationDenied) => set({ locationDenied }),
   setMapFlyTarget: (mapFlyTarget) => set({ mapFlyTarget }),
+  setShowFilters: (showFilters) => set({ showFilters }),
+  setHasActiveFilters: (hasActiveFilters) => set({ hasActiveFilters }),
 }));

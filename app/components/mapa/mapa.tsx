@@ -122,11 +122,13 @@ function MyMap() {
     setLocationDenied,
     mapFlyTarget,
     setMapFlyTarget,
+    showFilters,
+    setShowFilters,
+    setHasActiveFilters,
   } = useAppStore();
 
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [filters, setFilters] = useState({ maxDistance: null as number | null });
-  const [showFilters, setShowFilters] = useState(false);
   const [generosSeleccionados, setGenerosSeleccionados] = useState<Set<string>>(new Set());
   const [ambientesSeleccionados, setAmbientesSeleccionados] = useState<Set<string>>(new Set());
   const [flyCoords, setFlyCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -191,6 +193,8 @@ function MyMap() {
     () => filters.maxDistance !== null || ambientesSeleccionados.size > 0 || generosSeleccionados.size > 0,
     [filters.maxDistance, ambientesSeleccionados, generosSeleccionados],
   );
+
+  useEffect(() => { setHasActiveFilters(hasActiveFilters); }, [hasActiveFilters, setHasActiveFilters]);
 
   const filteredVenues = useMemo(() => venues.filter((v) => {
     const dist = parseDistanceToKm(v.distance);

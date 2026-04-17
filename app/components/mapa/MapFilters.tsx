@@ -37,23 +37,6 @@ export function MapFilters({
 
   return (
     <>
-      {/* Trigger button */}
-      <div className="absolute bottom-20 right-3 z-[938] pointer-events-none max-w-xl">
-        <button
-          type="button"
-          onClick={() => setShowFilters(true)}
-          className="pointer-events-auto bg-ozio-dark/95 text-ozio-text px-3 py-2 rounded-full flex items-center gap-2 shadow-xl border border-ozio-card hover:bg-ozio-card transition"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
-          </svg>
-          <span className="text-sm font-medium">Filtros</span>
-          {hasActiveFilters && (
-            <span className="w-2 h-2 rounded-full bg-ozio-blue flex-shrink-0" />
-          )}
-        </button>
-      </div>
-
       {/* Mobile backdrop */}
       {showFilters && (
         <div

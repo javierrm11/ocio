@@ -241,8 +241,7 @@ npm run lint
 ### Pendientes de producto
 - [✅] Fix z-index de los filtros del mapa (se solapan con el panel lateral)
 - [✅] SEO Html5
-- [ ] Radio de visualización en el mapa variable según el plan del usuario
-- [ ] Filtros adicionales en la búsqueda (aforo, precio, horario)
-- [ ] Notificaciones push (Web Push API / service worker)
+- [ ] Añadir buscar local desde el mapa
 - [ ] Historias en la vista de los establecimientos
 - [ ] Control de seguridad de rutas /anadir
+- [ ] Utilizar todos los colores de las variables

@@ -30,7 +30,7 @@ export default function AnadirPage() {
 
   return (
     <div className="min-h-screen bg-ozio-dark pb-24">
-      <header className="sticky top-0 z-20 bg-ozio-darker border-b border-gray-800/50 px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 z-20 bg-ozio-darker border-b border-ozio-darker/50 px-4 py-3 flex items-center gap-3">
         <button
           type="button"
           onClick={() => (tipo ? setTipo(null) : router.back())}
@@ -60,7 +60,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
         <button
           type="button"
           onClick={() => onSelect("historia")}
-          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-8 transition group"
+          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-ozio-card/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-8 transition group"
         >
           <span className="text-5xl">📸</span>
           <div className="text-center">
@@ -73,7 +73,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
         <button
           type="button"
           onClick={() => onSelect("evento")}
-          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-8 transition group"
+          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-ozio-card/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-8 transition group"
         >
           <span className="text-5xl">🎉</span>
           <div className="text-center">
@@ -304,7 +304,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
           <div className="flex items-center justify-center gap-10 w-full px-10">
             {/* Galería */}
             <button type="button" aria-label="Abrir galería" onClick={() => galleryRef.current?.click()}
-              className="w-14 h-14 rounded-xl border-2 border-white/50 bg-gray-800 flex items-center justify-center active:scale-95 transition">
+              className="w-14 h-14 rounded-xl border-2 border-white/50 bg-ozio-card flex items-center justify-center active:scale-95 transition">
               <ImageIcon className="w-7 h-7 text-white/70" />
             </button>
             {/* Capturar */}
@@ -327,7 +327,7 @@ function FormHistoria({ onBack }: { onBack: () => void }) {
         /* ── Controles con preview ── */
         <div className="flex flex-col items-center gap-4 pb-10 pt-5 px-6 bg-black">
           {error && (
-            <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2 w-full">{error}</p>
+            <p className="text-ambience-high text-sm text-center bg-ambience-high/10 border border-ambience-high/30 rounded-xl px-4 py-2 w-full">{error}</p>
           )}
           <div className="flex items-center justify-center gap-4 w-full">
             <button type="button" aria-label="Descartar" onClick={() => { setFile(null); setPreview(null); startCamera(); }}
@@ -460,7 +460,7 @@ function FormEvento() {
   };
 
   const inputClass =
-    "w-full bg-ozio-card border border-gray-700/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
+    "w-full bg-ozio-card border border-ozio-card/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
   const labelClass = "text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1.5 block";
 
   const limitReached = !userIsPremium && monthlyCount !== null && monthlyCount >= 2;
@@ -470,10 +470,10 @@ function FormEvento() {
       {showLimitModal && <PremiumLimitModal onClose={() => setShowLimitModal(false)} />}
 
       {limitReached && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className="bg-ozio-orange/10 border border-ozio-orange/30 rounded-xl px-4 py-3 flex items-center gap-3">
           <span className="text-xl">🔒</span>
           <div>
-            <p className="text-amber-400 text-sm font-semibold">Límite mensual alcanzado</p>
+            <p className="text-ozio-orange text-sm font-semibold">Límite mensual alcanzado</p>
             <p className="text-gray-400 text-xs mt-0.5">Has creado 2 eventos este mes. Actualiza a Premium para crear eventos ilimitados.</p>
           </div>
         </div>
@@ -551,7 +551,7 @@ function FormEvento() {
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
                       selected
                         ? "bg-ozio-blue border-ozio-blue text-white scale-105"
-                        : "bg-ozio-card border-gray-700/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
+                        : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:border-ozio-blue/50 hover:text-white"
                     }`}
                   >
                     <span>{genre.emoji}</span>
@@ -573,7 +573,7 @@ function FormEvento() {
       <div>
         <label className={labelClass}>Imagen del evento</label>
         <div
-          className="relative rounded-xl border border-dashed border-gray-700 hover:border-gray-500 transition cursor-pointer overflow-hidden min-h-[140px]"
+          className="relative rounded-xl border border-dashed border-ozio-card hover:border-ozio-card/70 transition cursor-pointer overflow-hidden min-h-[140px]"
           onClick={() => imageRef.current?.click()}
         >
           <input
@@ -613,17 +613,17 @@ function FormEvento() {
           onClick={() => set("featured", !form.featured)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm ${
             form.featured
-              ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-400"
-              : "bg-ozio-card border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-500"
+              ? "bg-ozio-orange/10 border-ozio-orange/40 text-ozio-orange"
+              : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-white hover:border-ozio-card/70"
           }`}
         >
-          <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-yellow-400" : ""}`} />
+          <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-ozio-orange" : ""}`} />
           <div className="text-left">
             <p className="font-medium">Evento destacado</p>
             <p className="text-xs opacity-70 mt-0.5">Aparecerá primero en el listado</p>
           </div>
           {form.featured && (
-            <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">Activo</span>
+            <span className="ml-auto text-xs bg-ozio-orange/20 text-ozio-orange px-2 py-0.5 rounded-full">Activo</span>
           )}
         </button>
       ) : (
@@ -631,7 +631,7 @@ function FormEvento() {
           <button
             type="button"
             onClick={() => setShowPremiumModal(true)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-700/50 bg-ozio-card cursor-pointer transition text-left"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-ozio-card/50 bg-ozio-card cursor-pointer transition text-left"
           >
             <Star className="w-4 h-4 flex-shrink-0 text-gray-600" />
             <div className="text-left">
@@ -645,7 +645,7 @@ function FormEvento() {
       )}
 
       {error && (
-        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">{error}</p>
+        <p className="text-ambience-high text-sm bg-ambience-high/10 border border-ambience-high/30 rounded-xl px-4 py-3">{error}</p>
       )}
 
       <button
@@ -668,7 +668,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title" onClick={onClose}>
       <div
-        className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
+        className="w-full max-w-md bg-ozio-dark rounded-t-3xl p-6 pb-10 border-t border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
@@ -689,7 +689,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
         <ul className="space-y-3 mb-6 list-none p-0 m-0">
           {["🚀 Eventos ilimitados cada mes", "⭐ Eventos destacados en el listado", "📊 Estadísticas avanzadas de asistencia", "👑 Badge exclusivo en el mapa"].map((feat) => (
             <li key={feat} className="flex items-center gap-3 text-sm">
-              <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
+              <span className="text-ozio-orange text-base">{feat.slice(0, 2)}</span>
               <span className="text-gray-300">{feat.slice(3)}</span>
             </li>
           ))}
@@ -717,7 +717,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="featured-modal-title" onClick={onClose}>
       <div
-        className="w-full max-w-md bg-[#0f1220] rounded-t-3xl p-6 pb-10 border-t border-white/10"
+        className="w-full max-w-md bg-ozio-dark rounded-t-3xl p-6 pb-10 border-t border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
@@ -738,7 +738,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
         <ul className="space-y-3 mb-6 list-none p-0 m-0">
           {["🔝 Posición destacada en el listado", "👁️ Mayor visibilidad para tu evento", "🚀 Más asistentes potenciales", "👑 Badge exclusivo en el mapa"].map((feat) => (
             <li key={feat} className="flex items-center gap-3 text-sm">
-              <span className="text-amber-400 text-base">{feat.slice(0, 2)}</span>
+              <span className="text-ozio-orange text-base">{feat.slice(0, 2)}</span>
               <span className="text-gray-300">{feat.slice(3)}</span>
             </li>
           ))}

@@ -246,4 +246,4 @@ npm run lint
 - [✅] Control de seguridad de rutas /anadir
 - [ ] Utilizar todos los colores de las variables
   
-teniendo globals.css las variables de los colores neceito que todo el uso de colores utilize las variables de ozio actualiza el events/id/page.tsx
+teniendo globals.css las variables de los colores neceito que todo el uso de colores utilize las variables de ozio actualiza el components/

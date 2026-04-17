@@ -100,7 +100,7 @@ function BottomNav() {
                     setShowAddModal(false);
                     router.push('/anadir?tipo=historia');
                   }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
                 >
                   <span className="text-4xl">📸</span>
                   <div className="text-center">
@@ -116,7 +116,7 @@ function BottomNav() {
                     setShowAddModal(false);
                     router.push('/anadir?tipo=evento');
                   }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
                 >
                   <span className="text-4xl">🎉</span>
                   <div className="text-center">
@@ -135,7 +135,7 @@ function BottomNav() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-6">
           <div className="w-full max-w-sm rounded-2xl bg-ozio-card p-6 text-center shadow-2xl">
             <h3 className="text-lg font-semibold text-white">Debes iniciar sesión</h3>
-            <p className="mt-2 text-sm text-zinc-300">
+            <p className="mt-2 text-sm text-gray-300">
               Para usar esta opción necesitas tener una cuenta.
             </p>
 
@@ -143,7 +143,7 @@ function BottomNav() {
               <button
                 type="button"
                 onClick={() => setShowAuthModal(false)}
-                className="flex-1 rounded-xl border border-zinc-600 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800"
+                className="flex-1 rounded-xl border border-ozio-card px-4 py-2 text-sm text-gray-200 hover:bg-ozio-card"
               >
                 Cancelar
               </button>
@@ -190,8 +190,8 @@ function NavItem({
         ${special
           ? 'bg-ozio-blue text-white p-3 rounded-full shadow-xl'
           : active
-            ? 'text-blue-500'
-            : 'text-zinc-400 hover:text-zinc-200'
+            ? 'text-ozio-blue'
+            : 'text-gray-400 hover:text-gray-200'
         }
       `}
     >

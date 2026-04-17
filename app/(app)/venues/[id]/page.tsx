@@ -26,6 +26,15 @@ interface CheckIn {
   created_at: string;
   active: boolean;
 }
+interface Story {
+  id?: string;
+  venue_id: string;
+  media_type: string;
+  media_path: string;
+  created_at: string;
+  expires_at: string;
+  venues: { name: string; avatar_path?: string };
+}
 interface Genre {
   genre: any;
   id: number;
@@ -77,6 +86,9 @@ export default function VenueDetail() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [togglingFavorite, setTogglingFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState<"events" | "location">("events");
+  const [venueStories, setVenueStories] = useState<Story[]>([]);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const [storyIndex, setStoryIndex] = useState(0);
 
   const isUserProfile =
     currentUser?.username !== undefined && currentUser?.username !== null;
@@ -90,7 +102,33 @@ export default function VenueDetail() {
   }, [venueFromStore, currentProfileId]);
 
   useEffect(() => {
-    if (venue) return;
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories?venue_id=${venueId}`)
+      .then((res) => res.json())
+      .then((data) => { if (Array.isArray(data)) setVenueStories(data); })
+      .catch(() => {});
+  }, [venueId]);
+
+  const hasStories = venueStories.length > 0;
+  const currentStory = venueStories[storyIndex] ?? null;
+
+  const openStories = () => { setShowStoryViewer(true); setStoryIndex(0); };
+  const closeStories = () => { setShowStoryViewer(false); setStoryIndex(0); };
+  const nextStory = () => {
+    if (storyIndex < venueStories.length - 1) setStoryIndex((i) => i + 1);
+    else closeStories();
+  };
+  const prevStory = () => {
+    if (storyIndex > 0) setStoryIndex((i) => i - 1);
+  };
+
+  useEffect(() => {
+    if (!showStoryViewer) return;
+    const timer = setTimeout(nextStory, 15000);
+    return () => clearTimeout(timer);
+  }, [showStoryViewer, storyIndex]);
+
+  useEffect(() => {
+    if (!venue) return;
 
     const fetchVenueDetail = async () => {
       try {
@@ -287,7 +325,10 @@ export default function VenueDetail() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <div className="w-[82px] h-[82px] rounded-full p-[2.5px] bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue">
+            <div
+              className={`w-[82px] h-[82px] rounded-full p-[2.5px] transition ${hasStories ? "bg-gradient-to-tr from-blue-400 to-blue-600 cursor-pointer" : "bg-gradient-to-tr from-ozio-orange via-ozio-purple to-ozio-blue"}`}
+              onClick={hasStories ? openStories : undefined}
+            >
               {venue.avatar_path ? (
                 <img
                   src={venue.avatar_path}
@@ -510,6 +551,84 @@ export default function VenueDetail() {
         )}
       </section>
     </main>
+
+    {/* ── Story Viewer ── */}
+    {showStoryViewer && currentStory && (
+      <div
+        className="fixed inset-0 bg-black z-50 flex items-center justify-center"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Historias de ${venue.name}`}
+      >
+        {/* Barras de progreso */}
+        <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
+          {venueStories.map((_, index) => (
+            <div key={index} className="flex-1 h-1 bg-gray-600 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full ${
+                index < storyIndex ? "bg-white w-full" :
+                index === storyIndex ? "bg-white animate-story-progress" : "w-0"
+              }`} />
+            </div>
+          ))}
+        </div>
+
+        {/* Header */}
+        <div className="absolute top-4 left-0 right-0 flex items-center justify-between px-4 z-10 mt-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-blue-600 p-0.5">
+              {venue.avatar_path ? (
+                <img src={venue.avatar_path} alt={venue.name} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <div className="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white text-xs font-bold">
+                  {venue.name[0].toUpperCase()}
+                </div>
+              )}
+            </div>
+            <span className="text-white font-semibold text-sm">{venue.name}</span>
+            <span className="text-gray-400 text-xs">
+              {storyIndex + 1}/{venueStories.length} · {new Date(currentStory.created_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          </div>
+          <button type="button" onClick={closeStories} aria-label="Cerrar historias" className="text-white hover:text-gray-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Contenido */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          {currentStory.media_type === "video" ? (
+            <video
+              key={currentStory.media_path}
+              src={currentStory.media_path}
+              className="max-w-full max-h-full object-contain"
+              autoPlay
+              onEnded={nextStory}
+            />
+          ) : (
+            <img
+              key={currentStory.media_path}
+              src={currentStory.media_path}
+              alt="Historia"
+              className="max-w-full max-h-full object-contain"
+            />
+          )}
+
+          {/* Zonas táctiles */}
+          <div className="absolute inset-0 flex">
+            <div className="w-1/3 h-full cursor-pointer" onClick={prevStory} />
+            <div className="w-1/3 h-full" />
+            <div className="w-1/3 h-full cursor-pointer" onClick={nextStory} />
+          </div>
+        </div>
+      </div>
+    )}
+
+    <style>{`
+      @keyframes story-progress { from { width: 0% } to { width: 100% } }
+      .animate-story-progress { animation: story-progress 15s linear forwards; }
+    `}</style>
     </div>
   );
 }

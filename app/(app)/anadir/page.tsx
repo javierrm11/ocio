@@ -13,13 +13,13 @@ export default function AnadirPage() {
     if (!getToken()) {
       router.replace('/profile');
       return;
-    }
-    if (currentUser && currentUser.role !== 'venue') {
+    }    
+    if (currentUser && currentUser.username ) {
       router.replace('/profile');
     }
   }, [currentUser, router]);
 
-  if (!currentUser || currentUser.role !== 'venue') {
+  if (!currentUser || currentUser.username) {
     return <div className="min-h-screen bg-ozio-dark" />;
   }
 

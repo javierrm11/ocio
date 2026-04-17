@@ -16,6 +16,13 @@ html {
   --color-ozio-purple: var(--ozio-purple);
   --color-ozio-orange: var(--ozio-orange);
   
+  /* Texto secundario */
+  --color-ozio-text-bright: var(--ozio-text-bright);
+  --color-ozio-text-secondary: var(--ozio-text-secondary);
+  --color-ozio-text-muted: var(--ozio-text-muted);
+  --color-ozio-text-subtle: var(--ozio-text-subtle);
+  --color-ozio-text-dim: var(--ozio-text-dim);
+
   --color-ambience-low: var(--ambience-low);
   --color-ambience-low-light: var(--ambience-low-light);
   --color-ambience-medium: var(--ambience-medium);
@@ -30,6 +37,12 @@ html {
 :root {
   /* Colores principales de Ozio */
   --ozio-text: #ffffff;
+  /* Texto secundario (equivalentes a gray-200/300/400/500/600) */
+  --ozio-text-bright: #e5e7eb;
+  --ozio-text-secondary: #d1d5db;
+  --ozio-text-muted: #9ca3af;
+  --ozio-text-subtle: #6b7280;
+  --ozio-text-dim: #4b5563;
   --ozio-dark: #0A0E1A;
   --ozio-darker: #060911;
   --ozio-card: #1A1F2E;

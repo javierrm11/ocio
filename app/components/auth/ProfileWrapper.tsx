@@ -53,7 +53,7 @@ export default function ProfilePage() {
       <main className="pt-16 px-4 flex flex-col justify-center min-h-screen pb-24">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-ozio-text mb-2">OZIO</h1>
-          <p className="text-gray-400">Descubre la vida nocturna</p>
+          <p className="text-ozio-text-muted">Descubre la vida nocturna</p>
         </div>
 
         {/* Navegación de pestañas */}
@@ -63,7 +63,7 @@ export default function ProfilePage() {
             className={`pb-3 px-4 font-medium transition-colors relative flex-1 ${
               activeTab === "login"
                 ? "text-ozio-text"
-                : "text-gray-400 hover:text-gray-300"
+                : "text-ozio-text-muted hover:text-ozio-text-secondary"
             }`}
           >
             Iniciar Sesión
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             className={`pb-3 px-4 font-medium transition-colors relative flex-1 ${
               activeTab === "register"
                 ? "text-ozio-text"
-                : "text-gray-400 hover:text-gray-300"
+                : "text-ozio-text-muted hover:text-ozio-text-secondary"
             }`}
           >
             Registro

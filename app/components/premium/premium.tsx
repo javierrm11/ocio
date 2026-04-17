@@ -70,14 +70,14 @@ export default function Premium() {
         <h1 className="text-ozio-text text-4xl font-black tracking-tight mb-2">
           Ozio <span className="premium-title-gradient">Premium</span>
         </h1>
-        <p className="text-gray-400 text-base max-w-xs mx-auto leading-relaxed">
+        <p className="text-ozio-text-muted text-base max-w-xs mx-auto leading-relaxed">
           Destaca tu local, consigue más visibilidad y accede a estadísticas exclusivas.
         </p>
 
         <ul className="flex flex-wrap justify-center gap-2 mt-5 list-none p-0 m-0">
           {["📊 Estadísticas", "🔥 Más visibilidad", "🚀 Sin límites"].map((b) => (
             <li key={b}>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300">
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-ozio-text-secondary">
                 {b}
               </span>
             </li>
@@ -103,10 +103,10 @@ export default function Premium() {
           <div className="p-6 pt-5">
             {/* Precio */}
             <div className="mb-5">
-              <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-1">Plan Premium</p>
+              <p className="text-ozio-text-muted text-xs font-semibold uppercase tracking-widest mb-1">Plan Premium</p>
               <div className="flex items-end gap-1">
                 <span className="text-ozio-text text-5xl font-black leading-none">29€</span>
-                <span className="text-gray-500 text-sm mb-1">/mes</span>
+                <span className="text-ozio-text-subtle text-sm mb-1">/mes</span>
               </div>
               <p className="text-ozio-orange/70 text-xs mt-1">Actívalo en menos de 24h</p>
             </div>
@@ -120,7 +120,7 @@ export default function Premium() {
                       <path d="M1.5 5.5L4 8L8.5 2.5" stroke="#fbbf24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
-                  <span className="text-gray-200 text-sm">{f.text}</span>
+                  <span className="text-ozio-text-bright text-sm">{f.text}</span>
                 </li>
               ))}
             </ul>
@@ -150,10 +150,10 @@ export default function Premium() {
         {/* ── Card GRATIS ── */}
         <article className="rounded-3xl p-6 free-card flex-1">
           <div className="mb-5">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
+            <p className="text-ozio-text-subtle text-xs font-semibold uppercase tracking-widest mb-1">Plan Gratis</p>
             <div className="flex items-end gap-1">
               <span className="text-ozio-text text-4xl font-black leading-none">0€</span>
-              <span className="text-gray-600 text-sm mb-0.5">/mes</span>
+              <span className="text-ozio-text-dim text-sm mb-0.5">/mes</span>
             </div>
           </div>
 
@@ -171,7 +171,7 @@ export default function Premium() {
                     </svg>
                   )}
                 </span>
-                <span className={`text-sm ${f.ok ? "text-gray-300" : "text-gray-600"}`}>{f.text}</span>
+                <span className={`text-sm ${f.ok ? "text-ozio-text-secondary" : "text-ozio-text-dim"}`}>{f.text}</span>
               </li>
             ))}
           </ul>
@@ -182,7 +182,7 @@ export default function Premium() {
               ✅ Plan activo
             </div>
           ) : sent === "free" ? (
-            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5">
+            <div className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-ozio-text-muted border border-white/10 bg-white/5">
               ✅ Solicitud enviada — te contactamos pronto
             </div>
           ) : (
@@ -190,7 +190,7 @@ export default function Premium() {
               type="button"
               onClick={() => handleSelect("free")}
               disabled={loading === "free"}
-              className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-gray-400 border border-white/10 bg-white/5 hover:bg-white/10 hover:text-gray-300 transition active:scale-[0.98] disabled:opacity-60"
+              className="w-full py-3.5 rounded-2xl text-center font-bold text-sm text-ozio-text-muted border border-white/10 bg-white/5 hover:bg-white/10 hover:text-ozio-text-secondary transition active:scale-[0.98] disabled:opacity-60"
             >
               {loading === "free" ? "Enviando..." : "Seleccionar plan"}
             </button>
@@ -199,7 +199,7 @@ export default function Premium() {
 
       </section>
 
-      <p className="relative z-10 text-gray-600 text-xs text-center pb-2 px-4 leading-relaxed mt-2">
+      <p className="relative z-10 text-ozio-text-dim text-xs text-center pb-2 px-4 leading-relaxed mt-2">
         Para activar el plan Premium contáctanos y activamos tu cuenta en menos de 24h.
       </p>
     </div>

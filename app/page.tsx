@@ -44,7 +44,7 @@ export default function LandingPage() {
           </span>
         </h1>
 
-        <p className="text-gray-400 text-lg sm:text-xl max-w-xl leading-relaxed mb-10">
+        <p className="text-ozio-text-muted text-lg sm:text-xl max-w-xl leading-relaxed mb-10">
           Consulta el ambiente de bares, restaurantes y locales en tiempo real, haz check-in y encuentra los mejores planes cerca de ti.
         </p>
 
@@ -70,7 +70,7 @@ export default function LandingPage() {
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
             </svg>
             App Store
-            <span className="text-[10px] text-gray-500 font-normal">Próximamente</span>
+            <span className="text-[10px] text-ozio-text-subtle font-normal">Próximamente</span>
           </button>
 
           <button
@@ -83,7 +83,7 @@ export default function LandingPage() {
               <path d="M3.18 23.76c.3.17.64.24.99.2l12.75-12.76L13.48 7.8 3.18 23.76zM20.49 10.46l-2.67-1.52-3.22 3.22 3.22 3.22 2.68-1.53c.76-.43.76-1.96-.01-2.39zM2.1.67C2.04.83 2 1.01 2 1.22v21.56c0 .21.04.39.1.55l12.08-12.08L2.1.67zM16.92 1.56L4.17.04c-.35-.04-.69.03-.99.2L15.57 12.4l3.44-3.44-2.09-7.4z"/>
             </svg>
             Google Play
-            <span className="text-[10px] text-gray-500 font-normal">Próximamente</span>
+            <span className="text-[10px] text-ozio-text-subtle font-normal">Próximamente</span>
           </button>
         </div>
       </section>
@@ -100,7 +100,7 @@ export default function LandingPage() {
               </svg>
             </div>
             <h3 className="text-ozio-text font-bold mb-1.5">Mapa en vivo</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">Visualiza el ambiente de cada local en el mapa. Cuanta más gente, más caliente el marcador.</p>
+            <p className="text-ozio-text-subtle text-sm leading-relaxed">Visualiza el ambiente de cada local en el mapa. Cuanta más gente, más caliente el marcador.</p>
           </article>
 
           <article className="bg-[#1A1F2E]/60 backdrop-blur border border-white/5 rounded-2xl p-6 hover:border-[#8B5CF6]/30 transition">
@@ -110,7 +110,7 @@ export default function LandingPage() {
               </svg>
             </div>
             <h3 className="text-ozio-text font-bold mb-1.5">Check-in real</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">Haz check-in cuando llegues a un local y ayuda a otros a saber dónde está la gente.</p>
+            <p className="text-ozio-text-subtle text-sm leading-relaxed">Haz check-in cuando llegues a un local y ayuda a otros a saber dónde está la gente.</p>
           </article>
 
           <article className="bg-[#1A1F2E]/60 backdrop-blur border border-white/5 rounded-2xl p-6 hover:border-[#FF8A00]/30 transition">
@@ -120,7 +120,7 @@ export default function LandingPage() {
               </svg>
             </div>
             <h3 className="text-ozio-text font-bold mb-1.5">Eventos</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">Descubre eventos activos y próximas noches especiales en los locales de tu ciudad.</p>
+            <p className="text-ozio-text-subtle text-sm leading-relaxed">Descubre eventos activos y próximas noches especiales en los locales de tu ciudad.</p>
           </article>
         </div>
       </section>
@@ -129,7 +129,7 @@ export default function LandingPage() {
       <section className="relative z-10 px-6 pb-24 max-w-2xl mx-auto text-center">
         <div className="bg-gradient-to-br from-[#2E5CFF]/10 to-[#8B5CF6]/10 border border-white/5 rounded-3xl p-10">
           <h2 className="text-3xl font-black mb-3">¿Listo para salir?</h2>
-          <p className="text-gray-400 mb-7">Entra al mapa y mira el ambiente de tu ciudad ahora mismo.</p>
+          <p className="text-ozio-text-muted mb-7">Entra al mapa y mira el ambiente de tu ciudad ahora mismo.</p>
           <Link
             href="/mapa"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#2E5CFF] to-[#8B5CF6] text-ozio-text font-bold hover:opacity-90 hover:scale-[1.02] transition shadow-xl shadow-[#2E5CFF]/25"
@@ -148,9 +148,9 @@ export default function LandingPage() {
           <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#2E5CFF] to-[#8B5CF6] flex items-center justify-center">
             <img src="/logo.jpeg" alt="Ozio Logo" className="w-3 h-3" />
           </div>
-          <span className="text-gray-500 text-sm">© {new Date().getFullYear()} Ozio</span>
+          <span className="text-ozio-text-subtle text-sm">© {new Date().getFullYear()} Ozio</span>
         </div>
-        <p className="text-gray-600 text-xs">Descubre el ocio nocturno de tu ciudad</p>
+        <p className="text-ozio-text-dim text-xs">Descubre el ocio nocturno de tu ciudad</p>
       </footer>
 
     </div>

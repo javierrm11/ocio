@@ -72,7 +72,7 @@ export default function Destacados() {
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'eventos'
                   ? 'bg-ozio-blue text-ozio-text shadow-lg'
-                  : 'text-gray-400 hover:text-ozio-text hover:bg-ozio-card/50'
+                  : 'text-ozio-text-muted hover:text-ozio-text hover:bg-ozio-card/50'
               }`}
             >
               🎉 Eventos
@@ -82,7 +82,7 @@ export default function Destacados() {
               className={`flex-1 py-3 rounded-xl font-medium transition ${
                 activeTab === 'locales'
                   ? 'bg-ozio-blue text-ozio-text shadow-lg'
-                  : 'text-gray-400 hover:text-ozio-text hover:bg-ozio-card/50'
+                  : 'text-ozio-text-muted hover:text-ozio-text hover:bg-ozio-card/50'
               }`}
             >
               🏆 Top Locales
@@ -113,7 +113,7 @@ export default function Destacados() {
               ) : (
                 <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-8 text-center">
                   <div className="text-6xl mb-4">🎉</div>
-                  <p className="text-gray-400">No hay eventos destacados en este momento</p>
+                  <p className="text-ozio-text-muted">No hay eventos destacados en este momento</p>
                 </div>
               )}
             </div>
@@ -151,7 +151,7 @@ function EventCard({ event }: { event: Event }) {
   const getStatusBadge = () => {
     if (isPastEvent) {
       return (
-        <span className="bg-ozio-card/90 backdrop-blur-sm text-gray-400 text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-card/30 flex items-center gap-1">
+        <span className="bg-ozio-card/90 backdrop-blur-sm text-ozio-text-muted text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-card/30 flex items-center gap-1">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -205,16 +205,16 @@ function EventCard({ event }: { event: Event }) {
       </figure>
 
       <div className="p-4">
-        <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-gray-400' : 'text-ozio-text'}`}>
+        <h3 className={`font-bold text-lg mb-2 ${isPastEvent ? 'text-ozio-text-muted' : 'text-ozio-text'}`}>
           {event.title}
         </h3>
 
         {event.description && (
-          <p className="text-gray-500 text-sm mb-3 line-clamp-2">{event.description}</p>
+          <p className="text-ozio-text-subtle text-sm mb-3 line-clamp-2">{event.description}</p>
         )}
 
-        <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-          <svg className={`w-4 h-4 ${isPastEvent ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 text-ozio-text-muted text-sm mb-2">
+          <svg className={`w-4 h-4 ${isPastEvent ? 'text-ozio-text-dim' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <time dateTime={event.starts_at}>
@@ -222,8 +222,8 @@ function EventCard({ event }: { event: Event }) {
           </time>
         </div>
 
-        <div className="flex items-center gap-2 text-gray-400 text-sm">
-          <svg className={`w-4 h-4 ${isPastEvent ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 text-ozio-text-muted text-sm">
+          <svg className={`w-4 h-4 ${isPastEvent ? 'text-ozio-text-dim' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>
@@ -236,7 +236,7 @@ function EventCard({ event }: { event: Event }) {
         <div className="flex items-center gap-2 mt-3">
           <div className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${
             isPastEvent
-              ? 'bg-ozio-card/50 text-gray-500 border border-ozio-card/30'
+              ? 'bg-ozio-card/50 text-ozio-text-subtle border border-ozio-card/30'
               : 'bg-ozio-blue/20 text-ozio-blue border border-ozio-blue/30'
           }`}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -293,7 +293,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
           <h3 className="text-ozio-text font-bold text-lg truncate">{venue.name}</h3>
 
           {venue.address && (
-            <div className="flex items-center gap-1 text-gray-400 text-sm mt-1">
+            <div className="flex items-center gap-1 text-ozio-text-muted text-sm mt-1">
               <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -313,7 +313,7 @@ function VenueCard({ venue, rank }: { venue: Venue; rank: number }) {
         </div>
 
         <div className="flex items-center">
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-ozio-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>

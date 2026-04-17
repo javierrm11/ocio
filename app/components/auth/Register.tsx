@@ -183,7 +183,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num, idx) => (
               <li key={num} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition border-2 ${
-                  step >= num ? 'bg-ozio-blue text-ozio-text border-ozio-blue' : 'bg-ozio-card text-gray-400 border-gray-600'
+                  step >= num ? 'bg-ozio-blue text-ozio-text border-ozio-blue' : 'bg-ozio-card text-ozio-text-muted border-gray-600'
                 }`}>
                   {num}
                 </div>
@@ -195,7 +195,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           </ol>
 
           <h2 id="register-title" className="text-2xl font-bold text-ozio-text mb-2">{stepTitle()}</h2>
-          <p className="text-gray-400 text-sm mb-6">Paso {step} de {totalSteps}</p>
+          <p className="text-ozio-text-muted text-sm mb-6">Paso {step} de {totalSteps}</p>
 
           {error && (
             <div className="bg-ambience-high/10 border border-ambience-high/50 text-ambience-high rounded-xl p-3 mb-4 text-sm">
@@ -207,7 +207,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {step === 1 && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">
                   Nombre {formData.profileType === 'user' ? 'completo' : 'del establecimiento'}
                 </label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required
@@ -215,13 +215,13 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   placeholder={formData.profileType === 'user' ? 'Tu nombre' : 'Nombre del local'} autoFocus />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} required
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="tu@email.com" />
               </div>
               <div>
-                <label htmlFor="profileType" className="block text-sm font-medium text-gray-300 mb-2">Tipo de cuenta</label>
+                <label htmlFor="profileType" className="block text-sm font-medium text-ozio-text-secondary mb-2">Tipo de cuenta</label>
                 <select id="profileType" name="profileType" value={formData.profileType} onChange={handleChange}
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
                   <option value="user">👤 Usuario</option>
@@ -238,23 +238,23 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {step === 2 && formData.profileType === 'user' && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Nombre de usuario</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Nombre de usuario</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ozio-text-muted">@</span>
                   <input type="text" name="username" value={formData.username} onChange={handleChange}
                     required minLength={3} pattern="[a-zA-Z0-9_]+"
                     className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                     placeholder="tunombre" autoFocus />
                 </div>
-                <p className="text-xs text-gray-400 mt-1">Mínimo 3 caracteres, sin espacios</p>
+                <p className="text-xs text-ozio-text-muted mt-1">Mínimo 3 caracteres, sin espacios</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Descripción (opcional)</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Descripción (opcional)</label>
                 <textarea name="description" value={formData.description} onChange={handleChange}
                   rows={4} maxLength={150}
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition resize-none"
                   placeholder="Cuéntanos sobre ti..." />
-                <p className="text-xs text-gray-400 mt-1 text-right">{formData.description.length}/150</p>
+                <p className="text-xs text-ozio-text-muted mt-1 text-right">{formData.description.length}/150</p>
               </div>
               <div className="flex gap-3 mt-6">
                 <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
@@ -267,21 +267,21 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {step === 2 && formData.profileType === 'venue' && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Dirección</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Dirección</label>
                 <input type="text" name="address" value={formData.address} onChange={handleChange} required
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Calle, número, ciudad" autoFocus />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Ubicación en el mapa</label>
-                <p className="text-xs text-gray-400 mb-2">Haz clic en el mapa para seleccionar tu ubicación</p>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Ubicación en el mapa</label>
+                <p className="text-xs text-ozio-text-muted mb-2">Haz clic en el mapa para seleccionar tu ubicación</p>
                 <div className="rounded-xl overflow-hidden border border-ozio-card h-64">
                   <MapWithNoSSR latitude={formData.latitude} longitude={formData.longitude}
                     onPositionChange={(lat, lng) => setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }))} />
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-2">
-                  <p className="text-xs text-gray-400">Lat: {formData.latitude.toFixed(6)}</p>
-                  <p className="text-xs text-gray-400">Lng: {formData.longitude.toFixed(6)}</p>
+                  <p className="text-xs text-ozio-text-muted">Lat: {formData.latitude.toFixed(6)}</p>
+                  <p className="text-xs text-ozio-text-muted">Lng: {formData.longitude.toFixed(6)}</p>
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
@@ -295,7 +295,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {step === 3 && formData.profileType === 'venue' && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
-                <p className="text-sm text-gray-400 mb-4">
+                <p className="text-sm text-ozio-text-muted mb-4">
                   Selecciona los géneros que suenan en tu local. Ayuda a los usuarios a encontrarte.
                 </p>
                 <ul className="flex flex-wrap gap-2 max-h-72 overflow-y-auto pr-1 list-none p-0 m-0">
@@ -309,7 +309,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                           className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all border ${
                             selected
                               ? 'bg-ozio-blue border-ozio-blue text-ozio-text scale-105'
-                              : 'bg-ozio-dark border-ozio-card text-gray-300 hover:border-ozio-blue/50 hover:text-ozio-text'
+                              : 'bg-ozio-dark border-ozio-card text-ozio-text-secondary hover:border-ozio-blue/50 hover:text-ozio-text'
                           }`}
                         >
                           <span>{genre.emoji}</span>
@@ -336,14 +336,14 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           {((step === 3 && formData.profileType === 'user') || (step === 4 && formData.profileType === 'venue')) && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Contraseña</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange}
                   required minLength={6}
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Mínimo 6 caracteres" autoFocus />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Confirmar contraseña</label>
+                <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Confirmar contraseña</label>
                 <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}
                   required minLength={6}
                   className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
@@ -356,7 +356,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                     <div className={`h-1 flex-1 rounded ${formData.password.length >= 8 ? 'bg-orange-500' : 'bg-ozio-card'}`} />
                     <div className={`h-1 flex-1 rounded ${formData.password.length >= 10 ? 'bg-ambience-low' : 'bg-ozio-card'}`} />
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-ozio-text-muted">
                     {formData.password.length < 6 && 'Demasiado corta'}
                     {formData.password.length >= 6 && formData.password.length < 8 && 'Débil'}
                     {formData.password.length >= 8 && formData.password.length < 10 && 'Media'}
@@ -395,10 +395,10 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   </button>
                 </figure>
                 <input ref={fileInputRef} type="file" accept="image/*" aria-label="Seleccionar imagen de perfil" onChange={handleImageChange} className="hidden" />
-                <p className="text-sm text-gray-300 mb-2">
+                <p className="text-sm text-ozio-text-secondary mb-2">
                   {formData.profileType === 'user' ? 'Foto de perfil' : 'Logo del establecimiento'}
                 </p>
-                <p className="text-xs text-gray-400 text-center">Opcional. Formatos: JPG, PNG (máx. 5MB)</p>
+                <p className="text-xs text-ozio-text-muted text-center">Opcional. Formatos: JPG, PNG (máx. 5MB)</p>
                 <button type="button" onClick={() => fileInputRef.current?.click()}
                   className="mt-4 px-6 py-2 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-medium rounded-xl transition">
                   {formData.profileImagePreview ? 'Cambiar imagen' : 'Seleccionar imagen'}
@@ -408,7 +408,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                     <div className="w-full bg-ozio-card rounded-full h-2">
                       <div className="bg-ozio-blue h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                     </div>
-                    <p className="text-xs text-gray-400 text-center mt-2">Subiendo imagen... {uploadProgress}%</p>
+                    <p className="text-xs text-ozio-text-muted text-center mt-2">Subiendo imagen... {uploadProgress}%</p>
                   </div>
                 )}
               </div>
@@ -433,7 +433,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             </form>
           )}
 
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-ozio-text-muted text-sm mt-6">
             ¿Ya tienes cuenta?{' '}
             <Link href="/profile" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
               Inicia sesión

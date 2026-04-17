@@ -34,7 +34,7 @@ export default function AnadirPage() {
         <button
           type="button"
           onClick={() => (tipo ? setTipo(null) : router.back())}
-          className="text-gray-400 hover:text-ozio-text transition"
+          className="text-ozio-text-muted hover:text-ozio-text transition"
           aria-label="Volver"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -65,7 +65,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
           <span className="text-5xl">📸</span>
           <div className="text-center">
             <p className="text-ozio-text font-semibold group-hover:text-ozio-purple transition">Historia</p>
-            <p className="text-gray-500 text-xs mt-1">Foto o vídeo del momento</p>
+            <p className="text-ozio-text-subtle text-xs mt-1">Foto o vídeo del momento</p>
           </div>
         </button>
       </li>
@@ -78,7 +78,7 @@ function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
           <span className="text-5xl">🎉</span>
           <div className="text-center">
             <p className="text-ozio-text font-semibold group-hover:text-ozio-blue transition">Evento</p>
-            <p className="text-gray-500 text-xs mt-1">Crea un evento en tu local</p>
+            <p className="text-ozio-text-subtle text-xs mt-1">Crea un evento en tu local</p>
           </div>
         </button>
       </li>
@@ -461,7 +461,7 @@ function FormEvento() {
 
   const inputClass =
     "w-full bg-ozio-card border border-ozio-card/50 rounded-xl px-4 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue/50 focus:border-ozio-blue/50 transition text-sm";
-  const labelClass = "text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1.5 block";
+  const labelClass = "text-ozio-text-muted text-xs uppercase font-semibold tracking-wider mb-1.5 block";
 
   const limitReached = !userIsPremium && monthlyCount !== null && monthlyCount >= 2;
 
@@ -474,7 +474,7 @@ function FormEvento() {
           <span className="text-xl">🔒</span>
           <div>
             <p className="text-ozio-orange text-sm font-semibold">Límite mensual alcanzado</p>
-            <p className="text-gray-400 text-xs mt-0.5">Has creado 2 eventos este mes. Actualiza a Premium para crear eventos ilimitados.</p>
+            <p className="text-ozio-text-muted text-xs mt-0.5">Has creado 2 eventos este mes. Actualiza a Premium para crear eventos ilimitados.</p>
           </div>
         </div>
       )}
@@ -503,7 +503,7 @@ function FormEvento() {
           maxLength={500}
           className={inputClass + " resize-none"}
         />
-        <p className="text-right text-gray-600 text-xs mt-1">{form.description.length}/500</p>
+        <p className="text-right text-ozio-text-dim text-xs mt-1">{form.description.length}/500</p>
       </div>
 
       {/* Fechas */}
@@ -551,7 +551,7 @@ function FormEvento() {
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition border ${
                       selected
                         ? "bg-ozio-blue border-ozio-blue text-ozio-text scale-105"
-                        : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:border-ozio-blue/50 hover:text-ozio-text"
+                        : "bg-ozio-card border-ozio-card/50 text-ozio-text-muted hover:border-ozio-blue/50 hover:text-ozio-text"
                     }`}
                   >
                     <span>{genre.emoji}</span>
@@ -598,9 +598,9 @@ function FormEvento() {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center gap-2 p-6 text-center min-h-[140px]">
-              <ImageIcon className="w-7 h-7 text-gray-600" />
-              <p className="text-gray-500 text-sm">Pulsa para añadir imagen</p>
-              <p className="text-gray-600 text-xs">JPG, PNG, WebP · Máx. 10 MB</p>
+              <ImageIcon className="w-7 h-7 text-ozio-text-dim" />
+              <p className="text-ozio-text-subtle text-sm">Pulsa para añadir imagen</p>
+              <p className="text-ozio-text-dim text-xs">JPG, PNG, WebP · Máx. 10 MB</p>
             </div>
           )}
         </div>
@@ -614,7 +614,7 @@ function FormEvento() {
           className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm ${
             form.featured
               ? "bg-ozio-orange/10 border-ozio-orange/40 text-ozio-orange"
-              : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-ozio-card/70"
+              : "bg-ozio-card border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-ozio-card/70"
           }`}
         >
           <Star className={`w-4 h-4 flex-shrink-0 ${form.featured ? "fill-ozio-orange" : ""}`} />
@@ -633,12 +633,12 @@ function FormEvento() {
             onClick={() => setShowPremiumModal(true)}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-ozio-card/50 bg-ozio-card cursor-pointer transition text-left"
           >
-            <Star className="w-4 h-4 flex-shrink-0 text-gray-600" />
+            <Star className="w-4 h-4 flex-shrink-0 text-ozio-text-dim" />
             <div className="text-left">
-              <p className="font-medium text-gray-500 text-sm">Evento destacado</p>
-              <p className="text-xs text-gray-600 mt-0.5">Solo disponible en el plan Premium</p>
+              <p className="font-medium text-ozio-text-subtle text-sm">Evento destacado</p>
+              <p className="text-xs text-ozio-text-dim mt-0.5">Solo disponible en el plan Premium</p>
             </div>
-            <Lock className="w-4 h-4 ml-auto text-gray-600" />
+            <Lock className="w-4 h-4 ml-auto text-ozio-text-dim" />
           </button>
           {showPremiumModal && <PremiumFeaturedModal onClose={() => setShowPremiumModal(false)} />}
         </>
@@ -681,7 +681,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
             <span className="text-3xl">🎉</span>
           </div>
           <h2 id="limit-modal-title" className="text-ozio-text text-xl font-black mb-2">Límite de eventos alcanzado</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-ozio-text-muted text-sm leading-relaxed">
             Con el plan gratuito puedes crear <span className="text-ozio-text font-semibold">2 eventos al mes</span>. Actualiza a Premium para crear eventos ilimitados.
           </p>
         </div>
@@ -690,7 +690,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
           {["🚀 Eventos ilimitados cada mes", "⭐ Eventos destacados en el listado", "📊 Estadísticas avanzadas de asistencia", "👑 Badge exclusivo en el mapa"].map((feat) => (
             <li key={feat} className="flex items-center gap-3 text-sm">
               <span className="text-ozio-orange text-base">{feat.slice(0, 2)}</span>
-              <span className="text-gray-300">{feat.slice(3)}</span>
+              <span className="text-ozio-text-secondary">{feat.slice(3)}</span>
             </li>
           ))}
         </ul>
@@ -703,7 +703,7 @@ function PremiumLimitModal({ onClose }: { onClose: () => void }) {
         >
           Actualizar a Premium 👑
         </button>
-        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-300 transition">
+        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-ozio-text-subtle text-sm hover:text-ozio-text-secondary transition">
           Ahora no
         </button>
       </div>
@@ -730,7 +730,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
             <span className="text-3xl">⭐</span>
           </div>
           <h2 id="featured-modal-title" className="text-ozio-text text-xl font-black mb-2">Eventos destacados</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-ozio-text-muted text-sm leading-relaxed">
             Con Premium tus eventos aparecen primero en el listado y consiguen más visibilidad.
           </p>
         </div>
@@ -739,7 +739,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
           {["🔝 Posición destacada en el listado", "👁️ Mayor visibilidad para tu evento", "🚀 Más asistentes potenciales", "👑 Badge exclusivo en el mapa"].map((feat) => (
             <li key={feat} className="flex items-center gap-3 text-sm">
               <span className="text-ozio-orange text-base">{feat.slice(0, 2)}</span>
-              <span className="text-gray-300">{feat.slice(3)}</span>
+              <span className="text-ozio-text-secondary">{feat.slice(3)}</span>
             </li>
           ))}
         </ul>
@@ -752,7 +752,7 @@ function PremiumFeaturedModal({ onClose }: { onClose: () => void }) {
         >
           Actualizar a Premium 👑
         </button>
-        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-gray-500 text-sm hover:text-gray-300 transition">
+        <button type="button" onClick={onClose} className="w-full mt-3 py-2 text-ozio-text-subtle text-sm hover:text-ozio-text-secondary transition">
           Ahora no
         </button>
       </div>

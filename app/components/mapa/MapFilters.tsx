@@ -74,7 +74,7 @@ export function MapFilters({
           <header className="px-5 py-4 border-b border-ozio-card flex items-center justify-between">
             <div>
               <h3 id="filters-title" className="text-ozio-text font-semibold">Filtros</h3>
-              <p className="text-xs text-gray-400">Afina tu búsqueda rápidamente</p>
+              <p className="text-xs text-ozio-text-muted">Afina tu búsqueda rápidamente</p>
             </div>
             <div className="flex items-center gap-2">
               {hasActiveFilters && (
@@ -89,7 +89,7 @@ export function MapFilters({
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
-                className="rounded-lg p-2 text-gray-400 hover:text-ozio-text hover:bg-ozio-card"
+                className="rounded-lg p-2 text-ozio-text-muted hover:text-ozio-text hover:bg-ozio-card"
                 aria-label="Cerrar filtros"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@ export function MapFilters({
             {/* Distance */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide">
+                <label className="text-ozio-text-secondary text-xs font-semibold uppercase tracking-wide">
                   Distancia máxima
                 </label>
                 <span className="text-ozio-blue text-xs font-medium">
@@ -129,7 +129,7 @@ export function MapFilters({
                 }
                 className="w-full accent-ozio-blue"
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <div className="flex justify-between text-xs text-ozio-text-subtle mt-1">
                 <span>500m</span>
                 <span>20km+</span>
               </div>
@@ -137,7 +137,7 @@ export function MapFilters({
 
             {/* Ambiente */}
             <div>
-              <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+              <label className="text-ozio-text-secondary text-xs font-semibold uppercase tracking-wide mb-2 block">
                 Ambiente
               </label>
               <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
@@ -148,7 +148,7 @@ export function MapFilters({
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                       ambientesSeleccionados.size === 0
                         ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                        : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                        : "border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                     }`}
                   >
                     Todos
@@ -175,7 +175,7 @@ export function MapFilters({
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                           active
                             ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                            : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                            : "border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                         }`}
                       >
                         {label}
@@ -189,7 +189,7 @@ export function MapFilters({
             {/* Géneros */}
             {generosDisponibles.length > 0 && (
               <div>
-                <label className="text-gray-300 text-xs font-semibold uppercase tracking-wide mb-2 block">
+                <label className="text-ozio-text-secondary text-xs font-semibold uppercase tracking-wide mb-2 block">
                   Género musical
                 </label>
                 <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
@@ -200,7 +200,7 @@ export function MapFilters({
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                         generosSeleccionados.size === 0
                           ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                          : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                          : "border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                       }`}
                     >
                       Todos
@@ -223,7 +223,7 @@ export function MapFilters({
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                             active
                               ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                              : "border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                              : "border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                           }`}
                         >
                           {emoji} {name}
@@ -239,10 +239,10 @@ export function MapFilters({
           {/* Footer */}
           <footer className="px-5 py-4 border-t border-ozio-card bg-ozio-dark/95">
             <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-xs">Locales visibles</span>
+              <span className="text-ozio-text-muted text-xs">Locales visibles</span>
               <span className="text-ozio-text text-sm font-bold">
                 {filteredCount}
-                <span className="text-gray-500 font-normal"> / {totalCount}</span>
+                <span className="text-ozio-text-subtle font-normal"> / {totalCount}</span>
               </span>
             </div>
           </footer>

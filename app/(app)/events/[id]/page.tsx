@@ -113,7 +113,7 @@ export default function EventDetailPage() {
   const getEventStatusBadge = () => {
     if (isPastEvent) {
       return (
-        <div className="bg-ozio-card/50 text-gray-400 text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
+        <div className="bg-ozio-card/50 text-ozio-text-muted text-sm font-semibold px-4 py-2 rounded-full flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -256,12 +256,12 @@ export default function EventDetailPage() {
                 <h1 className="text-ozio-text text-3xl font-bold flex-1">{event.title}</h1>
                 {getEventStatusBadge()}
               </div>
-              <p className={`font-semibold text-sm mb-2 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>
+              <p className={`font-semibold text-sm mb-2 ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-blue'}`}>
                 {attendees.length} {attendees.length === 1 ? 'asistente' : 'asistentes'}
                 {isPastEvent && ' (evento finalizado)'}
               </p>
               {event.description && (
-                <p className={`text-base leading-relaxed ${isPastEvent ? 'text-gray-500' : 'text-gray-400'}`}>
+                <p className={`text-base leading-relaxed ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-text-muted'}`}>
                   {event.description}
                 </p>
               )}
@@ -298,8 +298,8 @@ export default function EventDetailPage() {
                   )}
                   <div className="flex-1">
                     <p className="text-ozio-text font-semibold">{event.venues.name}</p>
-                    {event.venues.address && <address className="text-gray-400 text-sm not-italic">{event.venues.address}</address>}
-                    {event.venues.description && <p className="text-gray-500 text-xs mt-1">{event.venues.description}</p>}
+                    {event.venues.address && <address className="text-ozio-text-muted text-sm not-italic">{event.venues.address}</address>}
+                    {event.venues.description && <p className="text-ozio-text-subtle text-xs mt-1">{event.venues.description}</p>}
                   </div>
                   <button
                     onClick={() => router.push(`/venues/${event.venue_id}`)}
@@ -343,26 +343,26 @@ export default function EventDetailPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-ozio-card/20' : 'bg-ozio-blue/20'}`}>
-                    <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-blue'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs">Inicio</p>
+                    <p className="text-ozio-text-muted text-xs">Inicio</p>
                     <time dateTime={event.starts_at} className="text-ozio-text font-semibold block">{formatDate(event.starts_at)}</time>
-                    <time dateTime={event.starts_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</time>
+                    <time dateTime={event.starts_at} className={`text-sm block ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-blue'}`}>{formatTime(event.starts_at)}</time>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${isPastEvent ? 'bg-ozio-card/20' : 'bg-ozio-purple/20'}`}>
-                    <svg className={`w-5 h-5 ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs">Fin</p>
+                    <p className="text-ozio-text-muted text-xs">Fin</p>
                     <time dateTime={event.ends_at} className="text-ozio-text font-semibold block">{formatDate(event.ends_at)}</time>
-                    <time dateTime={event.ends_at} className={`text-sm block ${isPastEvent ? 'text-gray-500' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</time>
+                    <time dateTime={event.ends_at} className={`text-sm block ${isPastEvent ? 'text-ozio-text-subtle' : 'text-ozio-purple'}`}>{formatTime(event.ends_at)}</time>
                   </div>
                 </div>
               </div>
@@ -398,11 +398,11 @@ export default function EventDetailPage() {
             {/* Mensaje evento pasado */}
             {isPastEvent && (
               <div className="bg-ozio-darker/50 border border-ozio-card/50 rounded-2xl p-6 text-center">
-                <svg className="w-16 h-16 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-16 h-16 text-ozio-text-subtle mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <h4 className="text-ozio-text font-bold text-lg mb-2">Este evento ya finalizó</h4>
-                <p className="text-gray-400 text-sm">
+                <p className="text-ozio-text-muted text-sm">
                   {isAttending
                     ? `Asististe a este evento junto a ${attendees.length - 1} ${attendees.length - 1 === 1 ? 'persona más' : 'personas más'}.`
                     : `Este evento tuvo ${attendees.length} ${attendees.length === 1 ? 'asistente' : 'asistentes'}.`

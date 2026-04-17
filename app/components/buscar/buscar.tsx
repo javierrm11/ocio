@@ -177,7 +177,7 @@ export default function Buscar() {
 
             {/* Input búsqueda */}
             <div className="relative flex-1">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ozio-text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -189,7 +189,7 @@ export default function Buscar() {
                 className="w-full bg-ozio-card border border-ozio-card/50 rounded-md pl-12 pr-10 py-3 text-ozio-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition text-base"
               />
               {query && (
-                <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-ozio-text transition">
+                <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-ozio-text-muted hover:text-ozio-text transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -204,7 +204,7 @@ export default function Buscar() {
                 className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
                   filtrosAbiertos || filtrosActivos > 0
                     ? "bg-ozio-purple border-ozio-purple text-ozio-text"
-                    : "bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                    : "bg-ozio-card border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,13 +233,13 @@ export default function Buscar() {
 
                     {/* Estado */}
                     <div>
-                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Estado</p>
+                      <p className="text-ozio-text-muted text-xs uppercase font-semibold tracking-wider mb-2">Estado</p>
                       <button
                         onClick={() => setSoloActivos(!soloActivos)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-sm font-medium ${
                           soloActivos
                             ? "bg-ambience-low/20 border-ambience-low/50 text-ambience-low"
-                            : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                            : "bg-ozio-dark border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                         }`}
                       >
                         <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${soloActivos ? "bg-ambience-low animate-pulse" : "bg-ozio-card"}`} />
@@ -254,7 +254,7 @@ export default function Buscar() {
 
                     {/* Ordenar por */}
                     <div>
-                      <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Ordenar por</p>
+                      <p className="text-ozio-text-muted text-xs uppercase font-semibold tracking-wider mb-2">Ordenar por</p>
                       <div className="flex flex-col gap-2">
                         {[
                           { key: "relevancia", label: "Relevancia", icon: "✨", desc: "Más completos primero" },
@@ -268,13 +268,13 @@ export default function Buscar() {
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
                               sort === s.key
                                 ? "bg-ozio-purple/20 border-ozio-purple/50 text-ozio-text"
-                                : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500"
+                                : "bg-ozio-dark border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-gray-500"
                             }`}
                           >
                             <span className="text-base w-5 text-center flex-shrink-0">{s.icon}</span>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium leading-tight">{s.label}</p>
-                              <p className="text-xs text-gray-500 leading-tight mt-0.5">{s.desc}</p>
+                              <p className="text-xs text-ozio-text-subtle leading-tight mt-0.5">{s.desc}</p>
                             </div>
                             {sort === s.key && (
                               <svg className="w-4 h-4 text-ozio-purple flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,14 +289,14 @@ export default function Buscar() {
                     {/* Géneros */}
                     {generosDisponibles.length > 0 && (
                       <div>
-                        <p className="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Género musical</p>
+                        <p className="text-ozio-text-muted text-xs uppercase font-semibold tracking-wider mb-2">Género musical</p>
                         <div className="flex flex-wrap gap-2">
                           <button
                             onClick={() => setGeneroSeleccionado(null)}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                               !generoSeleccionado
                                 ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                                : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text"
+                                : "bg-ozio-dark border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text"
                             }`}
                           >
                             Todos
@@ -308,7 +308,7 @@ export default function Buscar() {
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                                 generoSeleccionado === name
                                   ? "bg-ozio-blue border-ozio-blue text-ozio-text"
-                                  : "bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text"
+                                  : "bg-ozio-dark border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text"
                               }`}
                             >
                               {emoji} {name}
@@ -371,7 +371,7 @@ export default function Buscar() {
           {!hasQuery && (
             <section className="py-4" aria-label="Descubrir">
               <div className="mb-6">
-                <h2 className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">🔥 Más visitados ahora</h2>
+                <h2 className="text-ozio-text-subtle text-xs uppercase font-semibold tracking-wider mb-3">🔥 Más visitados ahora</h2>
                 <ul className="space-y-3 list-none p-0 m-0">
                   {[...venues]
                     .sort((a: Venue, b: Venue) => (b.check_ins?.length || 0) - (a.check_ins?.length || 0))
@@ -382,13 +382,13 @@ export default function Buscar() {
                 </ul>
               </div>
               <div>
-                <h2 className="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-3">Búsquedas populares</h2>
+                <h2 className="text-ozio-text-subtle text-xs uppercase font-semibold tracking-wider mb-3">Búsquedas populares</h2>
                 <ul className="flex flex-wrap gap-2 list-none p-0 m-0">
                   {["Reggaeton", "House", "Techno", "Bar", "Discoteca", "Rooftop", "Salsa", "Pop"].map((s) => (
                     <li key={s}>
                       <button
                         onClick={() => setQuery(s)}
-                        className="bg-ozio-card border border-ozio-card/50 text-gray-300 text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-ozio-text transition"
+                        className="bg-ozio-card border border-ozio-card/50 text-ozio-text-secondary text-sm px-4 py-2 rounded-full hover:border-ozio-blue/50 hover:text-ozio-text transition"
                       >
                         {s}
                       </button>
@@ -402,7 +402,7 @@ export default function Buscar() {
           {/* Resultados */}
           {hasQuery && (
             <section aria-label="Resultados de búsqueda">
-              <p className="text-gray-500 text-sm mb-4">
+              <p className="text-ozio-text-subtle text-sm mb-4">
                 {filteredVenues.length} local{filteredVenues.length !== 1 ? "es" : ""}
                 {query && <> para <span className="text-ozio-text">"{query}"</span></>}
               </p>
@@ -411,7 +411,7 @@ export default function Buscar() {
                 <div className="bg-ozio-card border border-ozio-card/50 rounded-md p-12 text-center">
                   <div className="text-5xl mb-4">🏠</div>
                   <p className="text-ozio-text font-semibold mb-1">Sin resultados</p>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-ozio-text-muted text-sm">
                     No encontramos locales{query && <> para <span className="text-ozio-text">"{query}"</span></>}
                   </p>
                   <button
@@ -460,14 +460,14 @@ function MiniVenueCard({ venue, rank, events }: { venue: Venue; rank: number; ev
       />
       <div className="flex-1 min-w-0">
         <p className="text-ozio-text font-semibold truncate">{venue.name}</p>
-        <p className="text-gray-400 text-xs">{venue.check_ins?.length || 0} visitas</p>
+        <p className="text-ozio-text-muted text-xs">{venue.check_ins?.length || 0} visitas</p>
       </div>
       {tieneEventoActivo && (
         <span className="text-xs bg-ozio-purple/20 text-ozio-purple border border-ozio-purple/30 px-2 py-1 rounded-full flex-shrink-0">
           🎉 Evento
         </span>
       )}
-      <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 text-ozio-text-subtle flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </article>
@@ -540,7 +540,7 @@ function VenueCard({
       <div className="p-4">
         <h3 className="text-ozio-text font-bold text-base mb-1 truncate">{venue.name}</h3>
         {venue.address && (
-          <address className="text-gray-500 text-xs mb-3 truncate flex items-center gap-1 not-italic">
+          <address className="text-ozio-text-subtle text-xs mb-3 truncate flex items-center gap-1 not-italic">
             <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
@@ -553,14 +553,14 @@ function VenueCard({
           <ul className="flex gap-1.5 flex-wrap list-none p-0 m-0">
             {venue.genres?.slice(0, 2).map((g) => (
               <li key={getGenreName(g)}>
-                <span className="text-xs bg-ozio-card text-gray-300 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-ozio-card text-ozio-text-secondary px-2 py-0.5 rounded-full">
                   {getGenreEmoji(g)} {getGenreName(g)}
                 </span>
               </li>
             ))}
           </ul>
 
-          <div className="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
+          <div className="flex items-center gap-3 text-xs text-ozio-text-muted flex-shrink-0">
             {dist > 0 && (
               <span className="flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

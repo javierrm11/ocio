@@ -231,7 +231,7 @@ export default function Stories() {
                 {group.venue_name}
               </span>
               {group.stories.length > 1 && (
-                <span className="text-[10px] text-gray-400 -mt-1">
+                <span className="text-[10px] text-ozio-text-muted -mt-1">
                   {group.stories.length} historias
                 </span>
               )}
@@ -246,7 +246,7 @@ export default function Stories() {
           <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-lg w-full">
             <div className="border-b border-ozio-card/50 px-6 py-4 flex items-center justify-between">
               <h2 className="text-ozio-text text-xl font-bold">📸 Nueva Historia</h2>
-              <button onClick={() => { setShowUploadModal(false); setSelectedFile(null); setPreviewUrl(null); }} className="text-gray-400 hover:text-ozio-text transition">
+              <button onClick={() => { setShowUploadModal(false); setSelectedFile(null); setPreviewUrl(null); }} className="text-ozio-text-muted hover:text-ozio-text transition">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -322,11 +322,11 @@ export default function Stories() {
               </div>
               <span className="text-ozio-text font-semibold text-sm">{activeGroup.venue_name}</span>
               {/* ✅ Índice de story dentro del grupo */}
-              <span className="text-gray-400 text-xs">
+              <span className="text-ozio-text-muted text-xs">
                 {new Date(currentStory.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
-            <button onClick={closeViewer} className="text-ozio-text hover:text-gray-300">
+            <button onClick={closeViewer} className="text-ozio-text hover:text-ozio-text-secondary">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>

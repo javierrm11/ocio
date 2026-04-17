@@ -187,7 +187,7 @@ export default function Eventos() {
             {/* Input búsqueda */}
             <div className="relative flex-1">
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ozio-text-muted pointer-events-none"
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -202,7 +202,7 @@ export default function Eventos() {
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-ozio-text transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ozio-text-muted hover:text-ozio-text transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -218,7 +218,7 @@ export default function Eventos() {
                 className={`relative flex items-center justify-center w-14 h-12 rounded-md border transition flex-shrink-0 ${
                   filtrosAbiertos || filtrosActivos > 0
                     ? 'bg-ozio-purple border-ozio-purple text-ozio-text'
-                    : 'bg-ozio-card border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500'
+                    : 'bg-ozio-card border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-gray-500'
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,20 +256,20 @@ export default function Eventos() {
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left ${
                           filter === f.key
                             ? 'bg-ozio-purple/20 border-ozio-purple/50 text-ozio-text'
-                            : 'bg-ozio-dark border-ozio-card/50 text-gray-400 hover:text-ozio-text hover:border-gray-500'
+                            : 'bg-ozio-dark border-ozio-card/50 text-ozio-text-muted hover:text-ozio-text hover:border-gray-500'
                         }`}
                       >
                         <span className="text-lg w-6 text-center flex-shrink-0">{f.icon}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium leading-tight">{f.label}</p>
-                          <p className="text-xs text-gray-500 leading-tight mt-0.5">{f.desc}</p>
+                          <p className="text-xs text-ozio-text-subtle leading-tight mt-0.5">{f.desc}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {f.count > 0 && (
                             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                               filter === f.key
                                 ? 'bg-ozio-purple/40 text-purple-200'
-                                : 'bg-ozio-card text-gray-400'
+                                : 'bg-ozio-card text-ozio-text-muted'
                             }`}>
                               {f.count}
                             </span>
@@ -286,7 +286,7 @@ export default function Eventos() {
 
                   {generosDisponibles.length > 0 && (
                     <div className="px-3 pb-3 border-t border-ozio-card/50 pt-3">
-                      <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2 block">Género musical</span>
+                      <span className="text-ozio-text-muted text-xs font-semibold uppercase tracking-wide mb-2 block">Género musical</span>
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
@@ -294,7 +294,7 @@ export default function Eventos() {
                           className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                             generosSeleccionados.size === 0
                               ? 'bg-ozio-purple border-ozio-purple/80 text-ozio-text'
-                              : 'border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500'
+                              : 'border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500'
                           }`}
                         >
                           Todos
@@ -316,7 +316,7 @@ export default function Eventos() {
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                                 active
                                   ? 'bg-ozio-purple border-ozio-purple/80 text-ozio-text'
-                                  : 'border-ozio-card text-gray-400 hover:text-ozio-text hover:border-gray-500'
+                                  : 'border-ozio-card text-ozio-text-muted hover:text-ozio-text hover:border-gray-500'
                               }`}
                             >
                               {emoji} {name}
@@ -367,7 +367,7 @@ export default function Eventos() {
             <div className="bg-ozio-card border border-ozio-card/50 rounded-md p-12 text-center mt-4">
               <div className="text-6xl mb-4">🎉</div>
               <p className="text-ozio-text font-semibold mb-1">No hay eventos</p>
-              <p className="text-gray-400 text-sm">
+              <p className="text-ozio-text-muted text-sm">
                 {search ? 'Prueba con otra búsqueda' : 'No hay eventos para este filtro'}
               </p>
               {filter !== 'todos' && (
@@ -381,10 +381,10 @@ export default function Eventos() {
             </div>
           ) : (
             <>
-              <p className="text-gray-500 text-sm mb-4">
+              <p className="text-ozio-text-subtle text-sm mb-4">
                 {filteredEvents.length} evento{filteredEvents.length !== 1 ? 's' : ''}
                 {filter !== 'todos' && (
-                  <span className="text-gray-600"> · {currentFilter?.label}</span>
+                  <span className="text-ozio-text-dim"> · {currentFilter?.label}</span>
                 )}
               </p>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 m-0">
@@ -413,7 +413,7 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
 
   const getStatusBadge = () => {
     if (isPast) return (
-      <span className="bg-ozio-card/90 backdrop-blur-sm text-gray-400 text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-card/30 flex items-center gap-1">
+      <span className="bg-ozio-card/90 backdrop-blur-sm text-ozio-text-muted text-xs px-3 py-1.5 rounded-full font-medium border border-ozio-card/30 flex items-center gap-1">
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -479,12 +479,12 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
 
       {/* Contenido */}
       <div className="p-4">
-        <h3 className={`font-bold text-lg mb-1 leading-tight ${isPast ? 'text-gray-400' : 'text-ozio-text'}`}>
+        <h3 className={`font-bold text-lg mb-1 leading-tight ${isPast ? 'text-ozio-text-muted' : 'text-ozio-text'}`}>
           {event.title}
         </h3>
 
         {event.description && (
-          <p className="text-gray-500 text-sm mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
+          <p className="text-ozio-text-subtle text-sm mb-3 line-clamp-2 leading-relaxed">{event.description}</p>
         )}
         {/* Géneros del evento */}
         {event.genres && event.genres.length > 0 && (
@@ -504,13 +504,13 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
             {venue.avatar_path && (
               <img src={venue.avatar_path} alt={venue.name} className="w-5 h-5 rounded-full object-cover" />
             )}
-            <span className="text-gray-400 text-xs truncate">{venue.name}</span>
+            <span className="text-ozio-text-muted text-xs truncate">{venue.name}</span>
           </div>
         )}
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-            <svg className={`w-4 h-4 ${isPast ? 'text-gray-600' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-1.5 text-ozio-text-muted text-sm">
+            <svg className={`w-4 h-4 ${isPast ? 'text-ozio-text-dim' : 'text-ozio-purple'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>
@@ -522,7 +522,7 @@ function EventCard({ event, venue }: { event: Event; venue?: Venue }) {
 
           <div className={`text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${
             isPast
-              ? 'bg-ozio-card/50 text-gray-500 border border-ozio-card/30'
+              ? 'bg-ozio-card/50 text-ozio-text-subtle border border-ozio-card/30'
               : 'bg-ozio-blue/20 text-ozio-blue border border-ozio-blue/30'
           }`}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">

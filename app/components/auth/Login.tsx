@@ -67,7 +67,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-ozio-text-secondary mb-2">
               Email
             </label>
             <input
@@ -83,7 +83,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-ozio-text-secondary mb-2">
               Contraseña
             </label>
             <input
@@ -113,7 +113,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </button>
         </form>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-ozio-text-muted text-sm mt-6">
           ¿No tienes cuenta?{' '}
           <Link href="/profile" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
             Regístrate

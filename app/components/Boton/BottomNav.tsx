@@ -100,7 +100,7 @@ function BottomNav() {
                 type="button"
                 aria-label="Cerrar"
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-ozio-text transition"
+                className="text-ozio-text-muted hover:text-ozio-text transition"
               >
                 <svg
                   className="w-5 h-5"
@@ -133,7 +133,7 @@ function BottomNav() {
                     <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-purple transition">
                       Historia
                     </p>
-                    <p className="text-gray-500 text-xs mt-0.5">
+                    <p className="text-ozio-text-subtle text-xs mt-0.5">
                       Foto o vídeo del momento
                     </p>
                   </div>
@@ -153,7 +153,7 @@ function BottomNav() {
                     <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-blue transition">
                       Evento
                     </p>
-                    <p className="text-gray-500 text-xs mt-0.5">
+                    <p className="text-ozio-text-subtle text-xs mt-0.5">
                       Crea un evento en tu local
                     </p>
                   </div>
@@ -171,7 +171,7 @@ function BottomNav() {
             <h3 className="text-lg font-semibold text-ozio-text">
               Debes iniciar sesión
             </h3>
-            <p className="mt-2 text-sm text-gray-300">
+            <p className="mt-2 text-sm text-ozio-text-secondary">
               Para usar esta opción necesitas tener una cuenta.
             </p>
 
@@ -179,7 +179,7 @@ function BottomNav() {
               <button
                 type="button"
                 onClick={() => setShowAuthModal(false)}
-                className="flex-1 rounded-xl border border-ozio-card px-4 py-2 text-sm text-gray-200 hover:bg-ozio-card"
+                className="flex-1 rounded-xl border border-ozio-card px-4 py-2 text-sm text-ozio-text-bright hover:bg-ozio-card"
               >
                 Cancelar
               </button>
@@ -228,7 +228,7 @@ function NavItem({
         ? "bg-ozio-blue text-ozio-text rounded-full shadow-xl"
         : active
           ? "text-ozio-blue"
-          : "text-gray-400 hover:text-gray-200"
+          : "text-ozio-text-muted hover:text-ozio-text-bright"
     }
   `}
     >

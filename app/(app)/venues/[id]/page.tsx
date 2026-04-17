@@ -270,7 +270,7 @@ export default function VenueDetail() {
           <h1 className="text-ozio-text text-xl font-bold mb-2">
             Local no encontrado
           </h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-ozio-text-muted mb-6">
             El local que buscas no existe o ha sido eliminado
           </p>
           <button
@@ -347,12 +347,12 @@ export default function VenueDetail() {
           <div className="flex flex-1 items-center justify-around">
             <div className="text-center">
               <p className="text-ozio-text text-xl font-black leading-none">{totalCheckIns}</p>
-              <p className="text-gray-400 text-xs mt-1">Visitas</p>
+              <p className="text-ozio-text-muted text-xs mt-1">Visitas</p>
             </div>
             <div className="w-px h-8 bg-ozio-card" />
             <div className="text-center">
               <p className="text-ozio-text text-xl font-black leading-none">{venue.events?.length || 0}</p>
-              <p className="text-gray-400 text-xs mt-1">Eventos</p>
+              <p className="text-ozio-text-muted text-xs mt-1">Eventos</p>
             </div>
             
           </div>
@@ -367,13 +367,13 @@ export default function VenueDetail() {
             </span>
           </div>
           {venue.address && (
-            <address className="text-gray-500 text-sm mt-0.5 flex items-center gap-1 not-italic">
+            <address className="text-ozio-text-subtle text-sm mt-0.5 flex items-center gap-1 not-italic">
               <MapPin size={12} className="text-ozio-orange flex-shrink-0" />
               {venue.address}
             </address>
           )}
           {venue.description && (
-            <p className="text-gray-300 text-sm mt-1.5 leading-relaxed">{venue.description}</p>
+            <p className="text-ozio-text-secondary text-sm mt-1.5 leading-relaxed">{venue.description}</p>
           )}
           {/* ── Géneros musicales (solo venue) ── */}
               {venue.genres && venue.genres.length > 0 && (
@@ -439,7 +439,7 @@ export default function VenueDetail() {
               className={`w-10 border rounded-xl transition flex items-center justify-center disabled:opacity-70 ${
                 venueFromStore?.is_favorite
                   ? "bg-ambience-high/20 border-ambience-high/40 text-ambience-high"
-                  : "bg-ozio-card border-ozio-card/70 text-gray-300 hover:bg-ozio-card/70"
+                  : "bg-ozio-card border-ozio-card/70 text-ozio-text-secondary hover:bg-ozio-card/70"
               }`}
             >
               {togglingFavorite ? (
@@ -459,7 +459,7 @@ export default function VenueDetail() {
           onClick={() => setActiveTab("events")}
           aria-label="Eventos"
           aria-current={activeTab === "events" ? "page" : undefined}
-          className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+          className={`flex-1 py-3 flex justify-center transition ${activeTab === "events" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}
         >
           <CalendarDays size={22} />
         </button>
@@ -468,7 +468,7 @@ export default function VenueDetail() {
           onClick={() => setActiveTab("location")}
           aria-label="Ubicación"
           aria-current={activeTab === "location" ? "page" : undefined}
-          className={`flex-1 py-3 flex justify-center transition ${activeTab === "location" ? "text-ozio-text border-b-2 border-white" : "text-gray-600 hover:text-gray-400"}`}
+          className={`flex-1 py-3 flex justify-center transition ${activeTab === "location" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}
         >
           <MapPin size={22} />
         </button>
@@ -503,7 +503,7 @@ export default function VenueDetail() {
 
             {upcomingEvents.length > 0 ? (
               <div className="space-y-3">
-                <h2 className="text-gray-500 text-xs uppercase tracking-widest font-semibold px-1">Próximos</h2>
+                <h2 className="text-ozio-text-subtle text-xs uppercase tracking-widest font-semibold px-1">Próximos</h2>
                 <ul className="space-y-3">
                   {upcomingEvents.map((event) => (
                     <li key={event.id}>
@@ -516,7 +516,7 @@ export default function VenueDetail() {
               <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-10 text-center">
                 <p className="text-4xl mb-3">📅</p>
                 <p className="text-ozio-text font-semibold mb-1">Sin eventos</p>
-                <p className="text-gray-500 text-sm">No hay eventos programados</p>
+                <p className="text-ozio-text-subtle text-sm">No hay eventos programados</p>
               </div>
             )}
           </>
@@ -585,11 +585,11 @@ export default function VenueDetail() {
               )}
             </div>
             <span className="text-ozio-text font-semibold text-sm">{venue.name}</span>
-            <span className="text-gray-400 text-xs">
+            <span className="text-ozio-text-muted text-xs">
               {storyIndex + 1}/{venueStories.length} · {new Date(currentStory.created_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
-          <button type="button" onClick={closeStories} aria-label="Cerrar historias" className="text-ozio-text hover:text-gray-300">
+          <button type="button" onClick={closeStories} aria-label="Cerrar historias" className="text-ozio-text hover:text-ozio-text-secondary">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -668,9 +668,9 @@ function EventMiniCard({ event }: { event: Event }) {
         <div className="flex-1 min-w-0">
           <h3 className="text-ozio-text font-bold truncate mb-1">{event.title}</h3>
           {event.description && (
-            <p className="text-gray-400 text-sm line-clamp-1 mb-2">{event.description}</p>
+            <p className="text-ozio-text-muted text-sm line-clamp-1 mb-2">{event.description}</p>
           )}
-          <div className="flex items-center gap-2 text-gray-400 text-xs">
+          <div className="flex items-center gap-2 text-ozio-text-muted text-xs">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -689,7 +689,7 @@ function EventMiniCard({ event }: { event: Event }) {
         )}
 
         <div className="flex items-center">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-ozio-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>

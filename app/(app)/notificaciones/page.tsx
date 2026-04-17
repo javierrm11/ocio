@@ -154,7 +154,7 @@ export default function NotificationsPage() {
         {notifications.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔕</div>
-            <p className="text-gray-400 text-lg">No tienes notificaciones</p>
+            <p className="text-ozio-text-muted text-lg">No tienes notificaciones</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -201,12 +201,12 @@ export default function NotificationsPage() {
                       <h3 className="text-ozio-text font-bold text-base">
                         {notification.title}
                       </h3>
-                      <span className="text-gray-500 text-sm whitespace-nowrap">
+                      <span className="text-ozio-text-subtle text-sm whitespace-nowrap">
                         {getTimeAgo(notification.created_at)}
                       </span>
                     </div>
                     
-                    <p className="text-gray-300 text-sm leading-relaxed">
+                    <p className="text-ozio-text-secondary text-sm leading-relaxed">
                       {notification.message}
                     </p>
 
@@ -220,7 +220,7 @@ export default function NotificationsPage() {
 
                     {/* Badge de leída */}
                     {notification.is_read && (
-                      <div className="mt-3 inline-flex items-center gap-1.5 text-gray-500 text-xs">
+                      <div className="mt-3 inline-flex items-center gap-1.5 text-ozio-text-subtle text-xs">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                         </svg>

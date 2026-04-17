@@ -52,9 +52,9 @@ function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
-      <ul className="max-w-md mx-auto flex items-center relative py-2 list-none p-0 m-0">
+      <ul className="max-w-md mx-auto grid grid-cols-5 items-center relative py-2 list-none p-0 m-0">
         {navItems.map(({ icon, label, path, special, requiresAuth }) => (
-          <li key={path} className="flex flex-1 justify-center">
+          <li key={path} className="flex justify-center">
             <NavItem
               icon={icon}
               label={label}
@@ -126,7 +126,7 @@ function BottomNav() {
                     setShowAddModal(false);
                     router.push("/anadir?tipo=historia");
                   }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
                 >
                   <span className="text-4xl">📸</span>
                   <div className="text-center">
@@ -146,7 +146,7 @@ function BottomNav() {
                     setShowAddModal(false);
                     router.push("/anadir?tipo=evento");
                   }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-gray-700/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
+                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
                 >
                   <span className="text-4xl">🎉</span>
                   <div className="text-center">
@@ -171,7 +171,7 @@ function BottomNav() {
             <h3 className="text-lg font-semibold text-white">
               Debes iniciar sesión
             </h3>
-            <p className="mt-2 text-sm text-zinc-300">
+            <p className="mt-2 text-sm text-gray-300">
               Para usar esta opción necesitas tener una cuenta.
             </p>
 
@@ -179,7 +179,7 @@ function BottomNav() {
               <button
                 type="button"
                 onClick={() => setShowAuthModal(false)}
-                className="flex-1 rounded-xl border border-zinc-600 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800"
+                className="flex-1 rounded-xl border border-ozio-card px-4 py-2 text-sm text-gray-200 hover:bg-ozio-card"
               >
                 Cancelar
               </button>
@@ -227,8 +227,8 @@ function NavItem({
       special
         ? "bg-ozio-blue text-white rounded-full shadow-xl"
         : active
-          ? "text-blue-500"
-          : "text-zinc-400 hover:text-zinc-200"
+          ? "text-ozio-blue"
+          : "text-gray-400 hover:text-gray-200"
     }
   `}
     >

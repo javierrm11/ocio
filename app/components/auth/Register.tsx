@@ -10,7 +10,7 @@ const MapWithNoSSR = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 bg-gray-800 rounded-xl flex items-center justify-center">
+      <div className="h-64 bg-ozio-card rounded-xl flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-ozio-blue"></div>
       </div>
     )
@@ -183,12 +183,12 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num, idx) => (
               <li key={num} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition ${
-                  step >= num ? 'bg-ozio-blue text-white' : 'bg-gray-700 text-gray-400'
+                  step >= num ? 'bg-ozio-blue text-white' : 'bg-ozio-card text-gray-400'
                 }`}>
                   {num}
                 </div>
                 {idx < totalSteps - 1 && (
-                  <div className={`w-8 h-1 rounded transition ${step > num ? 'bg-ozio-blue' : 'bg-gray-700'}`} />
+                  <div className={`w-8 h-1 rounded transition ${step > num ? 'bg-ozio-blue' : 'bg-ozio-card'}`} />
                 )}
               </li>
             ))}
@@ -198,7 +198,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
           <p className="text-gray-400 text-sm mb-6">Paso {step} de {totalSteps}</p>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl p-3 mb-4 text-sm">
+            <div className="bg-ambience-high/10 border border-ambience-high/50 text-ambience-high rounded-xl p-3 mb-4 text-sm">
               {error}
             </div>
           )}
@@ -211,19 +211,19 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   Nombre {formData.profileType === 'user' ? 'completo' : 'del establecimiento'}
                 </label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder={formData.profileType === 'user' ? 'Tu nombre' : 'Nombre del local'} autoFocus />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="tu@email.com" />
               </div>
               <div>
                 <label htmlFor="profileType" className="block text-sm font-medium text-gray-300 mb-2">Tipo de cuenta</label>
                 <select id="profileType" name="profileType" value={formData.profileType} onChange={handleChange}
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-ozio-blue transition">
                   <option value="user">👤 Usuario</option>
                   <option value="venue">🏢 Establecimiento</option>
                 </select>
@@ -243,7 +243,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">@</span>
                   <input type="text" name="username" value={formData.username} onChange={handleChange}
                     required minLength={3} pattern="[a-zA-Z0-9_]+"
-                    className="w-full bg-ozio-dark border border-gray-700 rounded-xl pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                    className="w-full bg-ozio-dark border border-ozio-card rounded-xl pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                     placeholder="tunombre" autoFocus />
                 </div>
                 <p className="text-xs text-gray-400 mt-1">Mínimo 3 caracteres, sin espacios</p>
@@ -252,12 +252,12 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 <label className="block text-sm font-medium text-gray-300 mb-2">Descripción (opcional)</label>
                 <textarea name="description" value={formData.description} onChange={handleChange}
                   rows={4} maxLength={150}
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition resize-none"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition resize-none"
                   placeholder="Cuéntanos sobre ti..." />
                 <p className="text-xs text-gray-400 mt-1 text-right">{formData.description.length}/150</p>
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
                 <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
@@ -269,13 +269,13 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Dirección</label>
                 <input type="text" name="address" value={formData.address} onChange={handleChange} required
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Calle, número, ciudad" autoFocus />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Ubicación en el mapa</label>
                 <p className="text-xs text-gray-400 mb-2">Haz clic en el mapa para seleccionar tu ubicación</p>
-                <div className="rounded-xl overflow-hidden border border-gray-700 h-64">
+                <div className="rounded-xl overflow-hidden border border-ozio-card h-64">
                   <MapWithNoSSR latitude={formData.latitude} longitude={formData.longitude}
                     onPositionChange={(lat, lng) => setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }))} />
                 </div>
@@ -285,7 +285,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
                 <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
@@ -309,7 +309,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                           className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all border ${
                             selected
                               ? 'bg-ozio-blue border-ozio-blue text-white scale-105'
-                              : 'bg-ozio-dark border-gray-700 text-gray-300 hover:border-ozio-blue/50 hover:text-white'
+                              : 'bg-ozio-dark border-ozio-card text-gray-300 hover:border-ozio-blue/50 hover:text-white'
                           }`}
                         >
                           <span>{genre.emoji}</span>
@@ -326,7 +326,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 )}
               </div>
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="button" onClick={() => setStep(2)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
                 <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
@@ -339,22 +339,22 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
                 <input type="password" name="password" value={formData.password} onChange={handleChange}
                   required minLength={6}
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Mínimo 6 caracteres" autoFocus />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Confirmar contraseña</label>
                 <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}
                   required minLength={6}
-                  className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
+                  className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue transition"
                   placeholder="Repite tu contraseña" />
               </div>
               {formData.password && (
                 <div className="space-y-2">
                   <div className="flex gap-2">
-                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 6 ? 'bg-yellow-500' : 'bg-gray-700'}`} />
-                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 8 ? 'bg-orange-500' : 'bg-gray-700'}`} />
-                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 10 ? 'bg-green-500' : 'bg-gray-700'}`} />
+                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 6 ? 'bg-ozio-orange' : 'bg-ozio-card'}`} />
+                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 8 ? 'bg-orange-500' : 'bg-ozio-card'}`} />
+                    <div className={`h-1 flex-1 rounded ${formData.password.length >= 10 ? 'bg-ambience-low' : 'bg-ozio-card'}`} />
                   </div>
                   <p className="text-xs text-gray-400">
                     {formData.password.length < 6 && 'Demasiado corta'}
@@ -365,7 +365,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </div>
               )}
               <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(step - 1)} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="button" onClick={() => setStep(step - 1)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
                 <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-white font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
               </div>
             </form>
@@ -380,7 +380,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                     <img src={formData.profileImagePreview} alt="Preview"
                       className="w-32 h-32 rounded-full object-cover border-4 border-ozio-blue" />
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-ozio-blue to-ozio-purple border-4 border-gray-600 flex items-center justify-center">
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-ozio-blue to-ozio-purple border-4 border-ozio-card flex items-center justify-center">
                       <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
@@ -400,12 +400,12 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
                 </p>
                 <p className="text-xs text-gray-400 text-center">Opcional. Formatos: JPG, PNG (máx. 5MB)</p>
                 <button type="button" onClick={() => fileInputRef.current?.click()}
-                  className="mt-4 px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition">
+                  className="mt-4 px-6 py-2 bg-ozio-card hover:bg-ozio-card/70 text-white font-medium rounded-xl transition">
                   {formData.profileImagePreview ? 'Cambiar imagen' : 'Seleccionar imagen'}
                 </button>
                 {loading && uploadProgress > 0 && (
                   <div className="w-full mt-4">
-                    <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-ozio-card rounded-full h-2">
                       <div className="bg-ozio-blue h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                     </div>
                     <p className="text-xs text-gray-400 text-center mt-2">Subiendo imagen... {uploadProgress}%</p>
@@ -414,7 +414,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
               </div>
               <div className="flex gap-3 mt-8">
                 <button type="button" onClick={() => setStep(step - 1)} disabled={loading}
-                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50">
+                  className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-white font-semibold py-3 px-6 rounded-xl transition disabled:opacity-50">
                   ← Atrás
                 </button>
                 <button type="submit" disabled={loading}
@@ -435,7 +435,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
 
           <p className="text-center text-gray-400 text-sm mt-6">
             ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
+            <Link href="/profile" className="text-ozio-blue hover:text-ozio-purple font-semibold transition">
               Inicia sesión
             </Link>
           </p>

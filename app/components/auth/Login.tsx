@@ -60,7 +60,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         <h2 id="login-title" className="text-2xl font-bold text-white mb-6">Iniciar sesión</h2>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl p-3 mb-4 text-sm">
+          <div className="bg-ambience-high/10 border border-ambience-high/50 text-ambience-high rounded-xl p-3 mb-4 text-sm">
             {error}
           </div>
         )}
@@ -78,7 +78,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               onChange={handleChange}
               required
               placeholder="tu@email.com"
-              className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
             />
           </div>
 
@@ -94,7 +94,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               onChange={handleChange}
               required
               placeholder="Tu contraseña"
-              className="w-full bg-ozio-dark border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
+              className="w-full bg-ozio-dark border border-ozio-card rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ozio-blue focus:border-transparent transition"
             />
           </div>
 

@@ -30,7 +30,7 @@ export default function ProfilePage() {
     return (
       <div className="m-0 bg-ozio-dark min-h-screen">
         {/* Encabezado de la página */}
-        <div className="w-full bg-gradient-to-b from-gray-900 to-transparent absolute top-0 left-0 z-[991]">
+        <div className="w-full bg-gradient-to-b from-ozio-darker to-transparent absolute top-0 left-0 z-[991]">
           <Header />
         </div>
         
@@ -46,7 +46,7 @@ export default function ProfilePage() {
   return (
     <div className="m-0 bg-ozio-dark min-h-screen">
       {/* Encabezado de la página */}
-      <div className="w-full bg-gradient-to-b from-gray-900 to-transparent absolute top-0 left-0 z-[991]">
+      <div className="w-full bg-gradient-to-b from-ozio-darker to-transparent absolute top-0 left-0 z-[991]">
         <Header />
       </div>
       
@@ -57,7 +57,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Navegación de pestañas */}
-        <div className="flex justify-center items-center gap-4 mb-6 border-b border-gray-700">
+        <div className="flex justify-center items-center gap-4 mb-6 border-b border-ozio-card">
           <button
             onClick={() => setActiveTab("login")}
             className={`pb-3 px-4 font-medium transition-colors relative flex-1 ${

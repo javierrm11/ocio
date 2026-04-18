@@ -279,7 +279,7 @@ npm run lint
 
 ## Pendiente
 
-- [ ] **Hora pico** — Integrar `getMadridHour()` en la UI para mostrar en el mapa y en el panel lateral cuándo un local suele estar más lleno según la hora actual
+
 - [ ] **App móvil nativa** — Los botones de App Store y Google Play están en la landing como "Próximamente"
 
 ---

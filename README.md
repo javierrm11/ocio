@@ -288,12 +288,9 @@ npm run lint
 
 ### Producto
 - **Mapa de calor histórico** — Visualizar en el mapa la afluencia media por día de la semana y hora, usando el historial de check-ins agregado por local
-- **Recomendaciones personalizadas con IA** — Usar el Anthropic SDK (ya instalado) para sugerir locales o eventos basándose en el historial y preferencias del usuario
-- **Feed social** — Timeline de actividad de amigos: check-ins, asistencias a eventos y valoraciones
-- **Valoraciones y reseñas** — Sistema de rating por local con comentario y fotos, visible en el panel lateral
 - **Modo "salida de grupo"** — Crear una sala temporal donde varios usuarios coordinan a qué local van; el mapa muestra los pins del grupo en tiempo real
-- **Reservas en mesa** — Integrar un flujo básico de reserva directamente desde el panel lateral del local
 - **Descuentos y ofertas** — Los establecimientos pueden publicar promociones con hora de inicio/fin visibles en el mapa con un icono de oferta
+- programar checkin entrada o salida
 
 ### Técnico
 - **Realtime con Supabase Channels** — Sustituir el polling del store por suscripciones Realtime para que los check-ins y el ambiente se reflejen en el mapa sin refrescar

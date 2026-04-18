@@ -1,6 +1,29 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Venue } from "./types";
+import { Venue, ScheduleDay } from "./types";
+
+function parseTime(t: string): number {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function getOpenStatus(schedule: ScheduleDay[] | undefined): { open: boolean; label: string } | null {
+  if (!schedule?.length) return null;
+  const dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  const now = new Date();
+  const todayName = dayNames[now.getDay()];
+  const today = schedule.find(d => d.day === todayName);
+  if (!today) return null;
+  if (today.is_closed) return { open: false, label: `Cerrado hoy` };
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const op = parseTime(today.open);
+  const cl = parseTime(today.close);
+  const isOpen = cl < op ? (cur >= op || cur < cl) : (cur >= op && cur < cl);
+  return {
+    open: isOpen,
+    label: isOpen ? `Abierto · Cierra ${today.close}` : `Cerrado · Abre ${today.open}`,
+  };
+}
 import {
   getEventStatus,
   getActiveOrSoonEvent,
@@ -95,6 +118,8 @@ export function VenuePanel({
   const dirArrow =
     heatState === "full" ? "↑↑" : heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
 
+  const openStatus = getOpenStatus(venue.schedule);
+
   const currentHour = getMadridHour();
   const peakHourNum = venue.peak_hour ? parseInt(venue.peak_hour) : null;
   const hourDiff = peakHourNum !== null
@@ -179,6 +204,16 @@ export function VenuePanel({
               <h2 className="text-ozio-text text-2xl font-bold">{venue.name}</h2>
               {isPremium(venue) && <span className="premium-badge">👑 PREMIUM</span>}
             </div>
+
+            {/* Open status */}
+            {openStatus && (
+              <div className="mt-1">
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${openStatus.open ? 'bg-ambience-low/15 text-ambience-low border border-ambience-low/30' : 'bg-white/5 text-ozio-text-muted border border-white/10'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${openStatus.open ? 'bg-ambience-low animate-pulse' : 'bg-ozio-text-muted'}`} />
+                  {openStatus.label}
+                </span>
+              </div>
+            )}
 
             {/* Distance */}
             <div className="flex items-center gap-3 text-ozio-text-muted text-sm mt-1">

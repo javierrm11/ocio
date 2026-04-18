@@ -24,6 +24,54 @@ interface Genre {
   emoji: string;
 }
 
+interface ScheduleDay {
+  day: string;
+  open: string;
+  close: string;
+  is_closed: boolean;
+}
+
+const DAYS: string[] = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+const DEFAULT_SCHEDULE: ScheduleDay[] = DAYS.map(day => ({ day, open: '21:00', close: '04:00', is_closed: false }));
+
+function ScheduleEditor({ schedule, onChange }: { schedule: ScheduleDay[]; onChange: (s: ScheduleDay[]) => void }) {
+  const update = (i: number, field: keyof ScheduleDay, value: any) => {
+    const next = [...schedule];
+    next[i] = { ...next[i], [field]: value };
+    onChange(next);
+  };
+  return (
+    <div className="space-y-1.5">
+      {schedule.map((d, i) => (
+        <div key={d.day} className="flex items-center gap-2 bg-ozio-dark rounded-xl px-3 py-2">
+          <span className="w-20 text-ozio-text text-xs capitalize font-medium">{d.day}</span>
+          <button
+            type="button"
+            aria-label={d.is_closed ? `Abrir ${d.day}` : `Cerrar ${d.day}`}
+            onClick={() => update(i, 'is_closed', !d.is_closed)}
+            className={`w-9 h-5 rounded-full relative transition flex-shrink-0 ${d.is_closed ? 'bg-ozio-card' : 'bg-ozio-blue'}`}
+          >
+            <div className={`w-4 h-4 bg-white rounded-full shadow absolute top-0.5 transition-transform ${d.is_closed ? 'translate-x-0.5' : 'translate-x-4'}`} />
+          </button>
+          {d.is_closed ? (
+            <span className="text-ozio-text-muted text-xs flex-1">Cerrado</span>
+          ) : (
+            <div className="flex items-center gap-1.5 flex-1">
+              <input type="time" value={d.open} onChange={e => update(i, 'open', e.target.value)}
+                title={`Hora de apertura ${d.day}`} aria-label={`Hora de apertura ${d.day}`}
+                className="bg-ozio-card/50 text-ozio-text text-xs rounded-lg px-2 py-1 border border-ozio-card focus:border-ozio-blue focus:outline-none w-24" />
+              <span className="text-ozio-text-muted text-xs">–</span>
+              <input type="time" value={d.close} onChange={e => update(i, 'close', e.target.value)}
+                title={`Hora de cierre ${d.day}`} aria-label={`Hora de cierre ${d.day}`}
+                className="bg-ozio-card/50 text-ozio-text text-xs rounded-lg px-2 py-1 border border-ozio-card focus:border-ozio-blue focus:outline-none w-24" />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: () => void }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -42,6 +90,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
     profileImage: null as File | null,
     profileImagePreview: '' as string,
     selectedGenres: [] as number[],
+    schedule: DEFAULT_SCHEDULE,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,7 +98,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Total de pasos según tipo
-  const totalSteps = formData.profileType === 'venue' ? 5 : 4;
+  const totalSteps = formData.profileType === 'venue' ? 6 : 4;
 
   // Cargar géneros al montar
   useEffect(() => {
@@ -107,8 +156,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
       if (formData.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return; }
     }
 
-    // Paso 4 para venue = contraseña
-    if (step === 4 && formData.profileType === 'venue') {
+    // Paso 5 para venue = contraseña
+    if (step === 5 && formData.profileType === 'venue') {
       if (formData.password !== formData.confirmPassword) { setError('Las contraseñas no coinciden'); return; }
       if (formData.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return; }
     }
@@ -140,6 +189,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
         submitData.append('latitude', formData.latitude.toString());
         submitData.append('longitude', formData.longitude.toString());
         submitData.append('genre_ids', JSON.stringify(formData.selectedGenres));
+        submitData.append('schedule', JSON.stringify(formData.schedule));
       }
 
       if (formData.profileImage) {
@@ -168,7 +218,7 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
   // Títulos dinámicos por paso y tipo
   const stepTitle = () => {
     if (formData.profileType === 'venue') {
-      return ['Datos básicos', 'Ubicación', 'Géneros musicales', 'Seguridad', 'Logo del local'][step - 1];
+      return ['Datos básicos', 'Ubicación', 'Géneros musicales', 'Horarios', 'Seguridad', 'Logo del local'][step - 1];
     }
     return ['Datos básicos', 'Tu perfil', 'Seguridad', 'Foto de perfil'][step - 1];
   };
@@ -332,8 +382,25 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             </form>
           )}
 
-          {/* PASO 3: User / PASO 4: Venue → contraseña */}
-          {((step === 3 && formData.profileType === 'user') || (step === 4 && formData.profileType === 'venue')) && (
+          {/* PASO 4: Venue → horarios */}
+          {step === 4 && formData.profileType === 'venue' && (
+            <form onSubmit={handleNextStep} className="space-y-4">
+              <p className="text-sm text-ozio-text-muted mb-2">
+                Configura el horario de apertura de tu local. Puedes ajustarlo después desde tu perfil.
+              </p>
+              <ScheduleEditor
+                schedule={formData.schedule}
+                onChange={s => setFormData(prev => ({ ...prev, schedule: s }))}
+              />
+              <div className="flex gap-3 mt-6">
+                <button type="button" onClick={() => setStep(3)} className="flex-1 bg-ozio-card hover:bg-ozio-card/70 text-ozio-text font-semibold py-3 px-6 rounded-xl transition">← Atrás</button>
+                <button type="submit" className="flex-1 bg-ozio-blue hover:bg-ozio-purple text-ozio-text font-semibold py-3 px-6 rounded-xl transition">Continuar →</button>
+              </div>
+            </form>
+          )}
+
+          {/* PASO 3: User / PASO 5: Venue → contraseña */}
+          {((step === 3 && formData.profileType === 'user') || (step === 5 && formData.profileType === 'venue')) && (
             <form onSubmit={handleNextStep} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ozio-text-secondary mb-2">Contraseña</label>
@@ -371,8 +438,8 @@ export default function Register({ onRegisterSuccess }: { onRegisterSuccess?: ()
             </form>
           )}
 
-          {/* PASO 4: User / PASO 5: Venue → foto */}
-          {((step === 4 && formData.profileType === 'user') || (step === 5 && formData.profileType === 'venue')) && (
+          {/* PASO 4: User / PASO 6: Venue → foto */}
+          {((step === 4 && formData.profileType === 'user') || (step === 6 && formData.profileType === 'venue')) && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex flex-col items-center">
                 <figure className="relative mb-4 m-0">

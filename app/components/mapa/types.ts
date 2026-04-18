@@ -1,3 +1,10 @@
+export interface ScheduleDay {
+  day: string;
+  open: string;
+  close: string;
+  is_closed: boolean;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -33,4 +40,5 @@ export interface Venue {
   events?: Event[];
   plan?: string;
   peak_hour?: string | null;
+  schedule?: ScheduleDay[];
 }

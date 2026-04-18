@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
-import { CalendarDays, MapPin, Heart } from "lucide-react";
+import { CalendarDays, MapPin, Heart, Clock } from "lucide-react";
 import Header from "@/components/layout/header";
 
 interface Event {
@@ -42,6 +42,13 @@ interface Genre {
   slug: string;
   emoji: string;
 }
+interface ScheduleDay {
+  day: string;
+  open: string;
+  close: string;
+  is_closed: boolean;
+}
+
 interface Venue {
   id: string;
   name: string;
@@ -56,6 +63,7 @@ interface Venue {
   is_favorite?: boolean;
   genres?: Genre[];
   plan?: string;
+  schedule?: ScheduleDay[];
 }
 
 export default function VenueDetail() {
@@ -85,7 +93,7 @@ export default function VenueDetail() {
   const [checkingIn, setCheckingIn] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [togglingFavorite, setTogglingFavorite] = useState(false);
-  const [activeTab, setActiveTab] = useState<"events" | "location">("events");
+  const [activeTab, setActiveTab] = useState<"events" | "location" | "schedule">("events");
   const [venueStories, setVenueStories] = useState<Story[]>([]);
   const [showStoryViewer, setShowStoryViewer] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
@@ -472,6 +480,15 @@ export default function VenueDetail() {
         >
           <MapPin size={22} />
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("schedule")}
+          aria-label="Horarios"
+          aria-current={activeTab === "schedule" ? "page" : undefined}
+          className={`flex-1 py-3 flex justify-center transition ${activeTab === "schedule" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}
+        >
+          <Clock size={22} />
+        </button>
       </nav>
 
       {/* ── Tab content ── */}
@@ -520,6 +537,21 @@ export default function VenueDetail() {
               </div>
             )}
           </>
+        )}
+
+        {/* Horarios */}
+        {activeTab === "schedule" && (
+          <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl overflow-hidden">
+            {venue.schedule?.length ? (
+              <ScheduleTable schedule={venue.schedule} />
+            ) : (
+              <div className="p-10 text-center">
+                <p className="text-4xl mb-3">🕐</p>
+                <p className="text-ozio-text font-semibold mb-1">Sin horario configurado</p>
+                <p className="text-ozio-text-subtle text-sm">El local aún no ha publicado sus horarios</p>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Ubicación */}
@@ -629,6 +661,49 @@ export default function VenueDetail() {
       @keyframes story-progress { from { width: 0% } to { width: 100% } }
       .animate-story-progress { animation: story-progress 15s linear forwards; }
     `}</style>
+    </div>
+  );
+}
+
+function ScheduleTable({ schedule }: { schedule: ScheduleDay[] }) {
+  const dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  const todayName = dayNames[new Date().getDay()];
+
+  function parseTime(t: string) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  function isOpenNow(d: ScheduleDay): boolean {
+    if (d.is_closed) return false;
+    const cur = new Date().getHours() * 60 + new Date().getMinutes();
+    const op = parseTime(d.open);
+    const cl = parseTime(d.close);
+    return cl < op ? (cur >= op || cur < cl) : (cur >= op && cur < cl);
+  }
+
+  return (
+    <div className="divide-y divide-ozio-darker">
+      {schedule.map((d) => {
+        const isToday = d.day === todayName;
+        const openNow = isToday && isOpenNow(d);
+        return (
+          <div key={d.day} className={`flex items-center justify-between px-5 py-3.5 ${isToday ? 'bg-ozio-blue/5' : ''}`}>
+            <div className="flex items-center gap-2">
+              {isToday && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${openNow ? 'bg-ambience-low animate-pulse' : 'bg-ozio-text-muted'}`} />}
+              <span className={`text-sm capitalize font-medium ${isToday ? 'text-ozio-text' : 'text-ozio-text-secondary'}`}>{d.day}</span>
+              {isToday && <span className="text-[10px] text-ozio-blue font-semibold uppercase tracking-wide">hoy</span>}
+            </div>
+            {d.is_closed ? (
+              <span className="text-ozio-text-muted text-sm">Cerrado</span>
+            ) : (
+              <span className={`text-sm ${isToday ? 'text-ozio-text font-semibold' : 'text-ozio-text-secondary'}`}>
+                {d.open} – {d.close}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

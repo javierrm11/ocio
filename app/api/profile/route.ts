@@ -67,6 +67,8 @@ export async function PATCH(request: Request) {
     const username = formData.get("username") as string | null;
     const description = (formData.get("description") as string) || "";
     const avatarFile = formData.get("avatar") as File | null;
+    const scheduleRaw = formData.get("schedule") as string | null;
+    const schedule = scheduleRaw ? JSON.parse(scheduleRaw) : undefined;
 
     const isVenue = user.user_metadata.type === "venue";
     const identifier = name || user.user_metadata.username || user.id;
@@ -102,9 +104,11 @@ export async function PATCH(request: Request) {
     }
 
     if (isVenue) {
+      const venueUpdate: Record<string, any> = { name, avatar_path, description };
+      if (schedule !== undefined) venueUpdate.schedule = schedule;
       const { data, error } = await supabase
         .from("venues")
-        .update({ name, avatar_path, description })
+        .update(venueUpdate)
         .eq("id", user.id)
         .select()
         .single();

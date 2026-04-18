@@ -83,8 +83,9 @@ export async function POST(request: Request) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // Géneros: se envían como JSON string desde el frontend
+  // Géneros y horario: se envían como JSON string desde el frontend
   const genreIds: number[] = JSON.parse(formData.get("genre_ids") as string || "[]");
+  const schedule = formData.get("schedule") ? JSON.parse(formData.get("schedule") as string) : null;
 
   let avatar_path = null;
 
@@ -126,6 +127,11 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Guardar horario si se proporcionó
+  if (schedule && data.user?.id) {
+    await supabase.from("venues").update({ schedule }).eq("id", data.user.id);
   }
 
   // Insertar géneros si se proporcionaron

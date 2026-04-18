@@ -7,6 +7,7 @@ import { useAppStore } from "@/lib/stores/venueStore";
 import { createClient } from "@/lib/supabase/client";
 import { getToken } from "@/lib/hooks/getToken";
 import { Heart, Clock, Settings, CalendarDays, Plus, BarChart3, Lock, Sun, Moon } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { isPremium } from "@/lib/hooks/plan";
 
 interface CheckInHistory {
@@ -429,35 +430,47 @@ function StatsTab() {
         )}
       </div>
 
-      {/* Hora pico / top local */}
-      {isVenueStats && stats.peak_hour && (
-        <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-2xl">🕐</span>
-          <div>
-            <p className="text-ozio-text font-bold text-lg">{stats.peak_hour}</p>
-            <p className="text-ozio-text-muted text-xs">Hora pico de visitas</p>
-          </div>
-        </div>
-      )}
 
-      {/* Gráfico de barras simple — actividad */}
+      {/* Visitas por día — últimos 30 días */}
       {isVenueStats && stats.daily_data?.length > 0 && (
         <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
           <p className="text-ozio-text font-semibold text-sm mb-3">Visitas últimos 30 días</p>
-          <div className="flex items-end gap-1 h-20">
-            {stats.daily_data.slice(-20).map((d: any) => {
-              const max = Math.max(...stats.daily_data.map((x: any) => x.count), 1);
-              const pct = Math.round((d.count / max) * 100);
-              return (
-                <div key={d.date} className="flex-1 flex flex-col items-center gap-0.5">
-                  <div
-                    className="w-full rounded-t bg-ozio-orange/80"
-                    style={{ height: `${Math.max(pct, 4)}%` }}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          <ResponsiveContainer width="100%" height={110}>
+            <BarChart data={stats.daily_data.slice(-30)} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#9ca3af" }} tickFormatter={(v) => v.slice(5)} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: "#1a1a2e", border: "1px solid #333", borderRadius: 8, fontSize: 11 }}
+                labelStyle={{ color: "#9ca3af" }}
+                itemStyle={{ color: "#f97316" }}
+                formatter={(v: any) => [v, "visitas"]}
+              />
+              <Bar dataKey="count" radius={[3, 3, 0, 0]} fill="#f97316" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Distribución de visitas por hora */}
+      {isVenueStats && stats.hourly_data && (
+        <div className="bg-ozio-card border border-ozio-card/50 rounded-2xl p-4">
+          <p className="text-ozio-text font-semibold text-sm mb-3">Visitas por hora del día</p>
+          <ResponsiveContainer width="100%" height={110}>
+            <BarChart data={stats.hourly_data} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+              <XAxis dataKey="hour" tick={{ fontSize: 9, fill: "#9ca3af" }} interval={3} />
+              <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: "#1a1a2e", border: "1px solid #333", borderRadius: 8, fontSize: 11 }}
+                labelStyle={{ color: "#9ca3af" }}
+                itemStyle={{ color: "#f97316" }}
+                formatter={(v: any) => [v, "visitas"]}
+              />
+              <Bar dataKey="count" radius={[3, 3, 0, 0]} fill="#f97316" fillOpacity={0.7} />
+            </BarChart>
+          </ResponsiveContainer>
+          {stats.peak_hour && (
+            <p className="text-ozio-text-muted text-xs mt-2 text-center">Hora pico: <span className="text-ozio-orange font-bold">{stats.peak_hour}</span></p>
+          )}
         </div>
       )}
 

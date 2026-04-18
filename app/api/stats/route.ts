@@ -46,6 +46,7 @@ export async function GET() {
       hourCount[h] = (hourCount[h] ?? 0) + 1;
     }
     const peakHour = Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const hourlyData = Array.from({ length: 24 }, (_, h) => ({ hour: `${h}h`, count: hourCount[h] ?? 0 }));
 
     // Check-ins por día (últimos 30 días)
     const byDay: Record<string, number> = {};
@@ -74,6 +75,7 @@ export async function GET() {
       peak_hour: peakHour !== undefined ? `${peakHour}:00` : null,
       daily_avg: dailyAvg,
       daily_data: dailyData,
+      hourly_data: hourlyData,
       top_events: topEvents,
     });
   }

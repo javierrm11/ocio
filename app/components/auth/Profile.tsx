@@ -83,6 +83,15 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
       });
       if (!response.ok) throw new Error("Error al cargar perfil");
       const data = await response.json();
+
+      if (!data[0]) {
+        // Cookie session=1 existe pero la sesión de Supabase expiró → limpiar y redirigir
+        document.cookie = "session=; path=/; max-age=0; SameSite=Strict";
+        if (onLogout) onLogout();
+        else router.push("/profile");
+        return;
+      }
+
       setUser(data[0]);
     } catch (error) {
       console.error("Error:", error);

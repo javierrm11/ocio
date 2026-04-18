@@ -74,6 +74,8 @@ html.light {
   --ozio-dark: #f3f4f6;
   --ozio-darker: #e5e7eb;
   --ozio-card: #ffffff;
+  --ozio-blue: #3b82f6;
+  --ozio-purple: #a855f7;
 }
 
 html.light body {

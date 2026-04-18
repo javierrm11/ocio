@@ -9,6 +9,7 @@ import { getDistanceKm, getGenreEmoji, getGenreName, getHeatCategory, getHeatSte
 import { MapMarkers } from "./MapMarkers";
 import { MapFilters } from "./MapFilters";
 import { VenuePanel } from "./VenuePanel";
+import { MapLoader } from "./MapLoader";
 
 // Centra el mapa solo la primera vez que se obtiene la ubicación
 function MapViewSetter({ location }: { location: { latitude: number; longitude: number } | null }) {
@@ -352,17 +353,7 @@ function MyMap() {
   }, [venues, userFavorites, selectedVenue, setVenues, setUserFavorites]);
 
   if (!loaded) {
-    return (
-      <div className="fixed inset-0 bg-ozio-dark flex flex-col items-center justify-center z-50" role="status" aria-label="Cargando mapa">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-ozio-blue"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-ozio-blue to-ozio-purple rounded-full opacity-50"></div>
-          </div>
-        </div>
-        <p className="text-ozio-text text-lg font-semibold mt-6 animate-pulse">Cargando mapa...</p>
-      </div>
-    );
+    return <MapLoader />;
   }
 
   return (

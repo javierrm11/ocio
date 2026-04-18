@@ -245,3 +245,15 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ── Map loader ───────────────────────────────────────────────────────────── */
+.map-loader-root { background: var(--ozio-darker); }
+@keyframes loader-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+.loader-pin-a { will-change: transform; animation: loader-float 3.0s ease-in-out infinite 0.0s; }
+.loader-pin-b { will-change: transform; animation: loader-float 3.4s ease-in-out infinite 0.5s; }
+.loader-pin-c { will-change: transform; animation: loader-float 2.8s ease-in-out infinite 1.0s; }
+.loader-pin-d { will-change: transform; animation: loader-float 3.2s ease-in-out infinite 0.3s; }
+.loader-pin-e { will-change: transform; animation: loader-float 2.6s ease-in-out infinite 0.8s; }

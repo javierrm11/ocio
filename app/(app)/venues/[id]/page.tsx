@@ -309,14 +309,14 @@ export default function VenueDetail() {
     ) || [];
 
   // Check-in permitido si hay evento activo, o si el local está abierto según horario
-  function getVenueOpenStatus(): { open: boolean; label: string } | null {
-    const sched = venue.schedule;
+  const venueOpenStatus = (() => {
+    const sched = venue!.schedule;
     if (!sched?.length) return null;
     const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
     const todayName = dayNames[now.getDay()];
     const today = sched.find(d => d.day === todayName);
     if (!today) return null;
-    if (today.is_closed) return { open: false, label: `Cerrado hoy` };
+    if (today.is_closed) return { open: false, label: "Cerrado hoy" };
     const cur = now.getHours() * 60 + now.getMinutes();
     const [oh, om] = today.open.split(":").map(Number);
     const [ch, cm] = today.close.split(":").map(Number);
@@ -324,9 +324,7 @@ export default function VenueDetail() {
     const cl = ch * 60 + cm;
     const isOpen = cl < op ? (cur >= op || cur < cl) : (cur >= op && cur < cl);
     return { open: isOpen, label: isOpen ? `Abierto · Cierra ${today.close}` : `Cerrado · Abre ${today.open}` };
-  }
-
-  const venueOpenStatus = getVenueOpenStatus();
+  })();
   const checkInAllowed = activeEvents.length > 0 || venueOpenStatus === null || venueOpenStatus.open;
 
   const upcomingEvents =

@@ -119,6 +119,8 @@ export function VenuePanel({
     heatState === "full" ? "↑↑" : heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
 
   const openStatus = getOpenStatus(venue.schedule);
+  const hasActiveEvent = activeEvents.length > 0;
+  const checkInAllowed = hasActiveEvent || openStatus === null || openStatus.open;
 
   const currentHour = getMadridHour();
   const peakHourNum = venue.peak_hour ? parseInt(venue.peak_hour) : null;
@@ -407,13 +409,15 @@ export function VenuePanel({
               ) : (
                 <button
                   type="button"
-                  className="w-full bg-ozio-blue hover:bg-ozio-blue/80 text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
+                  disabled={!checkInAllowed}
+                  title={!checkInAllowed ? (openStatus?.label ?? "Local cerrado") : undefined}
+                  className="w-full bg-ozio-blue hover:bg-ozio-blue/80 disabled:opacity-40 disabled:cursor-not-allowed text-ozio-text font-semibold py-3 px-6 rounded-full flex items-center justify-center gap-2 transition"
                   onClick={() => onCheckIn(venue.id)}
                 >
-                  Hacer check-in
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  {!checkInAllowed
+                    ? <span className="flex items-center gap-2">🔒 {openStatus?.label ?? "Cerrado"}</span>
+                    : <>Hacer check-in <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+                  }
                 </button>
               ))}
 

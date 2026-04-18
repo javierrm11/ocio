@@ -166,8 +166,16 @@ export default function VenueDetail() {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ venue_id: venueId }),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error ?? "No puedes hacer check-in ahora.");
+          return null;
+        }
+        return data;
+      })
       .then((data) => {
+        if (!data) return;
         const created = Array.isArray(data?.data) ? data.data[0] : data?.data;
         if (!created) return;
         setVenues(
@@ -300,6 +308,27 @@ export default function VenueDetail() {
       (e) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now,
     ) || [];
 
+  // Check-in permitido si hay evento activo, o si el local está abierto según horario
+  function getVenueOpenStatus(): { open: boolean; label: string } | null {
+    const sched = venue.schedule;
+    if (!sched?.length) return null;
+    const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const todayName = dayNames[now.getDay()];
+    const today = sched.find(d => d.day === todayName);
+    if (!today) return null;
+    if (today.is_closed) return { open: false, label: `Cerrado hoy` };
+    const cur = now.getHours() * 60 + now.getMinutes();
+    const [oh, om] = today.open.split(":").map(Number);
+    const [ch, cm] = today.close.split(":").map(Number);
+    const op = oh * 60 + om;
+    const cl = ch * 60 + cm;
+    const isOpen = cl < op ? (cur >= op || cur < cl) : (cur >= op && cur < cl);
+    return { open: isOpen, label: isOpen ? `Abierto · Cierra ${today.close}` : `Cerrado · Abre ${today.open}` };
+  }
+
+  const venueOpenStatus = getVenueOpenStatus();
+  const checkInAllowed = activeEvents.length > 0 || venueOpenStatus === null || venueOpenStatus.open;
+
   const upcomingEvents =
     venue.events
       ?.filter((e) => new Date(e.starts_at) > now)
@@ -428,11 +457,14 @@ export default function VenueDetail() {
               <button
                 type="button"
                 onClick={onCheckIn}
-                disabled={checkingIn}
-                className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-ambience-high hover:opacity-90 text-ozio-text text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-70"
+                disabled={checkingIn || !checkInAllowed}
+                title={!checkInAllowed ? (venueOpenStatus?.label ?? "Local cerrado") : undefined}
+                className="flex-1 py-2 bg-gradient-to-r from-ozio-orange to-ambience-high hover:opacity-90 text-ozio-text text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {checkingIn ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" />
+                ) : !checkInAllowed ? (
+                  `🔒 ${venueOpenStatus?.label ?? "Cerrado"}`
                 ) : (
                   "📍 Hacer Check-in"
                 )}

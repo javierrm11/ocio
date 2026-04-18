@@ -263,8 +263,16 @@ function MyMap() {
         user_lng: userLocation?.longitude ?? null,
       }),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error ?? "No puedes hacer check-in ahora.");
+          return null;
+        }
+        return data;
+      })
       .then((data) => {
+        if (!data) return;
         const createdCheckIn = Array.isArray(data?.data) ? data.data[0] : data?.data;
         if (!createdCheckIn) return;
         const addCheckIn = (list: any[]) => [

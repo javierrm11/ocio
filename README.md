@@ -301,3 +301,62 @@ npm run lint
 - **Unificar tipo `Venue`** — Hay dos definiciones ligeramente distintas en `venueStore.tsx` y `components/mapa/types.ts`; consolidarlas en `lib/types.ts`
 - **Caché de venues en Service Worker** — Precachear los venues y el tile del mapa para que la PWA funcione offline o con mala conexión
 - **Tests de integración** — Añadir tests para las rutas API críticas (`/api/checkins`, `/api/auth/login`) usando MSW o un entorno de test con Supabase local
+
+
+
+-- 1. Función que comprueba si un venue está cerrado AHORA
+CREATE OR REPLACE FUNCTION public.venue_is_closed_now(schedule jsonb)
+RETURNS boolean
+LANGUAGE plpgsql AS $$
+DECLARE
+  today_name text;
+  entry      jsonb;
+  t_open     time;
+  t_close    time;
+  t_now      time;
+BEGIN
+  today_name := CASE EXTRACT(DOW FROM (now() AT TIME ZONE 'Europe/Madrid'))::int
+    WHEN 0 THEN 'domingo'
+    WHEN 1 THEN 'lunes'
+    WHEN 2 THEN 'martes'
+    WHEN 3 THEN 'miércoles'
+    WHEN 4 THEN 'jueves'
+    WHEN 5 THEN 'viernes'
+    WHEN 6 THEN 'sábado'
+  END;
+
+  SELECT s INTO entry
+  FROM jsonb_array_elements(schedule) s
+  WHERE s->>'day' = today_name
+  LIMIT 1;
+
+  IF entry IS NULL THEN RETURN false; END IF;
+  IF (entry->>'is_closed')::boolean THEN RETURN true; END IF;
+
+  t_open  := (entry->>'open')::time;
+  t_close := (entry->>'close')::time;
+  t_now   := (now() AT TIME ZONE 'Europe/Madrid')::time;
+
+  -- Horario nocturno (ej. 22:00–05:00)
+  IF t_close < t_open THEN
+    RETURN NOT (t_now >= t_open OR t_now < t_close);
+  ELSE
+    RETURN NOT (t_now >= t_open AND t_now < t_close);
+  END IF;
+END;
+$$;
+
+-- 2. Cron cada 15 minutos: desactiva check-ins de venues cerrados
+SELECT cron.schedule(
+  'expire-checkins-on-close',
+  '*/15 * * * *',
+  $$
+    UPDATE public.check_ins ci
+    SET active = false
+    FROM public.venues v
+    WHERE ci.venue_id = v.id
+      AND ci.active = true
+      AND v.schedule IS NOT NULL
+      AND public.venue_is_closed_now(v.schedule) = true;
+  $$
+);

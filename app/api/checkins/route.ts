@@ -56,20 +56,60 @@ export async function POST(request: Request) {
 
   const { venue_id, user_lat, user_lng } = body;
 
+  // Obtener venue con schedule y eventos activos
+  const { data: venue } = await supabase
+    .from("venues")
+    .select("latitude, longitude, schedule, events(*)")
+    .eq("id", venue_id)
+    .single();
+
+  if (!venue) {
+    return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
+  }
+
+  // Comprobar si hay evento activo ahora mismo
+  const now = new Date();
+  const hasActiveEvent = Array.isArray((venue as any).events) &&
+    (venue as any).events.some(
+      (e: any) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now
+    );
+
+  // Comprobar si el local está abierto según su horario
+  if (!hasActiveEvent && venue.schedule?.length) {
+    const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const todayName = dayNames[now.getDay()];
+    const today = (venue.schedule as any[]).find((d: any) => d.day === todayName);
+
+    if (today) {
+      if (today.is_closed) {
+        return NextResponse.json(
+          { error: "El local está cerrado hoy. Solo puedes hacer check-in durante un evento." },
+          { status: 403 }
+        );
+      }
+
+      const cur = now.getHours() * 60 + now.getMinutes();
+      const [oh, om] = today.open.split(":").map(Number);
+      const [ch, cm] = today.close.split(":").map(Number);
+      const op = oh * 60 + om;
+      const cl = ch * 60 + cm;
+      const isOpen = cl < op ? (cur >= op || cur < cl) : (cur >= op && cur < cl);
+
+      if (!isOpen) {
+        return NextResponse.json(
+          { error: `El local está cerrado ahora. Abre a las ${today.open}.` },
+          { status: 403 }
+        );
+      }
+    }
+  }
+
   // Validar ubicación del usuario respecto al venue
   let location_valid = false;
 
   if (user_lat != null && user_lng != null) {
-    const { data: venue } = await supabase
-      .from("venues")
-      .select("latitude, longitude")
-      .eq("id", venue_id)
-      .single();
-
-    if (venue) {
-      const distKm = haversineKm(user_lat, user_lng, venue.latitude, venue.longitude);
-      location_valid = distKm <= PRESENCE_RADIUS_KM;
-    }
+    const distKm = haversineKm(user_lat, user_lng, venue.latitude, venue.longitude);
+    location_valid = distKm <= PRESENCE_RADIUS_KM;
   }
 
   const { data, error } = await supabase

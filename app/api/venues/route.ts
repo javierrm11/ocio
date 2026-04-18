@@ -40,14 +40,33 @@ export async function GET(request: Request) {
     }
   });
 
-  const { data, error } = await query;
+  const [{ data, error }, { data: allCheckins }] = await Promise.all([
+    query,
+    supabase.from("check_ins").select("venue_id, created_at"),
+  ]);
 
   if (error) {
     console.error("Error fetching venues:", error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json(data);
+  // Compute peak_hour per venue from historical check-ins
+  const peakHours: Record<string, string | null> = {};
+  if (allCheckins?.length) {
+    const hoursByVenue: Record<string, Record<number, number>> = {};
+    for (const c of allCheckins) {
+      if (!hoursByVenue[c.venue_id]) hoursByVenue[c.venue_id] = {};
+      const h = new Date(c.created_at).getHours();
+      hoursByVenue[c.venue_id][h] = (hoursByVenue[c.venue_id][h] ?? 0) + 1;
+    }
+    for (const [venueId, hours] of Object.entries(hoursByVenue)) {
+      const peak = Object.entries(hours).sort((a, b) => b[1] - a[1])[0];
+      peakHours[venueId] = peak ? `${peak[0]}:00` : null;
+    }
+  }
+
+  const enriched = (data ?? []).map((v) => ({ ...v, peak_hour: peakHours[v.id] ?? null }));
+  return NextResponse.json(enriched);
 }
 
 // crear un nuevo venue

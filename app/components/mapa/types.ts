@@ -32,4 +32,5 @@ export interface Venue {
   is_favorite?: boolean;
   events?: Event[];
   plan?: string;
+  peak_hour?: string | null;
 }

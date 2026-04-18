@@ -9,6 +9,7 @@ import {
   getHeatStep,
   getHeatCategory,
   getHeatLabel,
+  getMadridHour,
 } from "./utils";
 import { isPremium } from "@/lib/hooks/plan";
 
@@ -93,6 +94,17 @@ export function VenuePanel({
     : "text-ambience-low";
   const dirArrow =
     heatState === "full" ? "↑↑" : heatState === "hot" ? "↑" : heatState === "warm" ? "→" : "↓";
+
+  const currentHour = getMadridHour();
+  const peakHourNum = venue.peak_hour ? parseInt(venue.peak_hour) : null;
+  const hourDiff = peakHourNum !== null
+    ? Math.min(Math.abs(currentHour - peakHourNum), 24 - Math.abs(currentHour - peakHourNum))
+    : null;
+  const peakContext =
+    hourDiff === null ? null
+    : hourDiff === 0 ? { label: "¡Es ahora!", color: "text-ozio-orange" }
+    : hourDiff <= 2 ? { label: `En ${hourDiff}h`, color: "text-yellow-400" }
+    : { label: venue.peak_hour!, color: "text-ozio-text-muted" };
 
   return (
     <>
@@ -233,15 +245,18 @@ export function VenuePanel({
               <div className="flex items-center gap-2.5 rounded-xl bg-white/4 border border-white/6 px-3 py-2.5">
                 <span className="text-lg">🔥</span>
                 <div>
-                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Pico hoy</p>
-                  <p className="text-ozio-text text-xs font-black">02:00</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Hora pico</p>
+                  <p className="text-ozio-text text-xs font-black">{venue.peak_hour ?? "—"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-xl bg-ozio-blue/10 border border-ozio-blue/20 px-3 py-2.5">
                 <span className="text-lg">🕑</span>
                 <div>
-                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Mejor hora</p>
-                  <p className="text-ozio-blue/80 text-xs font-black">01:30</p>
+                  <p className="text-ozio-text/35 text-[9px] uppercase tracking-widest font-semibold mb-0.5">Ahora</p>
+                  {peakContext
+                    ? <p className={`text-xs font-black ${peakContext.color}`}>{peakContext.label}</p>
+                    : <p className="text-ozio-text-muted text-xs font-black">Sin datos</p>
+                  }
                 </div>
               </div>
             </div>

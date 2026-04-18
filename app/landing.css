@@ -24,7 +24,7 @@
   position: fixed; inset: 0 0 auto;
   z-index: 60;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 40px;
+  padding: 15px 40px;
   border-bottom: 1px solid transparent;
   transition: background .35s, backdrop-filter .35s, border-color .35s;
 
@@ -92,6 +92,7 @@
   position: relative; z-index: 5;
   text-align: center; padding: 0 24px; max-width: 980px;
   will-change: transform, opacity;
+  margin-top: -26px;
 }
 
 .lp-pill {

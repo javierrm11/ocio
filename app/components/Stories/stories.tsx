@@ -2,48 +2,22 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/hooks/getToken';
-
-interface Story {
-  id?: string;
-  venue_id: string;
-  media_type: string;
-  media_path: string;
-  created_at: string;
-  expires_at: string;
-  venues: { name: string; avatar_path?: string };
-}
-
-// ✅ Grupo de stories por venue
-interface StoryGroup {
-  venue_id: string;
-  venue_name: string;
-  venue_avatar?: string;
-  stories: Story[];
-}
+import { useAppStore, StoryGroup } from '@/lib/stores/venueStore';
 
 export default function Stories() {
-  const [storyGroups, setStoryGroups] = useState<StoryGroup[]>([]);
+  const { storyGroups, setStoryGroups, currentUser: storeUser } = useAppStore();
   const [activeGroup, setActiveGroup] = useState<StoryGroup | null>(null);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [userLoading, setUserLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchStories();
-    fetchCurrentUser();
-  }, []);
-
   const fetchStories = () => {
     fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/stories`)
       .then(res => res.json())
-      .then((data: Story[]) => {
+      .then((data: StoryGroup['stories']) => {
         if (!Array.isArray(data)) return;
-
-        // ✅ Agrupar stories por venue_id
         const groupMap = new Map<string, StoryGroup>();
         data.forEach(story => {
           if (!groupMap.has(story.venue_id)) {
@@ -56,32 +30,13 @@ export default function Stories() {
           }
           groupMap.get(story.venue_id)!.stories.push(story);
         });
-
         setStoryGroups(Array.from(groupMap.values()));
       })
       .catch(err => console.error(err));
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const token = getToken();
-      if (!token) { setUserLoading(false); return; }
-      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCurrentUser(data[0]);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setUserLoading(false);
-    }
-  };
-
   const router = useRouter();
-  const canUploadStories = !userLoading && currentUser && !currentUser.username;
+  const canUploadStories = storeUser && !storeUser.username;
 
   // ── Navegación dentro del grupo activo ──────────────────────────────────
   const currentStory = activeGroup?.stories[currentStoryIndex] ?? null;
@@ -187,21 +142,7 @@ export default function Stories() {
       <section className="max-w-7xl mx-auto" aria-label="Historias">
         <ul className="flex gap-4 p-4 overflow-x-auto list-none m-0">
 
-          {canUploadStories && (
-            <li>
-              <div
-                className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer animate-fade-in"
-                onClick={() => router.push('/anadir?tipo=historia')}
-              >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-ozio-blue/70 to-ozio-purple flex items-center justify-center">
-                  <svg className="w-8 h-8 text-ozio-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-                <span className="text-xs text-ozio-text font-semibold">Tu historia</span>
-              </div>
-            </li>
-          )}
+          
 
           {/* ✅ Un bubble por empresa */}
           {storyGroups.map(group => (

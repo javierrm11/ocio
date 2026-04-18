@@ -65,7 +65,7 @@ function BottomNav() {
                   return;
                 }
                 if (path === "__add__") {
-                  setShowAddModal(true);
+                  router.push("/anadir");
                   return;
                 }
                 router.push(path);
@@ -76,93 +76,7 @@ function BottomNav() {
         ))}
       </ul>
 
-      {/* Modal: elegir qué añadir */}
-      {showAddModal && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 px-4 pb-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="add-modal-title"
-          onClick={() => setShowAddModal(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl bg-ozio-card p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <header className="flex items-center justify-between mb-4">
-              <h3
-                id="add-modal-title"
-                className="text-ozio-text font-semibold text-base"
-              >
-                ¿Qué quieres añadir?
-              </h3>
-              <button
-                type="button"
-                aria-label="Cerrar"
-                onClick={() => setShowAddModal(false)}
-                className="text-ozio-text-muted hover:text-ozio-text transition"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </header>
 
-            <ul className="grid grid-cols-2 gap-3 list-none p-0 m-0">
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    router.push("/anadir?tipo=historia");
-                  }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-5 transition group"
-                >
-                  <span className="text-4xl">📸</span>
-                  <div className="text-center">
-                    <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-purple transition">
-                      Historia
-                    </p>
-                    <p className="text-ozio-text-subtle text-xs mt-0.5">
-                      Foto o vídeo del momento
-                    </p>
-                  </div>
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    router.push("/anadir?tipo=evento");
-                  }}
-                  className="w-full flex flex-col items-center gap-3 bg-ozio-dark border border-ozio-card/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-5 transition group"
-                >
-                  <span className="text-4xl">🎉</span>
-                  <div className="text-center">
-                    <p className="text-ozio-text font-semibold text-sm group-hover:text-ozio-blue transition">
-                      Evento
-                    </p>
-                    <p className="text-ozio-text-subtle text-xs mt-0.5">
-                      Crea un evento en tu local
-                    </p>
-                  </div>
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
 
       {/* Modal: requiere auth */}
       {showAuthModal && (

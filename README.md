@@ -12,7 +12,7 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 |---|---|---|
 | Framework | Next.js (App Router) | 16.1.4 |
 | Lenguaje | TypeScript | ^5 |
-| Estilos | Tailwind CSS | ^4 |
+| Estilos | Tailwind CSS v4 | ^4 |
 | Base de datos | Supabase (PostgreSQL) | ^2.91.1 |
 | Autenticación | Supabase Auth (email + Google OAuth) | — |
 | Mapas | Leaflet + React-Leaflet | 1.9.4 / 5.0.0 |
@@ -21,6 +21,11 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 | Charts | Recharts | ^3.7.0 |
 | Analytics | Vercel Analytics | ^2.0.1 |
 | IA | Anthropic SDK | ^0.71.2 |
+| Rate Limiting | Upstash Ratelimit + Redis | ^2.0.8 / ^1.37.0 |
+| Validación | Zod | ^4.3.6 |
+| Fechas | date-fns | ^4.1.0 |
+| Drag & Drop | dnd-kit | ^6.3.1 |
+| Tests | Vitest + happy-dom | ^4.1.4 |
 | Deploy | Vercel | — |
 
 ---
@@ -31,10 +36,12 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 - Mapa en tiempo real con OpenStreetMap
 - Localización GPS del usuario con `watchPosition`
 - Marcadores de locales con color según ambiente: tranquilo / animado / lleno
+- Iconos dinámicos con corona dorada para locales premium
 - Pulsos animados en locales con eventos activos o próximos
 - Panel lateral al seleccionar un local con info, eventos y acciones
 - Filtros por distancia máxima y nivel de ambiente
-- Cierre automático del dropdown al hacer clic fuera
+- Barra de búsqueda de locales con vuelo animado al resultado
+- Banner de ciudad manual si se deniega la geolocalización
 
 ### Eventos
 - Listado de todos los eventos con búsqueda en tiempo real
@@ -42,6 +49,7 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 - Ordenación automática: activos primero, luego próximos, luego pasados
 - Badge animado para eventos en curso
 - Tracking de asistentes por evento
+- Límite de 2 eventos/mes para usuarios free, ilimitado en premium
 
 ### Buscar
 - Búsqueda de locales por nombre, dirección, descripción y género musical
@@ -60,7 +68,7 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 - Estado del plan premium
 
 ### Check-in
-- Check-in basado en ubicación con validación de radio (300 m)
+- Check-in basado en ubicación con validación de radio (300 m, fórmula Haversine)
 - Check-out en tiempo real
 - Sincronización inmediata en el mapa y en el store global
 - Historial de check-ins en el perfil
@@ -73,23 +81,33 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 - Login con email y contraseña
 - Login con Google OAuth
 - Opción "Recuérdame" (cookie de 30 días)
+- Cookies con flags `httpOnly`, `Secure` y `SameSite=Strict`
 - Cierre de sesión global con limpieza de cookies y store
 
 ### Gamificación (puntos)
 - Sistema de puntos por acciones del usuario
-- Historial de puntos
+- Historial de puntos con `point_transactions`
 - Niveles basados en puntos acumulados
 
 ### Historias
 - Publicación y visualización de stories por usuarios y establecimientos
+- Stories con fecha de expiración (`expires_at`)
+- Visualizadas en el header del mapa y en el detalle del local
 
 ### Premium
 - Plan premium con funcionalidades ampliadas
+- Control de límites en la API (eventos, etc.)
 - Integración con sistema de notificaciones de plan
 
 ### Notificaciones
 - Notificaciones en tiempo real via triggers de Supabase
-- Centro de notificaciones en la aplicación
+- Centro de notificaciones con estado leído / archivado
+
+### Seguridad y rendimiento
+- Rate limiting en middleware con Upstash: auth (10/15 min), checkins (20/h), API general (100/min)
+- Headers estándar `X-RateLimit-*`
+- Carga inicial no bloqueante: venues y events en paralelo, perfil en background
+- SEO completo: Open Graph, Twitter Card, robots
 
 ---
 
@@ -104,7 +122,7 @@ app/
 │   ├── buscar/            # Búsqueda de locales
 │   ├── profile/           # Perfil de usuario/establecimiento
 │   ├── venues/[id]/       # Detalle de local
-│   ├── anadir/            # Crear local (admin)
+│   ├── anadir/            # Crear local (solo role: venue)
 │   ├── notificaciones/    # Centro de notificaciones
 │   ├── destacados/        # Locales destacados
 │   └── premium/           # Gestión del plan premium
@@ -126,11 +144,11 @@ app/
 │   └── notify-plan/       # Notificaciones de plan
 │
 ├── components/
-│   ├── mapa/              # Componentes del mapa
-│   ├── auth/              # Login, Register, Profile
+│   ├── mapa/              # mapa.tsx, MapMarkers, VenuePanel, MapFilters, MapSearchBar
+│   ├── auth/              # Login, Register, Profile (1200L)
 │   ├── eventos/           # Tarjetas y listas de eventos
 │   ├── buscar/            # Componente de búsqueda
-│   ├── layout/            # Header, modales de bienvenida
+│   ├── layout/            # Header, WelcomeEngagementModal
 │   ├── Boton/             # Navegación inferior (BottomNav)
 │   ├── Stories/           # Stories
 │   ├── anadir/            # Formulario de creación de local
@@ -153,9 +171,16 @@ app/
 │   └── utils/
 │       └── distance.ts    # Cálculo de distancia Haversine
 │
+├── __tests__/             # Tests unitarios (Vitest)
+│   ├── distance.test.ts
+│   ├── checkin-radius.test.ts
+│   ├── getToken.test.ts
+│   └── heat.test.ts
+│
+├── middleware.ts          # Rate limiting global con Upstash
 ├── AppInitializer.tsx     # Carga inicial: venues, events, user, location
 ├── layout.tsx             # Root layout + metadata SEO/OG
-└── globals.css            # Estilos globales
+└── globals.css            # Design system: variables CSS ozio-* y ambience-*
 ```
 
 ---
@@ -175,7 +200,7 @@ event_attendees   -- Asistentes por evento
 stories           -- Stories de usuarios y establecimientos
 notifications     -- Notificaciones de usuario
 points            -- Puntos actuales del usuario
-points_history    -- Historial de puntos por acción
+point_transactions -- Historial de puntos por acción
 ```
 
 **Triggers activos:**
@@ -195,6 +220,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=xxxx
 SUPABASE_SERVICE_ROLE_KEY=xxxx
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxxx
 NEXT_PUBLIC_RESEND_API_KEY=re_xxxx
+UPSTASH_REDIS_REST_URL=xxxx
+UPSTASH_REDIS_REST_TOKEN=xxxx
+ANTHROPIC_API_KEY=xxxx
 ```
 
 > **Nunca subas el archivo `.env` al repositorio.** Ya está en `.gitignore`.
@@ -214,38 +242,63 @@ npm run dev        # http://localhost:3000
 npm run build
 npm run start
 
+# Tests
+npm run test
+
 # Linting
 npm run lint
 ```
 
 ---
 
-## Mejoras pendientes y errores conocidos
+## Mejoras completadas
 
 ### Seguridad
-- [✅] **Cookies sin flags de seguridad** — El token de sesión se guarda en una cookie accesible desde JavaScript. Añadir `httpOnly`, `Secure` y `SameSite=Strict` para proteger contra XSS y CSRF. Actualmente cualquier script en la página puede leer el token.
+- [✅] **Cookies con flags de seguridad** — `httpOnly`, `Secure` y `SameSite=Strict`
+- [✅] **Rate limiting en rutas API** — Upstash Ratelimit en middleware con límites por categoría
 
 ### Calidad de código
-- [✅] **Componente mapa de 1.700+ líneas** — [mapa.tsx](app/components/mapa/mapa.tsx) agrupa mapa, marcadores, filtros, panel lateral y lógica de check-in en un solo fichero. Dividirlo en sub-componentes (e.g. `MapMarkers`, `VenuePanel`, `MapFilters`) facilitaría el mantenimiento y los tests.
+- [✅] **Componente mapa dividido** — De 1.700+ líneas a sub-componentes: `MapMarkers`, `VenuePanel`, `MapFilters`, `MapSearchBar`
+- [✅] **Suite de tests** — 4 tests unitarios: distancia Haversine, radio de check-in, lectura de token, categorías de ambiente
 
 ### Rendimiento
-- [✅] **`next.config.ts` vacío** — Configurar `images.remotePatterns` para que Next.js optimice las imágenes de avatares y portadas servidas desde Supabase Storage.
-- [✅ ] **Sin `useMemo` / `useCallback` en el mapa** — El componente recalcula filtros y marcadores en cada render. Memoizar los valores derivados reduciría renders innecesarios.
-- [✅] **Carga inicial bloqueante** — `AppInitializer` espera venues y events en serie antes de marcar `loaded = true`. Separar las cargas y mostrar contenido progresivamente mejoraría el tiempo de primera interacción.
+- [✅] **`next.config.ts` con `remotePatterns`** — Imágenes de Supabase optimizadas por Next.js
+- [✅] **Carga inicial no bloqueante** — `AppInitializer` carga venues y events en paralelo; perfil y favoritos en background
 
 ### Funcionalidad
-- [✅] **Fallback de ubicación hardcodeado a Córdoba** — Si el usuario deniega la geolocalización, el mapa centra en Córdoba sin aviso. Mostrar un modal o banner explicativo con opción de introducir ciudad manualmente.
-- [✅] **Sin suite de tests** — No existe ningún fichero `.test.ts` / `.spec.ts`. Al menos la validación de radio de check-in (300 m), la autenticación y el cálculo de distancia deberían cubrirse con tests unitarios.
-- [✅] **Sin rate limiting en las rutas API** — Endpoints como `/api/auth/login` o `/api/checkins` son susceptibles a abuso. Añadir rate limiting (e.g. con `upstash/ratelimit` o middleware de Vercel).
+- [✅] **Fallback de ubicación con banner** — Si se deniega GPS, aparece un banner para introducir ciudad manualmente
+- [✅] **Buscar local desde el mapa** — `MapSearchBar` con vuelo animado
+- [✅] **SEO completo** — Open Graph, Twitter Card, robots
+- [✅] **Historias en detalle de local** — Stories visibles en `/venues/[id]`
+- [✅] **Control de acceso a `/anadir`** — Solo usuarios con `role: venue`
+- [✅] **Design system de colores** — Variables CSS `ozio-*` y `ambience-*` en `globals.css`, registradas en Tailwind
+- [✅] **Fix z-index filtros del mapa**
+- [✅] **Fix color register/botón**
 
-### Pendientes de producto
-- [✅] Fix z-index de los filtros del mapa (se solapan con el panel lateral)
-- [✅] SEO Html5
-- [✅] Añadir buscar local desde el mapa
-- [✅] Historias en la vista de los establecimientos
-- [✅] Control de seguridad de rutas /anadir
-- [✅] Utilizar todos los colores de las variables
-- [✅] Fix color register, boton
-- [ ] Arreglar hora pico
-  
-teniendo globals.css las variables de los colores neceito que todo el uso de colores utilize las variables de ozio actualiza el components/
+---
+
+## Pendiente
+
+- [ ] **Hora pico** — Integrar `getMadridHour()` en la UI para mostrar en el mapa y en el panel lateral cuándo un local suele estar más lleno según la hora actual
+- [ ] **App móvil nativa** — Los botones de App Store y Google Play están en la landing como "Próximamente"
+
+---
+
+## Próximas ideas
+
+### Producto
+- **Mapa de calor histórico** — Visualizar en el mapa la afluencia media por día de la semana y hora, usando el historial de check-ins agregado por local
+- **Recomendaciones personalizadas con IA** — Usar el Anthropic SDK (ya instalado) para sugerir locales o eventos basándose en el historial y preferencias del usuario
+- **Feed social** — Timeline de actividad de amigos: check-ins, asistencias a eventos y valoraciones
+- **Valoraciones y reseñas** — Sistema de rating por local con comentario y fotos, visible en el panel lateral
+- **Modo "salida de grupo"** — Crear una sala temporal donde varios usuarios coordinan a qué local van; el mapa muestra los pins del grupo en tiempo real
+- **Reservas en mesa** — Integrar un flujo básico de reserva directamente desde el panel lateral del local
+- **Descuentos y ofertas** — Los establecimientos pueden publicar promociones con hora de inicio/fin visibles en el mapa con un icono de oferta
+
+### Técnico
+- **Realtime con Supabase Channels** — Sustituir el polling del store por suscripciones Realtime para que los check-ins y el ambiente se reflejen en el mapa sin refrescar
+- **Refactorizar `Profile.tsx`** — El componente tiene 1.200 líneas mezclando lógica de usuario, establecimiento, eventos, favoritos e historial; dividirlo en hooks y sub-vistas mejora el mantenimiento
+- **Unificar tipo `Venue`** — Hay dos definiciones ligeramente distintas en `venueStore.tsx` y `components/mapa/types.ts`; consolidarlas en `lib/types.ts`
+- **Caché de venues en Service Worker** — Precachear los venues y el tile del mapa para que la PWA funcione offline o con mala conexión
+- **Tests de integración** — Añadir tests para las rutas API críticas (`/api/checkins`, `/api/auth/login`) usando MSW o un entorno de test con Supabase local
+- **Panel de analítica para establecimientos** — Aprovechar Recharts (ya instalado) para mostrar a los venue owners gráficas de check-ins por día, horas pico y evolución de seguidores

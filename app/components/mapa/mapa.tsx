@@ -10,11 +10,15 @@ import { MapMarkers } from "./MapMarkers";
 import { MapFilters } from "./MapFilters";
 import { VenuePanel } from "./VenuePanel";
 
-// Re-centra el mapa cuando cambia la ubicación
+// Centra el mapa solo la primera vez que se obtiene la ubicación
 function MapViewSetter({ location }: { location: { latitude: number; longitude: number } | null }) {
   const map = useMap();
+  const hasSet = useRef(false);
   useEffect(() => {
-    if (location) map.setView([location.latitude, location.longitude], map.getZoom());
+    if (location && !hasSet.current) {
+      map.setView([location.latitude, location.longitude], map.getZoom());
+      hasSet.current = true;
+    }
   }, [location, map]);
   return null;
 }

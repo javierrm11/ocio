@@ -1,0 +1,38 @@
+"use client";
+
+import { Suspense, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Anadir from "@/components/anadir/anadir";
+import { useAppStore } from "@/lib/stores/venueStore";
+import { getToken } from "@/lib/hooks/getToken";
+import Header from "@/components/layout/header";
+import BottomNav from "@/components/Boton/BottomNav";
+
+export default function AnadirGuard() {
+  const router = useRouter();
+  const currentUser = useAppStore((s) => s.currentUser);
+
+  useEffect(() => {
+    if (!getToken()) {
+      router.replace("/profile");
+      return;
+    }
+    if (currentUser && currentUser.username) {
+      router.replace("/profile");
+    }
+  }, [currentUser, router]);
+
+  if (!currentUser || currentUser.username) {
+    return <div className="min-h-screen bg-ozio-dark" />;
+  }
+
+  return (
+    <div className="m-0">
+      <Header />
+      <Suspense fallback={<div className="min-h-screen bg-ozio-dark" />}>
+        <Anadir />
+      </Suspense>
+      <BottomNav />
+    </div>
+  );
+}

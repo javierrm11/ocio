@@ -197,3 +197,49 @@ body {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* ── Anadir / Selector ───────────────────────────────────────────────────── */
+.anadir-root {
+  background: #060911;
+}
+.anadir-bg-pattern {
+  background-image:
+    radial-gradient(circle at 50% 18%, rgba(46,92,255,0.15) 0%, transparent 55%),
+    radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px;
+}
+.anadir-back-btn  { color: #6b7280; }
+.anadir-title     { color: #ffffff; }
+.anadir-subtitle  { color: #4b5563; }
+.anadir-footer    { color: #374151; }
+.anadir-title-gradient {
+  background: linear-gradient(135deg, #2E5CFF, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.anadir-card-historia {
+  background: rgba(46,92,255,0.10);
+  border: 1px solid rgba(46,92,255,0.25);
+}
+.anadir-icon-historia {
+  background: linear-gradient(135deg, #2E5CFF, #7C3AED);
+  box-shadow: 0 4px 24px rgba(46,92,255,0.4);
+}
+.anadir-card-evento {
+  background: rgba(234,88,12,0.10);
+  border: 1px solid rgba(234,88,12,0.25);
+}
+.anadir-icon-evento {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  box-shadow: 0 4px 24px rgba(234,88,12,0.4);
+}
+.anadir-card-title  { color: #ffffff; }
+.anadir-card-desc   { color: #9ca3af; }
+.anadir-card-arrow  { color: #4b5563; }
+.anadir-vibe-gradient {
+  background: linear-gradient(135deg, #2E5CFF, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

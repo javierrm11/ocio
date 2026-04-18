@@ -1,33 +1,18 @@
-'use client';
-import { Suspense, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Anadir from '@/components/anadir/anadir';
-import { useAppStore } from '@/lib/stores/venueStore';
-import { getToken } from '@/lib/hooks/getToken';
+import { Metadata } from "next";
+import AnadirGuard from "@/components/anadir/AnadirGuard";
+
+export const metadata: Metadata = {
+  title: "Añadir | Ozio",
+  description:
+    "Crea una historia o un evento en tu local. Comparte el ambiente en tiempo real con tu comunidad.",
+  openGraph: {
+    title: "Añadir — Ozio",
+    description: "Publica una historia o crea un evento en tu local.",
+    type: "website",
+  },
+  robots: { index: false },
+};
 
 export default function AnadirPage() {
-  const router = useRouter();
-  const currentUser = useAppStore((s) => s.currentUser);
-
-  useEffect(() => {
-    if (!getToken()) {
-      router.replace('/profile');
-      return;
-    }    
-    if (currentUser && currentUser.username ) {
-      router.replace('/profile');
-    }
-  }, [currentUser, router]);
-
-  if (!currentUser || currentUser.username) {
-    return <div className="min-h-screen bg-ozio-dark" />;
-  }
-
-  return (
-    <div className="m-0">
-      <Suspense fallback={<div className="min-h-screen bg-ozio-dark" />}>
-        <Anadir />
-      </Suspense>
-    </div>
-  );
+  return <AnadirGuard />;
 }

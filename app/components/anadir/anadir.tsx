@@ -28,61 +28,157 @@ export default function AnadirPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-ozio-dark pb-24">
-      <header className="sticky top-0 z-20 bg-ozio-darker border-b border-ozio-darker/50 px-4 py-3 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => (tipo ? setTipo(null) : router.back())}
-          className="text-ozio-text-muted hover:text-ozio-text transition"
-          aria-label="Volver"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-ozio-text font-semibold text-base">
-          {tipo === "evento" ? "Nuevo evento" : "¿Qué quieres añadir?"}
-        </h1>
-      </header>
+  if (tipo === "evento") {
+    return (
+      <div className="min-h-screen bg-ozio-dark pb-24">
+        <header className="sticky top-0 z-20 bg-ozio-darker/80 backdrop-blur border-b border-white/5 px-4 py-3 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setTipo(null)}
+            className="text-ozio-text-muted hover:text-ozio-text transition"
+            aria-label="Volver"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-ozio-text font-semibold text-base">Nuevo evento</h1>
+        </header>
+        <section className="px-4 pt-6 max-w-lg mx-auto" aria-label="Formulario de evento">
+          <FormEvento />
+        </section>
+      </div>
+    );
+  }
 
-      <section className="px-4 pt-6 max-w-lg mx-auto" aria-label={tipo === "evento" ? "Formulario de evento" : "Seleccionar tipo de contenido"}>
-        {!tipo && <Selector onSelect={setTipo} />}
-        {tipo === "evento" && <FormEvento />}
-      </section>
-    </div>
-  );
+  return <Selector onSelect={setTipo} onBack={() => router.back()} />;
 }
 
 /* ─── Selector inicial ─── */
-function Selector({ onSelect }: { onSelect: (t: Tipo) => void }) {
+function Selector({ onSelect, onBack }: { onSelect: (t: Tipo) => void; onBack: () => void }) {
   return (
-    <ul className="grid grid-cols-2 gap-4 list-none p-0 m-0">
-      <li>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-6 pb-28 relative overflow-hidden"
+      style={{ background: "#060911" }}
+    >
+      {/* Fondo: brillo radial + grid de puntos */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 50% 18%, rgba(46,92,255,0.15) 0%, transparent 55%), radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "100% 100%, 36px 36px",
+        }}
+      />
+
+      {/* Botón volver */}
+      <button
+        type="button"
+        onClick={onBack}
+        aria-label="Volver"
+        className="absolute top-6 left-5 z-10 transition"
+        style={{ color: "#6b7280" }}
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
+
+      {/* Encabezado */}
+      <div className="text-center mb-12 relative z-10">
+        <h1 className="text-[2.6rem] font-black leading-tight tracking-tight" style={{ color: "#ffffff" }}>
+          Create the{" "}
+          <span
+            style={{
+              background: "linear-gradient(135deg,#2E5CFF,#7C3AED)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Vibe.
+          </span>
+        </h1>
+        <p className="text-[11px] tracking-[0.22em] uppercase mt-3" style={{ color: "#4b5563" }}>
+          What do you want to add?
+        </p>
+      </div>
+
+      {/* Tarjetas */}
+      <div className="flex flex-col gap-4 w-full max-w-sm relative z-10">
+
+        {/* Historia */}
         <button
           type="button"
           onClick={() => onSelect("historia")}
-          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-ozio-card/50 hover:border-ozio-purple/60 hover:bg-ozio-purple/10 rounded-2xl p-8 transition group"
+          className="w-full flex items-center gap-4 rounded-2xl p-5 text-left transition-all duration-200 active:scale-[0.97]"
+          style={{
+            background: "rgba(46,92,255,0.10)",
+            border: "1px solid rgba(46,92,255,0.25)",
+          }}
         >
-          <span className="text-5xl">📸</span>
-          <div className="text-center">
-            <p className="text-ozio-text font-semibold group-hover:text-ozio-purple transition">Historia</p>
-            <p className="text-ozio-text-subtle text-xs mt-1">Foto o vídeo del momento</p>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{
+              background: "linear-gradient(135deg,#2E5CFF,#7C3AED)",
+              boxShadow: "0 4px 24px rgba(46,92,255,0.4)",
+            }}
+          >
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z" />
+              <path d="M19 13l.9 2.7 2.1.9-2.1.9L19 20l-.9-2.5L16 16.5l2.1-.9L19 13z" opacity=".65" />
+              <path d="M5 15l.7 2.1L8 18l-2.3.9L5 21l-.7-2.1L2 18l2.3-.9L5 15z" opacity=".45" />
+            </svg>
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-lg leading-tight" style={{ color: "#ffffff" }}>Historia</p>
+            <p className="text-sm mt-1 leading-snug" style={{ color: "#9ca3af" }}>
+              Comparte un momento fugaz de tu noche con tu círculo
+            </p>
+          </div>
+          <svg className="w-5 h-5 flex-shrink-0" style={{ color: "#4b5563" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
-      </li>
-      <li>
+
+        {/* Evento */}
         <button
           type="button"
           onClick={() => onSelect("evento")}
-          className="w-full flex flex-col items-center gap-4 bg-ozio-card border border-ozio-card/50 hover:border-ozio-blue/60 hover:bg-ozio-blue/10 rounded-2xl p-8 transition group"
+          className="w-full flex items-center gap-4 rounded-2xl p-5 text-left transition-all duration-200 active:scale-[0.97]"
+          style={{
+            background: "rgba(234,88,12,0.10)",
+            border: "1px solid rgba(234,88,12,0.25)",
+          }}
         >
-          <span className="text-5xl">🎉</span>
-          <div className="text-center">
-            <p className="text-ozio-text font-semibold group-hover:text-ozio-blue transition">Evento</p>
-            <p className="text-ozio-text-subtle text-xs mt-1">Crea un evento en tu local</p>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{
+              background: "linear-gradient(135deg,#f59e0b,#ea580c)",
+              boxShadow: "0 4px 24px rgba(234,88,12,0.4)",
+            }}
+          >
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="white">
+              <path d="M2 9a1 1 0 011-1h1a2 2 0 100-4H3a1 1 0 01-1-1V2a1 1 0 011-1h18a1 1 0 011 1v1a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V9z" opacity=".9"/>
+              <path d="M3 13h18v9a1 1 0 01-1 1H4a1 1 0 01-1-1v-9z" opacity=".6"/>
+            </svg>
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-lg leading-tight" style={{ color: "#ffffff" }}>Evento</p>
+            <p className="text-sm mt-1 leading-snug" style={{ color: "#9ca3af" }}>
+              Organiza una reunión premium, guestlist o fiesta secreta
+            </p>
+          </div>
+          <svg className="w-5 h-5 flex-shrink-0" style={{ color: "#4b5563" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
-      </li>
-    </ul>
+      </div>
+
+      {/* Pie */}
+      <p
+        className="absolute bottom-10 text-[10px] tracking-[0.28em] uppercase z-10"
+        style={{ color: "#374151" }}
+      >
+        Select to proceed
+      </p>
+    </div>
   );
 }
 

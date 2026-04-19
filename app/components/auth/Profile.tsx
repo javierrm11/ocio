@@ -32,6 +32,8 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [settingsView, setSettingsView] = useState<"main" | "account" | "about" | "privacy" | "notifications">("main");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => { fetchUserProfile(); }, []);
   useEffect(() => { if (user) setActiveTab(!user.username ? "events" : "favorites"); }, [user]);
@@ -86,6 +88,32 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
     setLoaded(false);
     if (onLogout) onLogout();
     else router.push("/");
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/account`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      document.cookie = "session=; path=/; max-age=0; SameSite=Strict";
+      setCurrentUser(null);
+      setUserFavorites([]);
+      setVenues([]);
+      setLoaded(false);
+      if (onLogout) onLogout();
+      else router.push("/");
+    } catch {
+      alert("Error al eliminar la cuenta. Inténtalo de nuevo.");
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteModal(false);
+    }
   };
 
   if (loading) {
@@ -338,8 +366,9 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               <SettingsItem icon="ℹ️" title="Acerca de" onClick={() => setSettingsView("about")} />
               <SettingsItem icon="👤" title="Información de cuenta" onClick={() => setSettingsView("account")} />
               {isVenue && <SettingsItem icon="👑" title="Cambiar plan" onClick={() => router.push("/premium")} />}
-              <div className="pt-2 mt-2 border-t border-ozio-darker/80">
+              <div className="pt-2 mt-2 border-t border-ozio-darker/80 space-y-2">
                 <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />
+                <SettingsItem icon="🗑️" title="Eliminar cuenta" onClick={() => setShowDeleteModal(true)} textClassName="text-red-400" />
               </div>
             </div>
           )}
@@ -353,6 +382,35 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
         <EditEventModal event={editingEvent} onClose={() => setEditingEvent(null)} onEventUpdated={() => { setEditingEvent(null); fetchUserProfile(); }} onEventDeleted={() => { setEditingEvent(null); fetchUserProfile(); }} />
       )}
       {showPremiumModal && <PremiumModal onClose={() => setShowPremiumModal(false)} />}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-ozio-card border border-ozio-card/50 rounded-3xl max-w-sm w-full p-6 space-y-4">
+            <h2 className="text-ozio-text text-xl font-bold text-center">¿Eliminar cuenta?</h2>
+            <p className="text-ozio-text-muted text-sm text-center">
+              Esta acción es permanente. Se borrarán todos tus datos, check-ins, puntos e historial. No se puede deshacer.
+            </p>
+            <div className="flex flex-col gap-2 pt-2">
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount}
+                className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-3 rounded-2xl transition"
+              >
+                {deletingAccount ? "Eliminando..." : "Sí, eliminar mi cuenta"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deletingAccount}
+                className="w-full bg-ozio-darker hover:bg-ozio-card text-ozio-text font-semibold py-3 rounded-2xl transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

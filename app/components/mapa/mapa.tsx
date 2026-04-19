@@ -12,6 +12,52 @@ import { MapFilters } from "./MapFilters";
 import { VenuePanel } from "./VenuePanel";
 import { MapLoader } from "./MapLoader";
 
+function CheckinCelebration({
+  name,
+  avatar,
+  onDismiss,
+}: {
+  name: string;
+  avatar?: string | null;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    const t = setTimeout(onDismiss, 3000);
+    return () => clearTimeout(t);
+  }, [onDismiss]);
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed inset-0 z-[9997] flex items-center justify-center pointer-events-none"
+    >
+      {/* Expanding rings */}
+      <div className="absolute flex items-center justify-center">
+        <span className="absolute w-28 h-28 rounded-full border-2 border-ozio-blue/50 animate-checkin-ring1" />
+        <span className="absolute w-44 h-44 rounded-full border border-ozio-blue/30 animate-checkin-ring2" />
+        <span className="absolute w-60 h-60 rounded-full border border-ozio-blue/15 animate-checkin-ring3" />
+      </div>
+
+      {/* Card */}
+      <div className="animate-checkin-card relative bg-ozio-dark/95 backdrop-blur-md border border-white/15 rounded-3xl px-8 py-6 shadow-2xl flex flex-col items-center gap-3 max-w-[280px] w-full mx-4">
+        <div className="w-16 h-16 rounded-full overflow-hidden bg-white/10 flex items-center justify-center border-2 border-ozio-blue/60 shadow-lg">
+          {avatar ? (
+            <img src={avatar} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-3xl">📍</span>
+          )}
+        </div>
+        <div className="text-center">
+          <p className="text-ozio-blue font-black text-xl tracking-wide">¡Check-in!</p>
+          <p className="text-white font-semibold text-sm mt-1">{name}</p>
+          <p className="text-white/40 text-xs mt-0.5">Estás aquí</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Centra el mapa solo la primera vez que se obtiene la ubicación
 function MapViewSetter({ location }: { location: { latitude: number; longitude: number } | null }) {
   const map = useMap();
@@ -142,6 +188,7 @@ function MyMap() {
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [pointsToast, setPointsToast] = useState<number | null>(null);
   const [autoCheckinToast, setAutoCheckinToast] = useState<string | null>(null);
+  const [checkinCelebration, setCheckinCelebration] = useState<{ name: string; avatar?: string | null } | null>(null);
   const [isNight, setIsNight] = useState(() => {
     const h = getMadridHour();
     return h >= 21 || h < 7;
@@ -296,6 +343,8 @@ function MyMap() {
         setSelectedVenue((prev) =>
           prev && prev.id === venueId ? { ...prev, check_ins: addCheckIn(prev.check_ins || []) } : prev,
         );
+        const venue = venuesRef.current.find((v) => v.id === venueId);
+        if (venue) setCheckinCelebration({ name: venue.name, avatar: venue.avatar_path });
       });
   }, [userLocation, currentProfileId, setVenues]);
 
@@ -385,6 +434,15 @@ function MyMap() {
 
   return (
     <>
+      {/* Check-in celebration */}
+      {checkinCelebration && (
+        <CheckinCelebration
+          name={checkinCelebration.name}
+          avatar={checkinCelebration.avatar}
+          onDismiss={() => setCheckinCelebration(null)}
+        />
+      )}
+
       {/* Points toast */}
       {pointsToast !== null && (
         <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-ozio-orange text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
@@ -512,6 +570,19 @@ function MyMap() {
             right: calc(420px + 24px) !important;
           }
         }
+        @keyframes checkin-ring {
+          0%   { transform: scale(0.4); opacity: 0.8; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+        .animate-checkin-ring1 { animation: checkin-ring 1.2s ease-out forwards; }
+        .animate-checkin-ring2 { animation: checkin-ring 1.2s 0.2s ease-out forwards; }
+        .animate-checkin-ring3 { animation: checkin-ring 1.2s 0.4s ease-out forwards; }
+        @keyframes checkin-card {
+          0%   { opacity: 0; transform: scale(0.7); }
+          60%  { transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-checkin-card { animation: checkin-card 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards; }
         @keyframes slide-up {
           from { transform: translateY(100%); }
           to   { transform: translateY(0); }

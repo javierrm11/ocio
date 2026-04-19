@@ -17,6 +17,9 @@ import PremiumModal from "./profile/PremiumModal";
 import StatsTab from "./profile/StatsTab";
 import CheckInHistoryTab from "./profile/CheckInHistoryTab";
 import PointsTab from "./profile/PointsTab";
+import AccountInfoView from "./profile/AccountInfoView";
+import AboutView from "./profile/AboutView";
+import PrivacyView from "./profile/PrivacyView";
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const router = useRouter();
@@ -27,6 +30,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [settingsView, setSettingsView] = useState<"main" | "account" | "about" | "privacy">("main");
 
   useEffect(() => { fetchUserProfile(); }, []);
   useEffect(() => { if (user) setActiveTab(!user.username ? "events" : "favorites"); }, [user]);
@@ -179,7 +183,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               <Plus size={15} /> Crear evento
             </button>
           )}
-          <button onClick={() => setActiveTab("settings")} className="w-10 bg-ozio-card hover:bg-ozio-card/70 border border-ozio-card text-ozio-text-secondary rounded-xl transition flex items-center justify-center">
+          <button onClick={() => { setActiveTab("settings"); setSettingsView("main"); }} className="w-10 bg-ozio-card hover:bg-ozio-card/70 border border-ozio-card text-ozio-text-secondary rounded-xl transition flex items-center justify-center">
             <Settings size={16} />
           </button>
         </div>
@@ -199,7 +203,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               <BarChart3 size={22} />
               {!isPremium(user) && <Lock size={12} className="text-ozio-text-dim" />}
             </button>
-            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}>
+            <button onClick={() => { setActiveTab("settings"); setSettingsView("main"); }} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}>
               <Settings size={22} />
             </button>
           </>
@@ -214,7 +218,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
             <button onClick={() => setActiveTab("puntos")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "puntos" ? "border-b-2 border-ozio-orange" : "opacity-30 hover:opacity-60"}`}>
               <DiamondIcon size={22} />
             </button>
-            <button onClick={() => setActiveTab("settings")} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}>
+            <button onClick={() => { setActiveTab("settings"); setSettingsView("main"); }} className={`flex-1 py-3 flex justify-center transition ${activeTab === "settings" ? "text-ozio-text border-b-2 border-white" : "text-ozio-text-dim hover:text-ozio-text-muted"}`}>
               <Settings size={22} />
             </button>
           </>
@@ -308,14 +312,26 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
           {activeTab === "stats" && <StatsTab />}
 
-          {activeTab === "settings" && (
+          {activeTab === "settings" && settingsView === "privacy" && (
+            <PrivacyView onBack={() => setSettingsView("main")} />
+          )}
+
+          {activeTab === "settings" && settingsView === "account" && (
+            <AccountInfoView user={user} onBack={() => setSettingsView("main")} />
+          )}
+
+          {activeTab === "settings" && settingsView === "about" && (
+            <AboutView onBack={() => setSettingsView("main")} />
+          )}
+
+          {activeTab === "settings" && settingsView === "main" && (
             <div className="space-y-2">
               <ThemeToggleItem />
               <SettingsItem icon="🔔" title="Notificaciones" />
-              <SettingsItem icon="🔒" title="Privacidad" />
+              <SettingsItem icon="🔒" title="Privacidad" onClick={() => setSettingsView("privacy")} />
               {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
-              <SettingsItem icon="ℹ️" title="Acerca de" />
-              <SettingsItem icon="👤" title="Información de cuenta" />
+              <SettingsItem icon="ℹ️" title="Acerca de" onClick={() => setSettingsView("about")} />
+              <SettingsItem icon="👤" title="Información de cuenta" onClick={() => setSettingsView("account")} />
               {isVenue && <SettingsItem icon="👑" title="Cambiar plan" onClick={() => router.push("/premium")} />}
               <div className="pt-2 mt-2 border-t border-ozio-darker/80">
                 <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppStore } from "@/lib/stores/venueStore";
 import "leaflet/dist/leaflet.css";
 import { getToken } from "@/lib/hooks/getToken";
+import { useAutoCheckin } from "@/lib/hooks/useAutoCheckin";
 import { Venue } from "./types";
 import { getDistanceKm, getGenreEmoji, getGenreName, getHeatCategory, getHeatStep, getMadridHour, parseDistanceToKm } from "./utils";
 import { MapMarkers } from "./MapMarkers";
@@ -140,6 +141,7 @@ function MyMap() {
   const [routePoints, setRoutePoints] = useState<[number, number][]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [pointsToast, setPointsToast] = useState<number | null>(null);
+  const [autoCheckinToast, setAutoCheckinToast] = useState<string | null>(null);
   const [isNight, setIsNight] = useState(() => {
     const h = getMadridHour();
     return h >= 21 || h < 7;
@@ -328,6 +330,31 @@ function MyMap() {
       });
   }, [currentProfileId, currentUser, setCurrentUser, setVenues, showPointsToast]);
 
+  const showAutoToast = useCallback((msg: string) => {
+    setAutoCheckinToast(msg);
+    setTimeout(() => setAutoCheckinToast(null), 5000);
+  }, []);
+
+  const onAutoCheckIn = useCallback((venueId: string) => {
+    const name = venuesRef.current.find((v) => v.id === venueId)?.name ?? "venue";
+    onCheckIn(venueId);
+    showAutoToast(`Check-in automático en ${name}`);
+  }, [onCheckIn, showAutoToast]);
+
+  const onAutoCheckOut = useCallback((venueId: string) => {
+    const name = venuesRef.current.find((v) => v.id === venueId)?.name ?? "venue";
+    onCheckOut(venueId);
+    showAutoToast(`Check-out automático de ${name}`);
+  }, [onCheckOut, showAutoToast]);
+
+  useAutoCheckin({
+    venues,
+    userLocation,
+    currentProfileId: isUserProfile ? currentProfileId : undefined,
+    onAutoCheckIn,
+    onAutoCheckOut,
+  });
+
   const toggleFavorite = useCallback((venueId: any, isFavorite: boolean) => {
     const token = getToken();
     if (isFavorite) {
@@ -362,6 +389,13 @@ function MyMap() {
       {pointsToast !== null && (
         <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-ozio-orange text-black font-bold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-bounce">
           <span>+{pointsToast} puntos ganados</span>
+        </div>
+      )}
+
+      {/* Auto check-in/out toast */}
+      {autoCheckinToast !== null && (
+        <div role="status" aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] bg-ozio-blue text-white font-semibold px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2">
+          <span>📍 {autoCheckinToast}</span>
         </div>
       )}
 

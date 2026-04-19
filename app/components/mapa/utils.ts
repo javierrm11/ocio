@@ -241,3 +241,33 @@ export function getMadridHour(): number {
     10,
   );
 }
+
+export function isVenueOpen(venue: Venue): boolean {
+  if (venue.events) {
+    const now = new Date();
+    for (const event of venue.events) {
+      if (now >= new Date(event.starts_at) && now <= new Date(event.ends_at)) return true;
+    }
+  }
+
+  if (!venue.schedule || venue.schedule.length === 0) return false;
+
+  const now = new Date();
+  const madridNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Madrid" }));
+  const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const todayName = dayNames[madridNow.getDay()];
+  const today = venue.schedule.find((d) => d.day === todayName);
+
+  if (!today || today.is_closed) return false;
+
+  const parseTime = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  const cur = madridNow.getHours() * 60 + madridNow.getMinutes();
+  const op = parseTime(today.open);
+  const cl = parseTime(today.close);
+
+  return cl < op ? cur >= op || cur < cl : cur >= op && cur < cl;
+}

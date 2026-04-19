@@ -368,7 +368,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
               {isVenue && <SettingsItem icon="👑" title="Cambiar plan" onClick={() => router.push("/premium")} />}
               <div className="pt-2 mt-2 border-t border-ozio-darker/80 space-y-2">
                 <SettingsItem icon="🚪" title="Cerrar sesión" onClick={handleLogout} />
-                <SettingsItem icon="🗑️" title="Eliminar cuenta" onClick={() => setShowDeleteModal(true)} textClassName="text-red-400" />
+                <SettingsItem icon="🗑️" title="Eliminar cuenta" onClick={() => setShowDeleteModal(true)} />
               </div>
             </div>
           )}

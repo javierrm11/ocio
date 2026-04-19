@@ -194,12 +194,7 @@ function NotificationCard({ notification, onClick }: { notification: Notificatio
             <span className="text-ozio-text-dim text-xs whitespace-nowrap">{getTimeAgo(notification.created_at)}</span>
           </div>
           <p className="text-ozio-text-secondary text-sm leading-relaxed mt-0.5">{notification.message}</p>
-          {isUnread && (
-            <div className="mt-2 flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 bg-ozio-blue rounded-full" />
-              <span className="text-ozio-blue text-xs font-medium">Nueva</span>
-            </div>
-          )}
+
         </div>
       </div>
     </div>

@@ -20,6 +20,7 @@ import PointsTab from "./profile/PointsTab";
 import AccountInfoView from "./profile/AccountInfoView";
 import AboutView from "./profile/AboutView";
 import PrivacyView from "./profile/PrivacyView";
+import NotificationsView from "./profile/NotificationsView";
 
 export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [settingsView, setSettingsView] = useState<"main" | "account" | "about" | "privacy">("main");
+  const [settingsView, setSettingsView] = useState<"main" | "account" | "about" | "privacy" | "notifications">("main");
 
   useEffect(() => { fetchUserProfile(); }, []);
   useEffect(() => { if (user) setActiveTab(!user.username ? "events" : "favorites"); }, [user]);
@@ -312,6 +313,10 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
 
           {activeTab === "stats" && <StatsTab />}
 
+          {activeTab === "settings" && settingsView === "notifications" && (
+            <NotificationsView onBack={() => setSettingsView("main")} />
+          )}
+
           {activeTab === "settings" && settingsView === "privacy" && (
             <PrivacyView onBack={() => setSettingsView("main")} />
           )}
@@ -327,7 +332,7 @@ export default function Profile({ onLogout }: { onLogout?: () => void }) {
           {activeTab === "settings" && settingsView === "main" && (
             <div className="space-y-2">
               <ThemeToggleItem />
-              <SettingsItem icon="🔔" title="Notificaciones" />
+              <SettingsItem icon="🔔" title="Notificaciones" onClick={() => setSettingsView("notifications")} />
               <SettingsItem icon="🔒" title="Privacidad" onClick={() => setSettingsView("privacy")} />
               {isVenue && <SettingsItem icon="🏢" title="Información del local" />}
               <SettingsItem icon="ℹ️" title="Acerca de" onClick={() => setSettingsView("about")} />

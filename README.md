@@ -294,7 +294,7 @@ npm run lint
 
 ### Técnico
 - **Realtime con Supabase Channels** — Sustituir el polling del store por suscripciones Realtime para que los check-ins y el ambiente se reflejen en el mapa sin refrescar
-- **Refactorizar `Profile.tsx`** — El componente tiene 1.200 líneas mezclando lógica de usuario, establecimiento, eventos, favoritos e historial; dividirlo en hooks y sub-vistas mejora el mantenimiento
+
 - **Unificar tipo `Venue`** — Hay dos definiciones ligeramente distintas en `venueStore.tsx` y `components/mapa/types.ts`; consolidarlas en `lib/types.ts`
 - **Caché de venues en Service Worker** — Precachear los venues y el tile del mapa para que la PWA funcione offline o con mala conexión
 - **Tests de integración** — Añadir tests para las rutas API críticas (`/api/checkins`, `/api/auth/login`) usando MSW o un entorno de test con Supabase local

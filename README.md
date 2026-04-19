@@ -69,6 +69,9 @@ URL de producción: [ocio-virid.vercel.app](https://ocio-virid.vercel.app)
 
 ### Check-in
 - Check-in basado en ubicación con validación de radio (300 m, fórmula Haversine)
+- **Check-in automático** — si el usuario permanece a menos de 300 m de un local abierto durante 40 minutos, el check-in se activa automáticamente
+- **Check-out automático** — si el usuario sale del rango 300 m y permanece fuera 40 minutos, el check-out se activa automáticamente
+- Toast de confirmación para check-in/out automático
 - Check-out en tiempo real
 - Sincronización inmediata en el mapa y en el store global
 - Historial de check-ins en el perfil
@@ -166,8 +169,9 @@ app/
 │   ├── auth/
 │   │   └── get-user.ts    # Helper para obtener userId desde cookie
 │   ├── hooks/
-│   │   ├── getToken.ts    # Helper para leer token de cookie
-│   │   └── plan.ts        # Comprobación de plan premium
+│   │   ├── getToken.ts       # Helper para leer token de cookie
+│   │   ├── plan.ts           # Comprobación de plan premium
+│   │   └── useAutoCheckin.ts # Hook de check-in/out automático por proximidad
 │   └── utils/
 │       └── distance.ts    # Cálculo de distancia Haversine
 │
@@ -274,6 +278,8 @@ npm run lint
 - [✅] **Design system de colores** — Variables CSS `ozio-*` y `ambience-*` en `globals.css`, registradas en Tailwind
 - [✅] **Fix z-index filtros del mapa**
 - [✅] **Fix color register/botón**
+- [✅] **Check-in/out automático por proximidad** — `useAutoCheckin` detecta transiciones de entrada/salida del radio de 300 m y lanza timers de 40 min
+- [✅] **Mejora de rendimiento del mapa** — `keepBuffer`, `updateWhenIdle` y `updateWhenZooming` en TileLayer para reducir el lag al desplazar
 
 ---
 
@@ -290,7 +296,6 @@ npm run lint
 - **Mapa de calor histórico** — Visualizar en el mapa la afluencia media por día de la semana y hora, usando el historial de check-ins agregado por local
 - **Modo "salida de grupo"** — Crear una sala temporal donde varios usuarios coordinan a qué local van; el mapa muestra los pins del grupo en tiempo real
 - **Descuentos y ofertas** — Los establecimientos pueden publicar promociones con hora de inicio/fin visibles en el mapa con un icono de oferta
-- programar checkin entrada o salida
 
 ### Técnico
 - **Realtime con Supabase Channels** — Sustituir el polling del store por suscripciones Realtime para que los check-ins y el ambiente se reflejen en el mapa sin refrescar

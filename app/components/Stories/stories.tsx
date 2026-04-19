@@ -139,7 +139,7 @@ export default function Stories() {
   return (
     <>
       {/* ── Stories Bar ─────────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto" aria-label="Historias">
+      <section className="max-w-7xl mx-auto pointer-events-none" aria-label="Historias">
         <ul className="flex gap-4 p-4 overflow-x-auto list-none m-0">
 
           
@@ -148,7 +148,7 @@ export default function Stories() {
           {storyGroups.map(group => (
             <li
               key={group.venue_id}
-              className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer"
+              className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer pointer-events-auto"
               onClick={() => openGroup(group)}
             >
               <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-ozio-orange via-ambience-high to-ozio-purple p-0.5">
@@ -231,7 +231,7 @@ export default function Stories() {
 
       {/* ── Story Viewer ─────────────────────────────────────────────────── */}
       {activeGroup && currentStory && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label={activeGroup.venue_name}>
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center pointer-events-auto" role="dialog" aria-modal="true" aria-label={activeGroup.venue_name}>
 
           {/* ✅ Barra de progreso solo del grupo activo */}
           <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">

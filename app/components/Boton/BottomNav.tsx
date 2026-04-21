@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Compass, User, Search, Plus, Home, Heart } from "lucide-react";
 import { useAppStore } from "@/lib/stores/venueStore";
@@ -21,7 +21,17 @@ function BottomNav() {
   const pathname = usePathname();
   const { role } = useUser();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      setKeyboardOpen(vv.height < window.innerHeight * 0.8);
+    };
+    vv.addEventListener("resize", update);
+    return () => vv.removeEventListener("resize", update);
+  }, []);
 
   const isBusiness = role === "business";
   const isAuthenticated = Boolean(getToken());
@@ -49,6 +59,8 @@ function BottomNav() {
     { icon: <Search size={25} />, label: "Buscar", path: "/buscar" },
     { icon: <User size={25} />, label: "Perfil", path: "/profile" },
   ];
+
+  if (keyboardOpen) return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">

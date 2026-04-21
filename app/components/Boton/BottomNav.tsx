@@ -50,7 +50,7 @@ function BottomNav() {
   ];
 
   return (
-    <nav className="absolute bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-999">
+    <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
       <ul className="max-w-md mx-auto grid grid-cols-5 items-center relative py-2 list-none p-0 m-0">
         {navItems.map(({ icon, label, path, special, requiresAuth }) => (
           <li key={path} className="flex justify-center">

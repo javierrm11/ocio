@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Compass, User, Search, Plus, Home, Heart } from "lucide-react";
 import { useAppStore } from "@/lib/stores/venueStore";
 import { getToken } from "@/lib/hooks/getToken";
+import { isNative } from "@/lib/native/capacitor-bridge";
 
 // 🔥 Simulación (cámbialo por tu auth real)
 const useUser = () => {
@@ -21,6 +22,27 @@ function BottomNav() {
   const pathname = usePathname();
   const { role } = useUser();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isNative()) return;
+    import("@capacitor/keyboard").then(({ Keyboard }) => {
+      Promise.all([
+        Keyboard.addListener("keyboardWillShow", (info) => {
+          if (navRef.current) {
+            navRef.current.style.transition = "transform 0.25s ease";
+            navRef.current.style.transform = `translateY(${info.keyboardHeight}px)`;
+          }
+        }),
+        Keyboard.addListener("keyboardWillHide", () => {
+          if (navRef.current) {
+            navRef.current.style.transition = "transform 0.25s ease";
+            navRef.current.style.transform = "translateY(0)";
+          }
+        }),
+      ]);
+    });
+  }, []);
 
   const isBusiness = role === "business";
   const isAuthenticated = Boolean(getToken());
@@ -50,7 +72,7 @@ function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
+    <nav ref={navRef} className="fixed bottom-0 left-0 right-0 bg-ozio-darker border-t border-ozio-darker-800 z-50">
       <ul className="max-w-md mx-auto grid grid-cols-5 items-center relative py-2 list-none p-0 m-0">
         {navItems.map(({ icon, label, path, special, requiresAuth }) => (
           <li key={path} className="flex justify-center">

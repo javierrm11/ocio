@@ -11,6 +11,10 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
   },
   plugins: {
+    Keyboard: {
+      resize: 'none',
+      scrollAssist: false,
+    },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },

@@ -21,7 +21,7 @@ function Header() {
         {/* Logo + wordmark */}
         <Link href="/" className="flex items-center gap-2.5 p-2">
           <div className="w-8 h-8 rounded-lg bg-ozio-purple/10 border border-ozio-purple/40 flex items-center justify-center">
-            <img src="/logo.jpeg" alt="Ozio" className="w-5 h-5 rounded" />
+            <img src="/logo.png" alt="Ozio" className="w-5 h-5 rounded" />
           </div>
           <div className="leading-none">
             <h1 className="text-xl font-semibold tracking-wide text-ozio-text">OZIO</h1>

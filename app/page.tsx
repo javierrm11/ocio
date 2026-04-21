@@ -68,7 +68,7 @@ export default function LandingPage() {
       <nav ref={navRef} className="lp-nav">
         <Link className="lp-brand" href="/">
           <span className="lp-brand-mark">
-            <Image src="/logo.jpeg" alt="Ozio" width={34} height={34} className="lp-brand-logo" />
+            <Image src="/logo.png" alt="Ozio" width={34} height={34} className="lp-brand-logo" />
           </span>
           <span>Ozio</span>
         </Link>

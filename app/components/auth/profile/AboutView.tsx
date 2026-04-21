@@ -135,7 +135,7 @@ export default function AboutView({ onBack }: { onBack: () => void }) {
 
       <div className="flex flex-col items-center gap-2 py-6">
         <div className="rounded-3xl flex items-center justify-center shadow-lg shadow-ozio-blue/20">
-          <Image src="/logo.jpeg" alt="Ozio Logo" width={60} height={60} className="rounded-lg" />
+          <Image src="/logo.png" alt="Ozio Logo" width={60} height={60} className="rounded-lg" />
         </div>
         <h2 className="text-ozio-text text-xl font-black mt-2">Ozio</h2>
         <span className="text-ozio-text-muted text-xs px-3 py-1 bg-ozio-card rounded-full border border-ozio-card/50">

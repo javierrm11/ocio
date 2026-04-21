@@ -303,3 +303,29 @@ npm run lint
 - **Unificar tipo `Venue`** — Hay dos definiciones ligeramente distintas en `venueStore.tsx` y `components/mapa/types.ts`; consolidarlas en `lib/types.ts`
 - **Caché de venues en Service Worker** — Precachear los venues y el tile del mapa para que la PWA funcione offline o con mala conexión
 - **Tests de integración** — Añadir tests para las rutas API críticas (`/api/checkins`, `/api/auth/login`) usando MSW o un entorno de test con Supabase local
+
+
+Pasos manuales que te quedan
+1. Generar iconos PNG para las tiendas
+
+npx capacitor-assets generate --assetPath public/logo.jpeg
+Esto crea todos los tamaños necesarios para iOS y Android.
+
+3. Inicializar y añadir plataformas nativas
+
+npx cap add ios       # requiere macOS + Xcode
+npx cap add android   # requiere Android Studio
+npx cap sync
+
+1. iOS — añadir permisos en ios/App/App/Info.plist
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Ozio necesita tu ubicación para mostrarte locales cercanos y hacer check-in automático.</string>
+<key>UIBackgroundModes</key>
+<array>
+  <string>fetch</string>
+  <string>remote-notification</string>
+</array>
+
+
+npx cap run ios       # iOS Simulator
+npx cap run android   # Android Emulator

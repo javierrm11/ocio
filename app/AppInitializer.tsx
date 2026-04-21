@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { useAppStore, StoryGroup } from "@/lib/stores/venueStore";
 import { getToken } from '@/lib/hooks/getToken';
+import { isNative, getNativeGeolocation } from '@/lib/native/capacitor-bridge';
+import { setupPushNotifications } from '@/lib/native/push-setup';
 
 
 export function AppInitializer() {
@@ -19,8 +21,25 @@ export function AppInitializer() {
 
   useEffect(() => {
     if (loaded) return;
-    // ✅ NUEVO: obtener ubicación del usuario
-    if (navigator.geolocation) {
+
+    // Geolocalización: usar plugin nativo en Capacitor, browser API en web
+    if (isNative()) {
+      getNativeGeolocation().then(async (Geo) => {
+        if (!Geo) { setLocationDenied(true); return; }
+        try {
+          await Geo.requestPermissions();
+          const pos = await Geo.getCurrentPosition({ enableHighAccuracy: true });
+          setUserLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          Geo.watchPosition({ enableHighAccuracy: true }, (position) => {
+            if (position) {
+              setUserLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+            }
+          });
+        } catch {
+          setLocationDenied(true);
+        }
+      });
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
@@ -104,6 +123,11 @@ export function AppInitializer() {
               is_favorite: favoriteIds.includes(v.id),
             })),
           );
+
+          // Registrar push notifications nativas tras confirmar sesión
+          if (profileData[0]?.id) {
+            setupPushNotifications(profileData[0].id).catch(() => {});
+          }
         } catch {
           // Auth falló, el contenido público ya está visible
         }

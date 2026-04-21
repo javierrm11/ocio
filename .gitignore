@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# capacitor native platforms (generados con npx cap add)
+/android/
+/ios/
+
+# ide
+.idea/
+
+# capacitor assets source
+/assets/
+supabase-push-tokens.sql

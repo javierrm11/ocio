@@ -39,8 +39,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       if (typeof window !== 'undefined') {
         const maxAge = 60 * 60 * 24 * 30; // 30 días
-        const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-        document.cookie = `session=1; path=/; max-age=${maxAge}; SameSite=Strict${secure}`;
+        // SameSite=None;Secure required so WebViews (Capacitor) accept the cookie cross-context
+        document.cookie = `session=1; path=/; max-age=${maxAge}; SameSite=None; Secure`;
       }
 
       // ✅ Forzar recarga del store con el nuevo token

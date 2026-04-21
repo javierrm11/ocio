@@ -24,27 +24,13 @@ function BottomNav() {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   useEffect(() => {
-    let blurTimer: ReturnType<typeof setTimeout>;
-
-    const onFocusIn = (e: FocusEvent) => {
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable) {
-        clearTimeout(blurTimer);
-        setKeyboardOpen(true);
-      }
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      setKeyboardOpen(vv.height < window.innerHeight * 0.8);
     };
-
-    const onFocusOut = () => {
-      blurTimer = setTimeout(() => setKeyboardOpen(false), 200);
-    };
-
-    document.addEventListener("focusin", onFocusIn);
-    document.addEventListener("focusout", onFocusOut);
-    return () => {
-      document.removeEventListener("focusin", onFocusIn);
-      document.removeEventListener("focusout", onFocusOut);
-      clearTimeout(blurTimer);
-    };
+    vv.addEventListener("resize", update);
+    return () => vv.removeEventListener("resize", update);
   }, []);
 
   const isBusiness = role === "business";

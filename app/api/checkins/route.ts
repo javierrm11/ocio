@@ -68,10 +68,12 @@ export async function POST(request: Request) {
   }
 
   // Comprobar si hay evento activo ahora mismo
-  const now = new Date();
+  const nowUTC = new Date();
+  // Convertir a hora local de España para comparar con los horarios del local
+  const now = new Date(nowUTC.toLocaleString("en-US", { timeZone: "Europe/Madrid" }));
   const hasActiveEvent = Array.isArray((venue as any).events) &&
     (venue as any).events.some(
-      (e: any) => new Date(e.starts_at) <= now && new Date(e.ends_at) >= now
+      (e: any) => new Date(e.starts_at) <= nowUTC && new Date(e.ends_at) >= nowUTC
     );
 
   // Comprobar si el local está abierto según su horario

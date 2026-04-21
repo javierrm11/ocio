@@ -140,7 +140,7 @@ export function VenuePanel({
 
       {/* Panel */}
       <aside
-        className="fixed z-[1002] bg-ozio-dark overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90vh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
+        className="fixed z-[1002] bg-ozio-dark overflow-y-auto bottom-0 left-0 right-0 rounded-t-3xl max-h-[90dvh] animate-slide-up md:bottom-0 md:top-0 md:left-auto md:right-0 md:rounded-none md:w-96 md:max-h-full md:h-full md:animate-slide-right lg:w-[420px]"
         aria-label={`Detalles de ${venue.name}`}
         onClick={(e) => e.stopPropagation()}
       >

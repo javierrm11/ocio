@@ -279,6 +279,7 @@ function MyMap() {
   }, []);
 
   const closeModal = useCallback(() => setSelectedVenue(null), []);
+  const dismissCelebration = useCallback(() => setCheckinCelebration(null), []);
 
   const fetchRoute = useCallback(async (destLat: number, destLng: number) => {
     if (!userLocation) {
@@ -439,7 +440,7 @@ function MyMap() {
         <CheckinCelebration
           name={checkinCelebration.name}
           avatar={checkinCelebration.avatar}
-          onDismiss={() => setCheckinCelebration(null)}
+          onDismiss={dismissCelebration}
         />
       )}
 
